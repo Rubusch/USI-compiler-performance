@@ -3,3 +3,9 @@
 *.exe
 *.s
 notes.txt
+
+## eclipse setup
+*version.ini
+*.plugins/org.eclipse.jdt.core/variablesAndContainers.dat
+*.plugins/org.eclipse.core.resources/.projects/*/.location
+
