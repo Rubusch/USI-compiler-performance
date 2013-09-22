@@ -5,6 +5,7 @@
 *.exe
 *.s
 *.out
+*.orig
 
 ## eclipse setup
 ## resources: https://github.com/github/gitignore/blob/master/Global/Eclipse.gitignore
