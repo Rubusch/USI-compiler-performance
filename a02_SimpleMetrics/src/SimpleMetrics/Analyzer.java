@@ -67,9 +67,20 @@ public class Analyzer {
 		
 		totalNumberOfInstructionsByOpcode = new HashMap< String, Integer >();
 
+		if( 0 >= args.length ){
+			die( "Usage: java Analyzer <path to .jar>" );
+		}
 		final String jarFileName = args[0];
+
 		System.out.println( "analyzing '" + jarFileName + "'" );
-		final JarFile jar = new JarFile( jarFileName );
+		JarFile jar = null;
+		try{
+			jar = new JarFile( jarFileName );
+		}catch(IOException exp){
+			die("FAILED - see issues with the provided filename / path");
+			exp.printStackTrace();
+		}
+
 		final Enumeration<JarEntry> entries = jar.entries();
 		while( entries.hasMoreElements() ){
 			final JarEntry entry = entries.nextElement();
@@ -171,5 +182,10 @@ public class Analyzer {
 			String strOpcode = org.objectweb.asm.util.Printer.OPCODES[ Integer.valueOf(me.getKey()).intValue() ];
 			System.out.println( "  " + String.valueOf(me.getValue()) + "\t - " + strOpcode );
 		}
+	}
+	
+	private static void die( String msg){
+		System.out.println( msg );
+		System.exit(-1);
 	}
 };
