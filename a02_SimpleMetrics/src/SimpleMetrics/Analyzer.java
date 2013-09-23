@@ -147,20 +147,20 @@ public class Analyzer {
 
 		// output
 		System.out.println( "\nRESULT: ");
-		System.out.println( "  Number of classes '" + numberOfClasses + "'");
-		System.out.println( "  Number of methods '" + numberOfMethods + "'");
-		System.out.println( "  Total number of instructions '" + totalNumberOfInstructions + "'");
+
+		System.out.println( numberOfClasses + "\t - Number of classes (incl. interfaces and enums)" );
+		System.out.println( numberOfMethods + "\t - Number of concrete non-native, non-abstract methods (methods with code)");
+		System.out.println( totalNumberOfInstructions + "\t - Total number of instructions (you have to avoid ASM internal instructions with opcode -1)");
 		printOpcodes();
-		System.out.println( "  Total number of method invocation instructions '" + totalNumberOfMethodInvocationInstructions + "'");
-		System.out.println( "  Total number of conditional branch instructions '" + totalNumberOfConditionalBranchInstructions + "'");
+		System.out.println( totalNumberOfMethodInvocationInstructions + "\t - Total number of method invocation instructions (== call sites)");
+		System.out.println( totalNumberOfConditionalBranchInstructions + "\t - Total number of conditional branch instructions (this excludes GOTO)");
 
 		System.out.println( "\nREADY." );
 		jar.close();
 	}
 
 	private static void printOpcodes(){
-		System.out.println("  number of each opcode:");
-		System.out.println( "\toccurance\t - topcode" );
+		System.out.println("Total number of instructions by opcode (ignoring instructions with opcode -1):");
 		Set<Entry<String, Integer>> set = totalNumberOfInstructionsByOpcode.entrySet();
 		@SuppressWarnings("rawtypes")
 		Iterator iter = set.iterator();
@@ -168,9 +168,8 @@ public class Analyzer {
 		while( iter.hasNext() ){
 			@SuppressWarnings("unchecked")
 			Map.Entry<String, Integer> me = (Map.Entry<String, Integer>) iter.next();
-
 			String strOpcode = org.objectweb.asm.util.Printer.OPCODES[ Integer.valueOf(me.getKey()).intValue() ];
-			System.out.println("\t" + String.valueOf(me.getValue()) + "\t - " + strOpcode );
+			System.out.println( "  " + String.valueOf(me.getValue()) + "\t - " + strOpcode );
 		}
 	}
 };
