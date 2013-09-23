@@ -31,13 +31,34 @@ public class Analyzer {
 		int numberOfMethods = 0;
 		int totalNumberOfInstructions = 0;
 		int totalNumberOfMethodInvocationInstructions = 0; // TODO
-		final List< Integer > callOpcodes; // = [168]; // FIXME Integer types in list
-		callOpcodes = new ArrayList< Integer >(); // FIXME
+		final List< Integer > callOpcodes; // = [ 182, 183, 184, 185, 186 ]; // FIXME Integer types in list
+		callOpcodes = new ArrayList< Integer >();
+		// TODO improve this
+		callOpcodes.add( new Integer(182) );
+		callOpcodes.add( new Integer(183) );
+		callOpcodes.add( new Integer(184) );
+		callOpcodes.add( new Integer(185) );
+		callOpcodes.add( new Integer(186) );
 
 		int totalNumberOfConditionalBranchInstructions = 0; // TODO
 		// 148, 149, 150, 151, 152,   no branching opcodes?!
 		final List< Integer > branchOpcodes; // = [ 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166]; // FIXME
 		branchOpcodes = new ArrayList< Integer >(); // FIXME
+		// TODO improve this
+		branchOpcodes.add( new Integer(153) );
+		branchOpcodes.add( new Integer(154) );
+		branchOpcodes.add( new Integer(155) );
+		branchOpcodes.add( new Integer(156) );
+		branchOpcodes.add( new Integer(157) );
+		branchOpcodes.add( new Integer(158) );
+		branchOpcodes.add( new Integer(159) );
+		branchOpcodes.add( new Integer(160) );
+		branchOpcodes.add( new Integer(161) );
+		branchOpcodes.add( new Integer(162) );
+		branchOpcodes.add( new Integer(163) );
+		branchOpcodes.add( new Integer(164) );
+		branchOpcodes.add( new Integer(165) );
+		branchOpcodes.add( new Integer(166) );
 
 		final String jarFileName = args[0];
 		System.out.println( "analyzing '" + jarFileName + "'" );
@@ -81,6 +102,7 @@ public class Analyzer {
 
 						for( AbstractInsnNode instructionNode : instructionList.toArray() ){
 							opcode = instructionNode.getOpcode();
+//							instructionNode.
 							if( -1 != opcode ){
 //								System.out.println("  opcode '" + instructionNode.getOpcode() + "'"); // XXX
 								// total number of instructions
