@@ -20,7 +20,7 @@ import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodNode;
 
 /*
- * TASK
+ * ASSIGNMENT02
  * 
  * Number of classes (incl. interfaces and enums)
  * Number of concrete non-native, non-abstract methods (methods with code)
