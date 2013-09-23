@@ -20,6 +20,8 @@ import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodNode;
 
 /*
+ * TASK
+ * 
  * Number of classes (incl. interfaces and enums)
  * Number of concrete non-native, non-abstract methods (methods with code)
  * Total number of instructions (you have to avoid ASM internal instructions with opcode -1)
@@ -45,7 +47,6 @@ public class Analyzer {
 		callOpcodes.add( new Integer(186) );
 
 		int totalNumberOfConditionalBranchInstructions = 0; // TODO
-		// 148, 149, 150, 151, 152,   no branching opcodes?!
 		final List< Integer > branchOpcodes; // = [ 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166]; // FIXME
 		branchOpcodes = new ArrayList< Integer >(); // FIXME
 		// TODO improve this
@@ -118,15 +119,14 @@ public class Analyzer {
 
 								// append opcode statistics
 								Integer cnt = null;
-								String strOpcode = org.objectweb.asm.util.Printer.OPCODES[opcode];
-								if( null != (cnt = totalNumberOfInstructionsByOpcode.get(strOpcode))){
+								if( null != (cnt = totalNumberOfInstructionsByOpcode.get( String.valueOf(opcode) ))){
 									// opcode already in hashmap
 									++cnt;
 								}else{
 									// opcode is new, new element in hashmap
 									cnt = new Integer(1);
 								}
-								totalNumberOfInstructionsByOpcode.put(String.valueOf(strOpcode), cnt);
+								totalNumberOfInstructionsByOpcode.put( String.valueOf(opcode), cnt);
 
 								// if instruction is a method call (opcode "invoke")
 								if( callOpcodes.contains( Integer.valueOf( opcode )) ){
@@ -140,12 +140,10 @@ public class Analyzer {
 							}
 						}
 					}
-
-//					System.out.println( "  method instructions '" + String.valueOf( methodNode.instructions.size()) + "'");
+//					System.out.println( "  method instructions '" + String.valueOf( methodNode.instructions.size()) + "'"); // TODO rm
 				}
 			}
 		}
-
 
 		// output
 		System.out.println( "\nRESULT: ");
@@ -156,23 +154,23 @@ public class Analyzer {
 		System.out.println( "  Total number of method invocation instructions '" + totalNumberOfMethodInvocationInstructions + "'");
 		System.out.println( "  Total number of conditional branch instructions '" + totalNumberOfConditionalBranchInstructions + "'");
 
-
 		System.out.println( "\nREADY." );
 		jar.close();
 	}
 
 	private static void printOpcodes(){
 		System.out.println("  number of each opcode:");
-
 		System.out.println( "\toccurance\t - topcode" );
-
 		Set<Entry<String, Integer>> set = totalNumberOfInstructionsByOpcode.entrySet();
 		@SuppressWarnings("rawtypes")
 		Iterator iter = set.iterator();
+		// TODO generate list of elements and then sort
 		while( iter.hasNext() ){
 			@SuppressWarnings("unchecked")
 			Map.Entry<String, Integer> me = (Map.Entry<String, Integer>) iter.next();
-			System.out.println("\t" + String.valueOf(me.getValue()) + "\t - " + me.getKey() );
+
+			String strOpcode = org.objectweb.asm.util.Printer.OPCODES[ Integer.valueOf(me.getKey()).intValue() ];
+			System.out.println("\t" + String.valueOf(me.getValue()) + "\t - " + strOpcode );
 		}
 	}
 };
