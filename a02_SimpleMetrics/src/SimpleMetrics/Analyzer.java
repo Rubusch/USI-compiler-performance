@@ -5,7 +5,11 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -24,7 +28,7 @@ import org.objectweb.asm.tree.MethodNode;
  * Total number of conditional branch instructions (this excludes GOTO)
  */
 public class Analyzer {
-	private HashMap<Integer, Integer> totalNumberOfInstructionsByOpcode; // FIXME
+	private static HashMap<String, Integer> totalNumberOfInstructionsByOpcode;
 
 	public static void main(String[] args) throws IOException {
 		int numberOfClasses = 0;
@@ -59,6 +63,8 @@ public class Analyzer {
 		branchOpcodes.add( new Integer(164) );
 		branchOpcodes.add( new Integer(165) );
 		branchOpcodes.add( new Integer(166) );
+		
+		totalNumberOfInstructionsByOpcode = new HashMap< String, Integer >();
 
 		final String jarFileName = args[0];
 		System.out.println( "analyzing '" + jarFileName + "'" );
@@ -78,7 +84,7 @@ public class Analyzer {
 				// TODO check enums are contained?
 				// TODO check interfaces are contained?
 				classReader.accept( classNode, ClassReader.SKIP_FRAMES );
-				System.out.println("  class '" + classNode.name + "'");
+//				System.out.println("  class '" + classNode.name + "'");
 				numberOfClasses += 1;
 
 				// TODO check, interface is same as class, sometimes (so classNodes include number of interfaces? )
@@ -102,20 +108,32 @@ public class Analyzer {
 
 						for( AbstractInsnNode instructionNode : instructionList.toArray() ){
 							opcode = instructionNode.getOpcode();
-//							instructionNode.
+
+//							System.out.println( "XXX " + instructionNode.toString() ); // XXX
+
 							if( -1 != opcode ){
 //								System.out.println("  opcode '" + instructionNode.getOpcode() + "'"); // XXX
 								// total number of instructions
 								totalNumberOfInstructions += 1;
 
-								// TODO append entry to hashmap or update value if key is already in hashmap
+								// append opcode statistics
+								Integer cnt = null;
+								String strOpcode = org.objectweb.asm.util.Printer.OPCODES[opcode];
+								if( null != (cnt = totalNumberOfInstructionsByOpcode.get(strOpcode))){
+									// opcode already in hashmap
+									++cnt;
+								}else{
+									// opcode is new, new element in hashmap
+									cnt = new Integer(1);
+								}
+								totalNumberOfInstructionsByOpcode.put(String.valueOf(strOpcode), cnt);
 
-								// TODO if instruction is a call (opcode)
+								// if instruction is a method call (opcode "invoke")
 								if( callOpcodes.contains( Integer.valueOf( opcode )) ){
 									totalNumberOfMethodInvocationInstructions += 1;
 								}
 
-								// TODO if instruction is a branch (opcode), no GOTO!!
+								// if instruction is a branch (opcode), w/o GOTO!!
 								if( branchOpcodes.contains( Integer.valueOf( opcode )) ){
 									totalNumberOfConditionalBranchInstructions += 1;
 								}
@@ -128,25 +146,33 @@ public class Analyzer {
 			}
 		}
 
+
 		// output
-		System.out.println( "RESULT: ");
+		System.out.println( "\nRESULT: ");
 		System.out.println( "  Number of classes '" + numberOfClasses + "'");
 		System.out.println( "  Number of methods '" + numberOfMethods + "'");
 		System.out.println( "  Total number of instructions '" + totalNumberOfInstructions + "'");
 		printOpcodes();
 		System.out.println( "  Total number of method invocation instructions '" + totalNumberOfMethodInvocationInstructions + "'");
 		System.out.println( "  Total number of conditional branch instructions '" + totalNumberOfConditionalBranchInstructions + "'");
+
+
+		System.out.println( "\nREADY." );
 		jar.close();
 	}
 
 	private static void printOpcodes(){
-		int key = -1;
-		int value = -1;
-		
-		// TODO print totalNumberOfInstructionsByOpcode
-		
 		System.out.println("  number of each opcode:");
-		// TODO iterate over key list
-		// TODO print value to each key
+
+		System.out.println( "\toccurance\t - topcode" );
+
+		Set<Entry<String, Integer>> set = totalNumberOfInstructionsByOpcode.entrySet();
+		@SuppressWarnings("rawtypes")
+		Iterator iter = set.iterator();
+		while( iter.hasNext() ){
+			@SuppressWarnings("unchecked")
+			Map.Entry<String, Integer> me = (Map.Entry<String, Integer>) iter.next();
+			System.out.println("\t" + String.valueOf(me.getValue()) + "\t - " + me.getKey() );
+		}
 	}
 };
