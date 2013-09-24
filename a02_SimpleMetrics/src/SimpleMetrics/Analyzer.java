@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -36,35 +38,25 @@ public class Analyzer {
 		int numberOfClasses = 0;
 		int numberOfMethods = 0;
 		int totalNumberOfInstructions = 0;
-		int totalNumberOfMethodInvocationInstructions = 0; // TODO
-		final List< Integer > callOpcodes; // = [ 182, 183, 184, 185, 186 ]; // FIXME Integer types in list
-		callOpcodes = new ArrayList< Integer >();
-		// TODO improve this
-		callOpcodes.add( new Integer(182) );
-		callOpcodes.add( new Integer(183) );
-		callOpcodes.add( new Integer(184) );
-		callOpcodes.add( new Integer(185) );
-		callOpcodes.add( new Integer(186) );
 
-		int totalNumberOfConditionalBranchInstructions = 0; // TODO
-		final List< Integer > branchOpcodes; // = [ 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166]; // FIXME
-		branchOpcodes = new ArrayList< Integer >(); // FIXME
-		// TODO improve this
-		branchOpcodes.add( new Integer(153) );
-		branchOpcodes.add( new Integer(154) );
-		branchOpcodes.add( new Integer(155) );
-		branchOpcodes.add( new Integer(156) );
-		branchOpcodes.add( new Integer(157) );
-		branchOpcodes.add( new Integer(158) );
-		branchOpcodes.add( new Integer(159) );
-		branchOpcodes.add( new Integer(160) );
-		branchOpcodes.add( new Integer(161) );
-		branchOpcodes.add( new Integer(162) );
-		branchOpcodes.add( new Integer(163) );
-		branchOpcodes.add( new Integer(164) );
-		branchOpcodes.add( new Integer(165) );
-		branchOpcodes.add( new Integer(166) );
-		
+		int totalNumberOfMethodInvocationInstructions = 0;
+		final List< Integer > callOpcodes  = new ArrayList< Integer >();
+		{
+			final int []iOpcodes = { 182, 183, 184, 185, 186 };
+			for( int iOpcode : iOpcodes){ callOpcodes.add( new Integer( iOpcode )); }
+		}
+
+		int totalNumberOfConditionalBranchInstructions = 0;
+
+		final List< Integer > branchOpcodes;
+		branchOpcodes = new ArrayList< Integer >();
+		{
+			final int []iOpcodes = { 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166 };
+			for( int iOpcode : iOpcodes){
+				branchOpcodes.add(new Integer(iOpcode));
+			}
+		}
+
 		totalNumberOfInstructionsByOpcode = new HashMap< String, Integer >();
 
 		if( 0 >= args.length ){
@@ -85,7 +77,7 @@ public class Analyzer {
 		while( entries.hasMoreElements() ){
 			final JarEntry entry = entries.nextElement();
 			if( !entry.isDirectory() && entry.getName().endsWith( ".class" )){
-//				System.out.println(entry.getName());
+//				System.out.println(entry.getName()); // XXX
 				final InputStream is = jar.getInputStream(entry);
 
 				final ClassReader classReader = new ClassReader(is);
@@ -93,13 +85,13 @@ public class Analyzer {
 				final ClassNode classNode = new ClassNode();
 
 				// count number of classes
-				// TODO check enums are contained?
-				// TODO check interfaces are contained?
+// TODO check enums are contained?
+// TODO check interfaces are contained?
 				classReader.accept( classNode, ClassReader.SKIP_FRAMES );
-//				System.out.println("  class '" + classNode.name + "'");
+//				System.out.println("  class '" + classNode.name + "'"); // XXX
 				numberOfClasses += 1;
 
-				// TODO check, interface is same as class, sometimes (so classNodes include number of interfaces? )
+// TODO check, interface is same as class, sometimes (so classNodes include number of interfaces? )
 //				List<String> interfaces = classNode.interfaces;
 //				for( final String interfaceNode : interfaces ){
 //					System.out.println("XXX interface '" + interfaceNode + "'");
@@ -108,10 +100,10 @@ public class Analyzer {
 				int opcode = -1;
 				@SuppressWarnings("unchecked")
 				final List<MethodNode> methods = classNode.methods;
-//				System.out.println("  Number of methods in class '" + String.valueOf(methods.size()) + "'");
+//				System.out.println("  Number of methods in class '" + String.valueOf(methods.size()) + "'"); // XXX
 
 				for( final MethodNode methodNode : methods ){
-//					System.out.println( "  method '" + methodNode.name + methodNode.desc + "'" );
+//					System.out.println( "  method '" + methodNode.name + methodNode.desc + "'" ); // XXX
 					InsnList instructionList = methodNode.instructions;
 
 					// number of non-native and non-empty methods					
@@ -120,11 +112,8 @@ public class Analyzer {
 
 						for( AbstractInsnNode instructionNode : instructionList.toArray() ){
 							opcode = instructionNode.getOpcode();
-
-//							System.out.println( "XXX " + instructionNode.toString() ); // XXX
-
 							if( -1 != opcode ){
-//								System.out.println("  opcode '" + instructionNode.getOpcode() + "'"); // XXX
+
 								// total number of instructions
 								totalNumberOfInstructions += 1;
 
@@ -151,7 +140,6 @@ public class Analyzer {
 							}
 						}
 					}
-//					System.out.println( "  method instructions '" + String.valueOf( methodNode.instructions.size()) + "'"); // TODO rm
 				}
 			}
 		}
@@ -172,15 +160,10 @@ public class Analyzer {
 
 	private static void printOpcodes(){
 		System.out.println("Total number of instructions by opcode (ignoring instructions with opcode -1):");
-		Set<Entry<String, Integer>> set = totalNumberOfInstructionsByOpcode.entrySet();
-		@SuppressWarnings("rawtypes")
-		Iterator iter = set.iterator();
-		// TODO generate list of elements and then sort
-		while( iter.hasNext() ){
-			@SuppressWarnings("unchecked")
-			Map.Entry<String, Integer> me = (Map.Entry<String, Integer>) iter.next();
-			String strOpcode = org.objectweb.asm.util.Printer.OPCODES[ Integer.valueOf(me.getKey()).intValue() ];
-			System.out.println( "  " + String.valueOf(me.getValue()) + "\t - " + strOpcode );
+		SortedSet<String> keys = new TreeSet<String>(totalNumberOfInstructionsByOpcode.keySet());
+		for( String key : keys){
+			String szOpcode = org.objectweb.asm.util.Printer.OPCODES[ Integer.valueOf(key).intValue()];
+			System.out.println( String.valueOf(totalNumberOfInstructionsByOpcode.get(key)) + "\t\t - " + szOpcode);
 		}
 	}
 	
