@@ -47,7 +47,9 @@ public class Analyzer {
 		final List< Integer > branchOpcodes;
 		branchOpcodes = new ArrayList< Integer >();
 		{
-			final int []iOpcodes = { 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166 };
+			final int []iOpcodes = { 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166,
+					172, 173, 174, 175, 176, 177,
+					198, 199 };
 			for( int iOpcode : iOpcodes){
 				branchOpcodes.add(new Integer(iOpcode));
 			}
@@ -73,7 +75,6 @@ public class Analyzer {
 		while( entries.hasMoreElements() ){
 			final JarEntry entry = entries.nextElement();
 			if( !entry.isDirectory() && entry.getName().endsWith( ".class" )){
-//				System.out.println(entry.getName()); // XXX
 				final InputStream is = jar.getInputStream(entry);
 
 				final ClassReader classReader = new ClassReader(is);
@@ -82,24 +83,14 @@ public class Analyzer {
 
 				// count number of classes
 // TODO check enums are contained?
-// TODO check interfaces are contained?
 				classReader.accept( classNode, ClassReader.SKIP_FRAMES );
-//				System.out.println("  class '" + classNode.name + "'"); // XXX
 				numberOfClasses += 1;
-
-// TODO check, interface is same as class, sometimes (so classNodes include number of interfaces? )
-//				List<String> interfaces = classNode.interfaces;
-//				for( final String interfaceNode : interfaces ){
-//					System.out.println("XXX interface '" + interfaceNode + "'");
-//				}
 
 				int opcode = -1;
 				@SuppressWarnings("unchecked")
 				final List<MethodNode> methods = classNode.methods;
-//				System.out.println("  Number of methods in class '" + String.valueOf(methods.size()) + "'"); // XXX
 
 				for( final MethodNode methodNode : methods ){
-//					System.out.println( "  method '" + methodNode.name + methodNode.desc + "'" ); // XXX
 					InsnList instructionList = methodNode.instructions;
 
 					// number of non-native and non-empty methods					
