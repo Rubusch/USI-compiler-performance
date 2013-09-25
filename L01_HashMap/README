@@ -1,4 +1,18 @@
-ant -Dhost.name=x86_64-osx -Dconfig.name=BaseBaseMarkSweep
+Lab Assignment01
+
+Lothar Rubusch
+
+Content:
+ - README (console output)
+ - screenshot of rdb
+ - L01.java
+
+
+
+
+
+## rdb was built with following option, as also for target development (see rdb build)
+$ ant -Dhost.name=x86_64-osx -Dconfig.name=BaseBaseMarkSweep
 
 
 ## running w/o NullPointerException
@@ -29,17 +43,161 @@ idebian<13:26:55>::Lothar("/opt/git_java_performance/L01_HashMap/");
 $ /opt/hg_jike/dist/BaseBaseMarkSweep_x86_64-osx/rvm L01
 Exception in thread "MainThread" java.lang.NullPointerException
    at L01.main(L01.java:17)
-idebian<13:26:58>::Lothar("/opt/git_java_performance/L01_HashMap/");
-$ /opt/hg_jike/dist/BaseBaseMarkSweep_x86_64-osx/rdb L01
+
+
+## checked with rdb from rdb built repo (console output)
+
+Lothars-MacBook-Pro<16:18:36>::Lothar("/opt/git_java_performance/L01_HashMap/");
+$ /opt/hg_rgb/rdb/dist/development_x86_64-osx/rdb L01
 Welcome to Jikes RDB (Research DeBugger)
 Jikes RDB: RVM launch arg: L01
+BootImageCompiler: init (opt compiler)
 Scan JTOC.
-done scanning in 641ms.
+done scanning in 3999ms.
 findBaseAddress(3100000C)
   the given interior address already is a base address
 Create inspector for 3100000C
   Entity base address: 3100000C
   Entity kind: BOOT_RECORD
 OI: Inspecting object of type Lorg/jikesrvm/runtime/BootRecord;
+1380118817:645928 [  271]: RVMLauncher.launch: my pid 271
+1380118817:646525 [  271]: RVMLauncher.launch: my task 5135
+PROCESS: p_flag 400a [P_CONTROLT | P_NOCLDSTOP | P_EXEC]
+CPU INFO:
+cpu_type    CPU_TYPE_X86 (7)
+cpu_subtype CPU_SUBTYPE_486 (4)
+running     YES
+slot_num    0
+is_master   YES
+1380118817:651222 [  271]: RVMLauncher.launch: Launch JikesRVM as /opt/hg_rgb/rdb/dist/development_x86_64-osx/JikesRVM -X:ic=/opt/hg_rgb/rdb/dist/development_x86_64-osx/RVM.code.image -X:id=/opt/hg_rgb/rdb/dist/development_x86_64-osx/RVM.data.image -X:ir=/opt/hg_rgb/rdb/dist/development_x86_64-osx/RVM.rmap.image -X:vmClasses=/opt/hg_rgb/rdb/dist/development_x86_64-osx/jksvm.jar:/opt/hg_rgb/rdb/dist/development_x86_64-osx/rvmrt.jar -Djava.home=/opt/hg_rgb/rdb/dist/development_x86_64-osx -Dgnu.classpath.home.url=file:/opt/hg_rgb/rdb/dist/development_x86_64-osx -Dgnu.classpath.vm.shortname=JikesRVM -Duser.timezone=CET -Duser.home=/Users/Lothar -Duser.name=root -Duser.dir=/opt/git_java_performance/L01_HashMap -Dos.name=Darwin -Dos.arch=x86_64 -Dos.version=12.3.0 L01
+1380118817:663963 [  271]: initialized, releasing the child
+1380118817:664045 [  277]: start_jikesrvm: wait for parent to initialize
+1380118817:664079 [  277]: start_jikesrvm: ptrace( PT_TRACE_ME, 0, NULL, 0 ) returned 0
+1380118817:664085 [  277]: start_jikesrvm: ptrace( PT_SIGEXC, 0, NULL, 0 ) returned 0
+1380118817:664258 [  271]: RVMLauncher.launch: RVM pid 277
+1380118817:664735 [  271]: LiveImage.lookupSymbol: command line: nm /opt/hg_rgb/rdb/dist/development_x86_64-osx/JikesRVM
+1380118817:729937 [  271]: nm output "00008af0 T _bootThread", extracted address 8af0
+1380118817:730527 [  271]: write byte CC to 8af0, tail af0, page 8000 length fff
+1380118817:731837 [  271]: RVMLauncher.launch: set a hidden breakpoint at 00008AF0 ("bootThread" 55)
+1380118817:732152 [  271]: IPC.ptcont: received message from 14707 "EXC_SOFTWARE"
+1380118817:732185 [  271]: IPC.ptcont: ptrace( PT_THUPDATE, 277, 14707, 0 ) returned 0
+1380118817:732196 [  271]: IPC.ptcont: responded to the first ptrace
+1380118817:732218 [  271]: RVMLauncher.launch: PT_CONTINUE 0
+1380118817:780742 [  271]: IPC.bpwait: received message from thread 14707 "EXC_BREAKPOINT"
+1380118817:780920 [  271]: write byte 55 to 8af0, tail af0, page 8000 length fff
+1380118817:781013 [  271]: RVMLauncher.launch: reset a hidden breakpoint at 00008AF0
+1380118817:781407 [  271]: IPC.resumervm: send a message to enable normal execution
+1380118817:781443 [  271]: Breakpoint.resume: done
+1380118817:974416 [  271]: IPC.bpwait: received message from thread 1460f "EXC_SOFTWARE"
+1380118817:974516 [  271]: IPC.bpwait: this is a unix signal exception, may want to let the app handle it.
+1380118817:974579 [  271]: Breakpoint.listen: Stopped at location 418373ab in thread 0001460f, type SOFTWARE, code 0000000B00010003, status STOPPED, exitcode 0, signal 0
+1380118817:975455 [  271]: RVM memory regions 157. No error.
+1380118817:976004 [  271]: Read region bounds 157. No error.
+Incremental Scan JTOC.
+1380118818: 95971 [  271]: Read from 31000000   34562048 bytes, expected size   34562048 (time to read   119).
+1380118818:104060 [  271]: Read from 41000000    1048576 bytes, expected size    1048576 (time to read     2).
+1380118818:106714 [  271]: Read from 75200000    1048576 bytes, expected size    1048576 (time to read     1).
+1380118818:113035 [  271]: Read from 75000000    1048576 bytes, expected size    1048576 (time to read     2).
+1380118818:172928 [  271]: Read from 35000000   17035264 bytes, expected size   17035264 (time to read    59).
+1380118818:180869 [  271]: Read from 75400000    1048576 bytes, expected size    1048576 (time to read     1).
+1380118818:190011 [  271]: Read from 41800000    1048576 bytes, expected size    1048576 (time to read     1).
+1380118818:199604 [  271]: Read from 75500000    1048576 bytes, expected size    1048576 (time to read     0).
+done scanning in 233ms.
+1380118818:351846 [  271]: Read from bf800000    8388608 bytes, expected size    8388608 (time to read     6).
+Time to setup thread    14707 state   234 (number of frames   5)
+1380118818:579122 [  271]: Read from 41c00000    1048576 bytes, expected size    1048576 (time to read     2).
+Time to setup thread     970B state    80 (number of frames   5)
+Time to setup thread    1150B state    65 (number of frames  10)
+Time to setup thread    1140B state     4 (number of frames  10)
+Time to setup thread    1092B state     3 (number of frames  10)
+Time to setup thread    1130B state     5 (number of frames  10)
+Time to setup thread    14507 state     2 (number of frames  10)
+Time to setup thread    14803 state     2 (number of frames  10)
+1380118818:741565 [  271]: Read from 41d00000    1048576 bytes, expected size    1048576 (time to read     1).
+Time to setup thread    14903 state     3 (number of frames  10)
+Time to setup thread    14A03 state     4 (number of frames  10)
+Time to setup thread    14B03 state     2 (number of frames  10)
+Time to setup thread    14C03 state     2 (number of frames  10)
+Time to setup thread    14D03 state     2 (number of frames  12)
+1380118818:755785 [  271]: Read from 41e00000    1048576 bytes, expected size    1048576 (time to read     0).
+Time to setup thread    14E03 state     5 (number of frames  10)
+Time to setup thread    14F03 state     2 (number of frames  12)
+Time to setup thread    15003 state     3 (number of frames  12)
+Time to setup thread    15103 state     4 (number of frames  12)
+Time to setup thread    15203 state     3 (number of frames  12)
+1380118818:774282 [  271]: Read from 41f00000    1048576 bytes, expected size    1048576 (time to read     1).
+Time to setup thread    1460F state     3 (number of frames   7)
+1380118818:776216 [  271]: RVMLauncher.launch: total update time 801 ms.
+Create inspector for 3100000C
+  Entity base address: 3100000C
+  Entity kind: BOOT_RECORD
+OI: Inspecting object of type Lorg/jikesrvm/runtime/BootRecord;
+findBaseAddress(31000000)
+  aligning address to                        31000000
+  adding header size, will start search from 3100000C
+  will end search before                     30F0000C
+  found valid base at                        3100000C
+  kind=BootRecord
+  getObjectEndAddress(3100000C)
+    tib=3305EA60
+    rvmClass=321AD5EC
+    size=596
+  entity at that base ends at                31000254
+  given address is inside the found entity
+Create inspector for 31000000
+  Entity base address: 3100000C
+  Entity kind: BOOT_RECORD
+OI: Inspecting object of type Lorg/jikesrvm/runtime/BootRecord;
+findBaseAddress(31000000)
+  aligning address to                        31000000
+  adding header size, will start search from 3100000C
+  will end search before                     30F0000C
+  found valid base at                        3100000C
+  kind=BootRecord
+  getObjectEndAddress(3100000C)
+    tib=3305EA60
+    rvmClass=321AD5EC
+    size=596
+  entity at that base ends at                31000254
+  given address is inside the found entity
+Create inspector for 31000000
+  Entity base address: 3100000C
+  Entity kind: BOOT_RECORD
+OI: Inspecting object of type Lorg/jikesrvm/runtime/BootRecord;
+findBaseAddress(4183720C)
+  the given interior address already is a base address
+Create inspector for 4183720C
+  Entity base address: 4183720C
+  Entity kind: CODE_ARRAY
+MemberDescriptionPanel: text=<html><b>L01</b>.<b>main</b>(java.lang.String[]): void
+Disassemble code in address range [4183720C, 41837428[ (540 bytes)
+  Generating binary file with code: /var/folders/zz/zyxvpxvq6csfxvn_n0000000000000/T/jikesrdb-binary-for-disassembly3073854855463483160.bin
+  Lanuching ndisasm to disassemble the generated file
+    ndisasm
+    -b
+    32
+    -o
+    0x4183720C
+    /var/folders/zz/zyxvpxvq6csfxvn_n0000000000000/T/jikesrdb-binary-for-disassembly3073854855463483160.bin
+  Draining ndisasm's stdout/stderr
+BootImageCompiler: init (opt compiler)
+findBaseAddress(4183720C)
+  the given interior address already is a base address
+Create inspector for 4183720C
+  Entity base address: 4183720C
+  Entity kind: CODE_ARRAY
+MemberDescriptionPanel: text=<html><b>L01</b>.<b>main</b>(java.lang.String[]): void
+Disassemble code in address range [4183720C, 41837428[ (540 bytes)
+  Generating binary file with code: /var/folders/zz/zyxvpxvq6csfxvn_n0000000000000/T/jikesrdb-binary-for-disassembly3127742896474794689.bin
+  Lanuching ndisasm to disassemble the generated file
+    ndisasm
+    -b
+    32
+    -o
+    0x4183720C
+    /var/folders/zz/zyxvpxvq6csfxvn_n0000000000000/T/jikesrdb-binary-for-disassembly3127742896474794689.bin
+  Draining ndisasm's stdout/stderr
+BootImageCompiler: init (opt compiler)
+^C1380119312:824483 [  271]: RVMLauncher.shutdown: Shutdown RVM status = 0
 
 
