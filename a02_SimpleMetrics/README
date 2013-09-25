@@ -1,0 +1,185 @@
+Assignment02
+
+Lothar Rubusch
+
+Content:
+ - README
+ - Analyzer.java (package SimplesMetrics)
+ - Screenshot
+ 
+ Changes:
+ - cover letter ("README")
+ - print additional output of local classes.jar (the file was checked out from
+   source repo, so is not exactly the official iTunes version of classes.jar,
+   the numbers thus may differ! )
+ - clean from folder structure (src, bin, .classpath, etc.)
+ 
+The content of the originally posted package, can be found in the folder "old".
+
+
+
+analyzing '/System/Library/Frameworks/JavaVM.framework/Versions/1.6/Classes/classes.jar'
+
+RESULT: 
+20799    - Number of classes (incl. interfaces and enums)
+162331   - Number of concrete non-native, non-abstract methods (methods with code)
+4896578  - Total number of instructions (you have to avoid ASM internal instructions with opcode -1)
+Total number of instructions by opcode (ignoring instructions with opcode -1):
+38584        - ACONST_NULL
+646      - LCONST_1
+17381        - ISUB
+760      - LSUB
+1035         - FSUB
+757      - DSUB
+3529         - IMUL
+276      - LMUL
+2419         - FMUL
+1862         - DMUL
+1516         - IDIV
+182      - LDIV
+3952         - FCONST_0
+461      - FDIV
+749      - DDIV
+710      - IREM
+107      - LREM
+3        - FREM
+17       - DREM
+817      - INEG
+53       - LNEG
+69       - FNEG
+162      - DNEG
+1354         - FCONST_1
+2525         - ISHL
+385      - LSHL
+1553         - ISHR
+157      - LSHR
+838      - IUSHR
+317      - LUSHR
+7705         - IAND
+1833         - LAND
+2795         - IOR
+389      - LOR
+456      - FCONST_2
+597      - IXOR
+92       - LXOR
+21516        - IINC
+2505         - I2L
+1532         - I2F
+1065         - I2D
+1319         - L2I
+63       - L2F
+96       - L2D
+699      - F2I
+1308         - DCONST_0
+25       - F2L
+5954         - F2D
+479      - D2I
+49       - D2L
+1910         - D2F
+2175         - I2B
+1048         - I2C
+635      - I2S
+3613         - LCMP
+596      - FCMPL
+828      - DCONST_1
+286      - FCMPG
+1196         - DCMPL
+682      - DCMPG
+60972        - IFEQ
+29055        - IFNE
+4025         - IFLT
+3295         - IFGE
+1212         - IFGT
+5571         - IFLE
+9340         - IF_ICMPEQ
+111148       - BIPUSH
+16629        - IF_ICMPNE
+3655         - IF_ICMPLT
+17074        - IF_ICMPGE
+2825         - IF_ICMPGT
+4708         - IF_ICMPLE
+3298         - IF_ACMPEQ
+6863         - IF_ACMPNE
+92494        - GOTO
+1111         - JSR
+457      - RET
+53919        - SIPUSH
+1949         - TABLESWITCH
+1386         - LOOKUPSWITCH
+40274        - IRETURN
+1500         - LRETURN
+765      - FRETURN
+871      - DRETURN
+78369        - ARETURN
+78130        - RETURN
+61072        - GETSTATIC
+15377        - PUTSTATIC
+248977       - LDC
+273413       - GETFIELD
+96723        - PUTFIELD
+386556       - INVOKEVIRTUAL
+158615       - INVOKESPECIAL
+74262        - INVOKESTATIC
+61231        - INVOKEINTERFACE
+94970        - NEW
+6591         - NEWARRAY
+54029        - ANEWARRAY
+14094        - ARRAYLENGTH
+32951        - ATHROW
+40447        - CHECKCAST
+10043        - INSTANCEOF
+2892         - MONITORENTER
+6522         - MONITOREXIT
+87       - MULTIANEWARRAY
+31075        - IFNULL
+20078        - IFNONNULL
+10545        - ICONST_M1
+215505       - ILOAD
+10219        - LLOAD
+7290         - FLOAD
+9403         - DLOAD
+1010436      - ALOAD
+129168       - ICONST_0
+111286       - ICONST_1
+5442         - IALOAD
+538      - LALOAD
+1396         - FALOAD
+1280         - DALOAD
+62169        - ICONST_2
+14763        - AALOAD
+3952         - BALOAD
+2140         - CALOAD
+412      - SALOAD
+71488        - ISTORE
+3504         - LSTORE
+3126         - FSTORE
+3240         - DSTORE
+144431       - ASTORE
+11908        - ICONST_3
+10020        - ICONST_4
+14346        - IASTORE
+6258         - ICONST_5
+912      - LASTORE
+2598         - FASTORE
+1213         - DASTORE
+169159       - AASTORE
+7680         - BASTORE
+4811         - CASTORE
+8617         - SASTORE
+32130        - POP
+147      - POP2
+300688       - DUP
+3701         - LCONST_0
+3075         - DUP_X1
+211      - DUP_X2
+857      - DUP2
+63       - DUP2_X1
+11       - DUP2_X2
+24127        - IADD
+1303         - LADD
+2315         - FADD
+1173         - DADD
+680664   - Total number of method invocation instructions (== call sites)
+419584   - Total number of conditional branch instructions (this excludes GOTO)
+
+READY.

@@ -19,7 +19,7 @@ import org.objectweb.asm.tree.MethodNode;
 
 /*
  * ASSIGNMENT02
- * 
+ *
  * Number of classes (incl. interfaces and enums)
  * Number of concrete non-native, non-abstract methods (methods with code)
  * Total number of instructions (you have to avoid ASM internal instructions with opcode -1)
