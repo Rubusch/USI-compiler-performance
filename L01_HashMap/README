@@ -1,0 +1,45 @@
+ant -Dhost.name=x86_64-osx -Dconfig.name=BaseBaseMarkSweep
+
+
+## running w/o NullPointerException
+
+idebian<13:24:40>::Lothar("/opt/git_java_performance/L01_HashMap/");
+$ javac ./L01.java 
+idebian<13:24:50>::Lothar("/opt/git_java_performance/L01_HashMap/");
+$ java L01
+value: 111
+
+READY.
+idebian<13:25:09>::Lothar("/opt/git_java_performance/L01_HashMap/");
+$ /opt/hg_jike/dist/BaseBaseMarkSweep_x86_64-osx/rvm L01
+value: 111
+
+READY.
+
+
+## when turned on the NullPointerException
+
+idebian<13:25:16>::Lothar("/opt/git_java_performance/L01_HashMap/");
+$ javac ./L01.java 
+idebian<13:26:15>::Lothar("/opt/git_java_performance/L01_HashMap/");
+$ java L01
+Exception in thread "main" java.lang.NullPointerException
+    at L01.main(L01.java:17)
+idebian<13:26:55>::Lothar("/opt/git_java_performance/L01_HashMap/");
+$ /opt/hg_jike/dist/BaseBaseMarkSweep_x86_64-osx/rvm L01
+Exception in thread "MainThread" java.lang.NullPointerException
+   at L01.main(L01.java:17)
+idebian<13:26:58>::Lothar("/opt/git_java_performance/L01_HashMap/");
+$ /opt/hg_jike/dist/BaseBaseMarkSweep_x86_64-osx/rdb L01
+Welcome to Jikes RDB (Research DeBugger)
+Jikes RDB: RVM launch arg: L01
+Scan JTOC.
+done scanning in 641ms.
+findBaseAddress(3100000C)
+  the given interior address already is a base address
+Create inspector for 3100000C
+  Entity base address: 3100000C
+  Entity kind: BOOT_RECORD
+OI: Inspecting object of type Lorg/jikesrvm/runtime/BootRecord;
+
+
