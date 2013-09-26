@@ -57,7 +57,6 @@ public class ControlFlowGraphDataStructure {
 		}
 	}
 
-// TODO first idx, then szIns
 	private void append( final String mnemonic, final int idx ){
 		// initial
 		if( 0 == content.size() ){
@@ -87,10 +86,6 @@ public class ControlFlowGraphDataStructure {
 		if( null == ptr){
 			// this starts a new block
 
-// TODO rm
-			// dst: resolve idx -> idx:mnemonic
-//System.out.println("XXX append key: '" + idx + "', val '" + String.valueOf(idx + ":" + mnemonic + "'")); // TODO rm
-
 			// handle int dst to sz dst mapping, for dotty
 			dstResolvMap.put(Integer.valueOf(idx), String.valueOf(idx + ":" + mnemonic));
 
@@ -98,10 +93,12 @@ public class ControlFlowGraphDataStructure {
 			ptr = new ArrayList<String>();
 			content.add( ptr );
 
-			if( 0 != idx && fallthruOpcodes.contains( instructions.get(idx).getOpcode() )){
+System.out.println( "XXX if-issue - ptr==null, opcode " + instructions.get(idx).getOpcode()); // TODO rm
+			if( 0 < idx && fallthruOpcodes.contains( instructions.get(idx).getOpcode() )){
+System.out.println( "XXX if-issue - opcode was branching"); // TODO rm
 				String src = String.valueOf(idx-1 + ":" + Printer.OPCODES[this.instructions.get(idx-1).getOpcode()]);
 				String dst = String.valueOf(idx + ":" + mnemonic);
-				fallthruList.add(src + "->" + dst);
+				fallthruList.add(src + " -> " + dst);
 			}
 		}
 
@@ -155,9 +152,6 @@ public class ControlFlowGraphDataStructure {
 			}
 
 			for( String src : srces){
-// FIXME value is "null" something...
-//				System.out.println( "XXX val " + src);
-//				System.out.println("  " + src + " -> " + me.getKey());
 				System.out.println("  " + src + " -> " + dst);
 			}
 
@@ -169,7 +163,6 @@ System.out.println("XXX size of fallthrulist " + fallthruList.size());
 		System.out.println("}");
 	}
 
-// TODO rn forwardJump
 	private void forward(String src, int dst){
 		String vals;
 		if( null != (vals = srctable.get( String.valueOf(dst) )) ){
@@ -177,7 +170,6 @@ System.out.println("XXX size of fallthrulist " + fallthruList.size());
 		}else{
 			vals = "";
 		}
-// FIXME vals seems to contain "null"?!
 		vals += src;
 
 System.out.println( "XXX null issue, vals " + vals ); // TODO rm
@@ -187,7 +179,7 @@ System.out.println( "XXX null issue, vals " + vals ); // TODO rm
 
 // TODO rn backwardJump
 	private void backward( String src, int dst){
-		System.out.println( "XXX BACKWARD - src: " + src + ", dst: " + dst); // TODO rm
+//		System.out.println( "XXX BACKWARD - src: " + src + ", dst: " + dst); // TODO rm
 // TODO check by comparing hash list if ge, then, go into corresponding list, find target node, and split list (insert second part after, w/ hashtable entry)
 
 		// find block index
@@ -241,7 +233,6 @@ System.out.println( "XXX null issue, vals " + vals ); // TODO rm
 			}
 		} // splitting was necessary
 
-
 		// updating table
 		String vals = srctable.get( String.valueOf(dst) );
 		if( null != vals ){
@@ -252,24 +243,13 @@ System.out.println( "XXX null issue, vals " + vals ); // TODO rm
 		vals += src;
 
 		srctable.put( String.valueOf(dst), vals );
-//		System.out.println( "XXX BACKWARD - idxBlock " + idxBlock + ", idxIns " + idxIns);
 
-
-		// get keys (dests) as list
-/*
-		ArrayList<String> arlist = new ArrayList<String>();
-		for(Map.Entry<String,String> map : hmap.entrySet()){
-			
-		}
-//*/
-		// if dests[idx] < dest
-		
 		ptr = null;
 	}
 
 	public void appendInstruction( final AbstractInsnNode ins, final int idx ){
 		final int opcode = ins.getOpcode();
-		final String mnemonic = (opcode==-1 ? "" : Printer.OPCODES[instructions.get(idx).getOpcode()]);
+		String mnemonic = (opcode==-1 ? "" : Printer.OPCODES[this.instructions.get(idx).getOpcode()]);
 // FIXME some instructions seem not to be in the OPCODES table
 
 // TODO rm
@@ -292,7 +272,12 @@ System.out.println( "XXX null issue, vals " + vals ); // TODO rm
 				backward( new String(idx + ":" + mnemonic), dest);
 			}
 			return;
+		}else if( AbstractInsnNode.LABEL == ins.getType() ){
+			// pseudo-instruction (branch or exception target)
+			mnemonic = "label";
 		}
+		
+		// append other type of instructions and nops (-1)
 		append( mnemonic, idx );
 	}
 }
