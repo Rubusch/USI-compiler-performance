@@ -29,29 +29,79 @@ public class ControlFlowGraphDataStructure {
 	private ArrayList< ArrayList< String > > content;
 	private ArrayList< String > ptr;
 
-	public ControlFlowGraphDataStructure(){
+	// table of dst int (keys) -> sz (values)
+	private HashMap< Integer, String > dstResolvMap;
+	
+	// list of readymade strings for dotty for fallthrough connections for if_ instructions
+	private ArrayList< String > fallthruList;
+
+	private ArrayList<Integer> fallthruOpcodes;
+	
+	private final InsnList instructions;
+
+	public ControlFlowGraphDataStructure( final InsnList instructions ){
+		this.instructions = instructions;
+
 		srctable = new HashMap< String, String >();
 		content = new ArrayList< ArrayList< String >>();
-// TODO
+		dstResolvMap = new HashMap< Integer, String>();
+		fallthruList = new ArrayList< String >();
+		fallthruOpcodes = new ArrayList<Integer>();
+		{
+			final int []iOpcodes = { 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166,
+					172, 173, 174, 175, 176, 177,
+					198, 199 };
+			for( int iOpcode : iOpcodes){
+				fallthruOpcodes.add(new Integer(iOpcode));
+			}
+		}
 	}
 
 // TODO first idx, then szIns
 	private void append( final String mnemonic, final int idx ){
-		// new block or start
-		if( null == ptr){
-			ptr = new ArrayList<String>();
-			content.add( ptr );
-		}
-
 		// initial
 		if( 0 == content.size() ){
-			content.add( ptr );
+			// first entry, the start link
+			ptr = new ArrayList<String>();
 			ptr.add( "S" );
+			content.add( ptr );
+			ptr = null;
+
+			// update source hashmap (for forward)
 			srctable.put( String.valueOf(idx), "S" );
 
-			ptr = null;
+			// just link start
+			String dst = String.valueOf(idx + ":" + mnemonic);
+			fallthruList.add("S->" + dst);
+		}
+
+		// a former forward link connected to this instruction, so we provoke starting a new block
+		if( null != ptr){
+			if(1 < ptr.size() && null != srctable.get(String.valueOf(idx))){
+				ptr = null;
+			}
+		}
+
+
+		if( null == ptr){
+			// this starts a new block
+
+// TODO rm
+			// dst: resolve idx -> idx:mnemonic
+//System.out.println("XXX append key: '" + idx + "', val '" + String.valueOf(idx + ":" + mnemonic + "'")); // TODO rm
+
+			// handle int dst to sz dst mapping, for dotty
+			dstResolvMap.put(Integer.valueOf(idx), String.valueOf(idx + ":" + mnemonic));
+
+			// start a new block list
 			ptr = new ArrayList<String>();
 			content.add( ptr );
+
+			if( 0 != idx && fallthruOpcodes.contains( instructions.get(idx).getOpcode() )){
+				String src = String.valueOf(idx-1 + ":" + Printer.OPCODES[this.instructions.get(idx-1).getOpcode()]);
+				String dst = String.valueOf(idx + ":" + mnemonic);
+				fallthruList.add(src + "->" + dst);
+			}
 		}
 
 		// append current item
@@ -60,8 +110,6 @@ public class ControlFlowGraphDataStructure {
 
 	public void printDotty(){
 		System.out.println("\n---");
-//		ControlFlowGraphExtractor.die("XXX"); // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
 		if( 0 == content.size() ) return;
 
 // TODO better use String / Stringbuffer instead of this ;)
@@ -99,14 +147,10 @@ public class ControlFlowGraphDataStructure {
 
 // TODO improve this by a hashmap
 			String dst = "";
-			for( int idxDst=0; idxDst < content.size(); ++idxDst){
-//				System.out.println( "XXX get(0) - size " + content.get(idxDst).size());
-//////////////
-				System.out.println( "XXX key " + me.getKey()); // + ", get(0) " + content.get(idxDst).get(0) ); // TODO rm
-				if( me.getKey().equals( content.get(idxDst).get(0).split(":")[0] )){
-					dst = content.get(idxDst).get(0);
-					break;
-				}
+
+			if( null == (dst = dstResolvMap.get(Integer.valueOf(String.valueOf(me.getKey()))))){
+				dst = "TODO_" + me.getKey();
+				// TODO if dst == null?			
 			}
 
 			for( String src : srces){
@@ -114,6 +158,10 @@ public class ControlFlowGraphDataStructure {
 //				System.out.println( "XXX val " + src);
 //				System.out.println("  " + src + " -> " + me.getKey());
 				System.out.println("  " + src + " -> " + dst);
+			}
+
+			for( String str : fallthruList){
+				System.out.println("  " + str);
 			}
 		}
 		System.out.println("}");
@@ -151,6 +199,7 @@ public class ControlFlowGraphDataStructure {
 		int idxIns = 0;
 		if(dst != Integer.valueOf( content.get(idxBlock).get(idxIns).split(":")[0]).intValue()){
 			// splitting necessary, elem is not at idx 0
+// TODO test
 			for( idxIns = 1; idxIns < content.get(idxBlock).size(); ++idxIns){
 //				System.out.println( "XXX BACKWARD - " + content.get(idxBlock).get(idxIns).split(":")[0] );
 				if( dst == Integer.valueOf( content.get(idxBlock).get(idxIns).split(":")[0]).intValue()){
@@ -179,10 +228,13 @@ public class ControlFlowGraphDataStructure {
 			// insert new list
 // FIXME list is empty, why?
 			if( secHalfBlock.size() > 0){
-				System.out.println( "AAA secHalfBlock.size() " + secHalfBlock.size() );
+//				System.out.println( "AAA secHalfBlock.size() " + secHalfBlock.size() );
 				content.add(idxBlock+1, secHalfBlock);
+
+				System.out.println("XXX BACKWARD - check first val of secHalf: " + content.get(idxBlock+1).get(0)); // TODO rm
+				dstResolvMap.put(Integer.valueOf(idxIns), content.get(idxBlock+1).get(0));
 			}
-        } // splitting necessary
+		} // splitting was necessary
 
 
 		// updating table
@@ -194,7 +246,6 @@ public class ControlFlowGraphDataStructure {
 		vals += src;
 
 		srctable.put( String.valueOf(dst), vals );
-
 //		System.out.println( "XXX BACKWARD - idxBlock " + idxBlock + ", idxIns " + idxIns);
 
 
@@ -207,13 +258,12 @@ public class ControlFlowGraphDataStructure {
 //*/
 		// if dests[idx] < dest
 		
-//ControlFlowGraphExtractor.die("XXX STOP XXX"); // TODO rm
 		ptr = null;
 	}
 
-	public void appendInstruction( final AbstractInsnNode ins, final int idx, final InsnList instructions ){
+	public void appendInstruction( final AbstractInsnNode ins, final int idx ){
 		final int opcode = ins.getOpcode();
-		final String mnemonic = (opcode==-1 ? "" : Printer.OPCODES[ins.getOpcode()]);
+		final String mnemonic = (opcode==-1 ? "" : Printer.OPCODES[instructions.get(idx).getOpcode()]);
 // FIXME some instructions seem not to be in the OPCODES table
 
 // TODO rm
@@ -229,6 +279,7 @@ public class ControlFlowGraphDataStructure {
 			final int dest = instructions.indexOf(targetInstruction);
 			if( idx < dest ){
 				append( mnemonic, idx);
+//System.out.println("XXX instruction " + Printer.OPCODES[instructions.get(idx).getOpcode()] + ", opcode " + instructions.get(idx).getOpcode());  // TODO rm
 				forward( new String(idx + ":" + mnemonic), dest );
 			}else{
 				append( mnemonic, idx);

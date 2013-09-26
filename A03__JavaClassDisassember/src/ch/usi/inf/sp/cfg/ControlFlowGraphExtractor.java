@@ -70,11 +70,11 @@ public final class ControlFlowGraphExtractor {
 	 * @param method
 	 */
 	private void flowMethod( final MethodNode method ){
-		ControlFlowGraphDataStructure controlFlow = new ControlFlowGraphDataStructure();
 		final InsnList instructions = method.instructions;
+		ControlFlowGraphDataStructure controlFlow = new ControlFlowGraphDataStructure( instructions );
 		for( int idx=0; idx<instructions.size(); ++idx){
 			final AbstractInsnNode instruction = instructions.get(idx);
-			controlFlow.appendInstruction(instruction, idx, instructions);
+			controlFlow.appendInstruction(instruction, idx);
 		}
 		controlFlow.printDotty();
 	}
