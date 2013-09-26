@@ -171,13 +171,16 @@ System.out.println("XXX size of fallthrulist " + fallthruList.size());
 
 // TODO rn forwardJump
 	private void forward(String src, int dst){
-		String vals = srctable.get( String.valueOf(dst) );
-		if( null != vals ){
+		String vals;
+		if( null != (vals = srctable.get( String.valueOf(dst) )) ){
 			vals += ",";
+		}else{
+			vals = "";
 		}
+// FIXME vals seems to contain "null"?!
 		vals += src;
 
-//System.out.println();
+System.out.println( "XXX null issue, vals " + vals ); // TODO rm
 		srctable.put( String.valueOf(dst), vals );
 		ptr = null;
 	}
@@ -229,7 +232,6 @@ System.out.println("XXX size of fallthrulist " + fallthruList.size());
 			}
 
 			// insert new list
-// FIXME list is empty, why?
 			if( secHalfBlock.size() > 0){
 //				System.out.println( "AAA secHalfBlock.size() " + secHalfBlock.size() );
 				content.add(idxBlock+1, secHalfBlock);
@@ -243,8 +245,9 @@ System.out.println("XXX size of fallthrulist " + fallthruList.size());
 		// updating table
 		String vals = srctable.get( String.valueOf(dst) );
 		if( null != vals ){
-//			System.out.println( "XXX BACKWARD - vals not null!");
 			vals += ",";
+		}else{
+			vals = "";
 		}
 		vals += src;
 
