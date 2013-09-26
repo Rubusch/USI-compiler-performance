@@ -92,10 +92,25 @@ public class ControlFlowGraphDataStructure {
 		Iterator iter = set.iterator();
 		while( iter.hasNext() ){
 			Map.Entry me = (Map.Entry) iter.next();
-			String []vals = String.valueOf(me.getValue()).split(",");
-			for( String val : vals){
+			String []srces = String.valueOf(me.getValue()).split(",");
+
+// TODO improve this by a hashmap
+			String dst = "";
+			for( int idxDst=0; idxDst < content.size(); ++idxDst){
+//				System.out.println( "XXX get(0) - size " + content.get(idxDst).size());
+//////////////
+				System.out.println( "XXX key " + me.getKey()); // + ", get(0) " + content.get(idxDst).get(0) ); // TODO rm
+				if( me.getKey().equals( content.get(idxDst).get(0).split(":")[0] )){
+					dst = content.get(idxDst).get(0);
+					break;
+				}
+			}
+
+			for( String src : srces){
 // FIXME value is "null" something...
-				System.out.println("  " + val + " -> " + me.getKey());
+//				System.out.println( "XXX val " + src);
+//				System.out.println("  " + src + " -> " + me.getKey());
+				System.out.println("  " + src + " -> " + dst);
 			}
 		}
 		System.out.println("}");
@@ -145,16 +160,29 @@ public class ControlFlowGraphDataStructure {
 
 		// split block at idxIns (first half)
 		ArrayList< String > secHalfBlock = new ArrayList< String >();
-		for( int idx=idxIns+1; idx < content.get(idxBlock).size(); ++idx){
-			secHalfBlock.add(content.get(idxBlock).get(idx));
+		for( int idx=idxIns; idx < content.get(idxBlock).size(); ++idx){
+//			secHalfBlock.add(content.get(idxBlock).get(idx));
+			secHalfBlock.add( new String( content.get(idxBlock).get(idx) ));
+// TODO check
 		}
 
-		for( int idx = content.get(idxBlock).size()-1; idx > idxIns ; --idx){
+		for( int idx = content.get(idxBlock).size()-1; idx >= idxIns ; --idx){
 			content.get(idxBlock).remove(idx);
 		}
 
-		content.add(idxBlock+1, secHalfBlock);
+		// insert new list
+// FIXME list is empty, why?
+		if( secHalfBlock.size() > 0){
+			System.out.println( "AAA secHalfBlock.size() " + secHalfBlock.size() );
+			content.add(idxBlock+1, secHalfBlock);
+		}
 
+		
+		
+		
+		
+		
+		
 		// updating table
 		String vals = srctable.get( String.valueOf(dst) );
 		if( null != vals ){
