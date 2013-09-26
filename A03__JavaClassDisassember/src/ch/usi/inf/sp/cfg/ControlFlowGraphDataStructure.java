@@ -19,6 +19,9 @@ import org.objectweb.asm.util.Printer;
  * @author Lothar Rubusch
  */
 public class ControlFlowGraphDataStructure {
+// TODO change map key = src -> val = dst, but one src, may point to several dsts, as also one dst may have different srcs
+// TODO find better datastructure	
+	
 	// table of jump point sources, key = destination, value = source
 	private HashMap< String, String > srctable;
 
@@ -130,7 +133,7 @@ public class ControlFlowGraphDataStructure {
 
 // TODO rn backwardJump
 	private void backward( String src, int dst){
-//		System.out.println( "XXX BACKWARD - src: " + src + ", dst: " + dst); // TODO rm
+		System.out.println( "XXX BACKWARD - src: " + src + ", dst: " + dst); // TODO rm
 // TODO check by comparing hash list if ge, then, go into corresponding list, find target node, and split list (insert second part after, w/ hashtable entry)
 
 		// find block index
@@ -146,43 +149,42 @@ public class ControlFlowGraphDataStructure {
 
 		// find instruction index, in block
 		int idxIns = 0;
-		for( ; idxIns < content.get(idxBlock).size(); ++idxIns){
-//			System.out.println( "XXX BACKWARD - " + content.get(idxBlock).get(idxIns).split(":")[0] );
-			if( dst == Integer.valueOf( content.get(idxBlock).get(idxIns).split(":")[0]).intValue()){
-				break;
+		if(dst != Integer.valueOf( content.get(idxBlock).get(idxIns).split(":")[0]).intValue()){
+			// splitting necessary, elem is not at idx 0
+			for( idxIns = 1; idxIns < content.get(idxBlock).size(); ++idxIns){
+//				System.out.println( "XXX BACKWARD - " + content.get(idxBlock).get(idxIns).split(":")[0] );
+				if( dst == Integer.valueOf( content.get(idxBlock).get(idxIns).split(":")[0]).intValue()){
+					break;
+				}
 			}
-		}
 
-		// checks
-		if( idxIns == content.get(idxBlock).size()){
-			ControlFlowGraphExtractor.die("something went wrong, refering a lower index that was not parsed already?! ");
-		}
+			// checks
+			if( idxIns == content.get(idxBlock).size()){
+				ControlFlowGraphExtractor.die("something went wrong, refering a lower index that was not parsed already?! ");
+			}
 
-		// split block at idxIns (first half)
-		ArrayList< String > secHalfBlock = new ArrayList< String >();
-		for( int idx=idxIns; idx < content.get(idxBlock).size(); ++idx){
-//			secHalfBlock.add(content.get(idxBlock).get(idx));
-			secHalfBlock.add( new String( content.get(idxBlock).get(idx) ));
+			// split block at idxIns (first half)
+			ArrayList< String > secHalfBlock = new ArrayList< String >();
+			for( int idx=idxIns; idx < content.get(idxBlock).size(); ++idx){
+//				secHalfBlock.add(content.get(idxBlock).get(idx));
+				secHalfBlock.add( new String( content.get(idxBlock).get(idx) ));
 // TODO check
-		}
+			}
 
-		for( int idx = content.get(idxBlock).size()-1; idx >= idxIns ; --idx){
-			content.get(idxBlock).remove(idx);
-		}
+			// clean secHalfElements still in former list
+			for( int idx = content.get(idxBlock).size()-1; idx >= idxIns ; --idx){
+				content.get(idxBlock).remove(idx);
+			}
 
-		// insert new list
+			// insert new list
 // FIXME list is empty, why?
-		if( secHalfBlock.size() > 0){
-			System.out.println( "AAA secHalfBlock.size() " + secHalfBlock.size() );
-			content.add(idxBlock+1, secHalfBlock);
-		}
+			if( secHalfBlock.size() > 0){
+				System.out.println( "AAA secHalfBlock.size() " + secHalfBlock.size() );
+				content.add(idxBlock+1, secHalfBlock);
+			}
+        } // splitting necessary
 
-		
-		
-		
-		
-		
-		
+
 		// updating table
 		String vals = srctable.get( String.valueOf(dst) );
 		if( null != vals ){
