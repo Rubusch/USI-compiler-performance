@@ -51,7 +51,6 @@ public final class ControlFlowGraphExtractor {
 		System.out.println( "\nREADY.");
 	}
 
-
 	private void flow( ClassNode cnode, String methodNameAndDescriptor ){
 		final List<MethodNode> methods = cnode.methods;
 		for( int idx=0; idx<methods.size(); ++idx){
@@ -75,6 +74,6 @@ public final class ControlFlowGraphExtractor {
 			final AbstractInsnNode instruction = instructions.get(idx);
 			controlFlow.appendInstruction(instruction, idx);
 		}
-		controlFlow.printDotty();
+		controlFlow.dottyPrint();
 	}
 }

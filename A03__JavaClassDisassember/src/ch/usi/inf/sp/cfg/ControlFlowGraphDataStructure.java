@@ -12,15 +12,12 @@ import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.util.Printer;
 
-// TODO perhaps better inherit from ArrayList< ArrayList >
-
 /**
  * 
  * @author Lothar Rubusch
  */
 public class ControlFlowGraphDataStructure {
-// TODO change map key = src -> val = dst, but one src, may point to several dsts, as also one dst may have different srcs
-// TODO find better datastructure	
+// TODO this is a complete mess of data structures, mapping, etc.!
 	
 	// table of jump point sources, key = destination, value = source
 	private HashMap< String, String > srctable;
@@ -59,23 +56,6 @@ public class ControlFlowGraphDataStructure {
 	}
 
 	private void append( final String mnemonic, final int idx ){
-		// initial
-//		if( 0 == content.size() ){
-			// first entry, the start link
-//			ptr = new ArrayList<String>();
-//			ptr.add( "S" );
-//			content.add( ptr );
-//			ptr = null;
-
-			// update source hashmap (for forward)
-//			srctable.put( String.valueOf(idx), "S" );
-
-			// just link start
-//			String dst = String.valueOf(idx + "> " + mnemonic);
-
-			// no fallthruList for 'S' is covered by srcTable
-//		}
-
 		// a former forward link connected to this instruction, so we provoke starting a new block
 		if( null != ptr){
 			if(1 < ptr.size() && null != srctable.get(String.valueOf(idx))){
@@ -83,24 +63,16 @@ public class ControlFlowGraphDataStructure {
 			}
 		}
 
-
 		if( null == ptr){
-			// this starts a new block
-
 			// handle int dst to sz dst mapping, for dotty
 			dstResolvMap.put(Integer.valueOf(idx), String.valueOf(idx + "> " + mnemonic));
 
 			// start a new block list
 			ptr = new ArrayList<String>();
 			content.add( ptr );
-
-if(0 < idx) System.out.println("XXX before filter - opcode '"+instructions.get(idx).getOpcode()+"'"); //  ["+Printer.OPCODES[instructions.get(idx).getOpcode()]+"]");
-//			if( 0 < idx && !fallthruOpcodes.contains( instructions.get(idx).getOpcode() )){
 			if( 0 < idx && !fallthruOpcodes.contains( instructions.get(idx-1).getOpcode() )){
-System.out.println("XXX not filtered  - opcode '"+instructions.get(idx).getOpcode() ); //+"' ["+Printer.OPCODES[instructions.get(idx).getOpcode()]+"]");
 				String src = String.valueOf(idx-1 + "> " + Printer.OPCODES[this.instructions.get(idx-1).getOpcode()]);
 				String dst = String.valueOf(idx + "> " + mnemonic);
-System.out.println("XXX find GOTO: src '"+ src + "', dst '" + dst + "'");
 				fallthruList.add(src + "->" + dst);
 			}
 		}
@@ -109,11 +81,9 @@ System.out.println("XXX find GOTO: src '"+ src + "', dst '" + dst + "'");
 		ptr.add( String.valueOf(idx) + "> " + mnemonic );
 	}
 
-	public void printDotty(){
+	public void dottyPrint(){
 		System.out.println("\n---");
 		if( 0 == content.size() ) return;
-
-// TODO better use String / Stringbuffer instead of this?
 
 		// header
 		System.out.println( "digraph G {" );
@@ -140,56 +110,32 @@ System.out.println("XXX find GOTO: src '"+ src + "', dst '" + dst + "'");
 		}
 		System.out.println( "" );
 
-		// trailer
 		System.out.println("  nodeS:S -> node0:0");
-
 		// print hashmap as references between groups
 		Set set = srctable.entrySet();
 		Iterator iter = set.iterator();
 		while( iter.hasNext() ){
 			Map.Entry me = (Map.Entry) iter.next();
 			String []srces = String.valueOf(me.getValue()).split(",");
-
-// TODO improve this by a hashmap
 			String dst = "";
-			if( null == (dst = dstResolvMap.get(Integer.valueOf(String.valueOf(me.getKey()))))){
-				dst = "TODO_" + me.getKey();
-				// TODO if dst == null?			
-			}
-
+			dst = dstResolvMap.get(Integer.valueOf(String.valueOf(me.getKey())));
 			for( String src : srces){
 				dottyEdge(src, dst);
-/* // TODO
-				String idxDst = String.valueOf( getBlockIndex( dst ));
-				String idxDstIns = dst.split(">")[0];
-				String idxSrc = String.valueOf( getBlockIndex( src ));
-				String idxSrcIns = src.split(">")[0];
-				System.out.println( "  node" + idxSrc + ":" + idxSrcIns + " -> node" + idxDst + ":" + idxDstIns );
-//*/
 			}
-
 		}
-
 		System.out.println("");
+
 		for( String str : fallthruList){
 			String src = str.split("->")[0];
 			String dst = str.split("->")[1];
 			dottyEdge(src, dst);
-/* // TODO
-			String idxDst = String.valueOf( getBlockIndex( dst ));
-			String idxDstIns = dst.split(">")[0];
-			String idxSrc = String.valueOf( getBlockIndex( src ));
-			String idxSrcIns = src.split(">")[0];
-			System.out.println( "  node" + idxSrc + ":" + idxSrcIns + " -> node" + idxDst + ":" + idxDstIns );
-//*/
 		}
-		
 		System.out.println("");
-		
+
+		// trailer
 		System.out.println("  node" + String.valueOf(content.size()-1)
 				+ ":" + String.valueOf(content.get(content.size()-1).get(content.get(content.size()-1).size()-1).split(">")[0] )
 				+ " -> nodeE:E" );
-		
 		System.out.println("}");
 	}
 
@@ -214,35 +160,19 @@ System.out.println("XXX find GOTO: src '"+ src + "', dst '" + dst + "'");
 		System.out.println( "  node" + idxSrc + ":" + idxSrcIns + " -> node" + idxDst + ":" + idxDstIns );
 	}
 
-	private int _getBlockIndex( String ins ){
-//		System.out.println( "XXX ins " + ins ); // TODO rm
-		for( int idxBlock = 0; idxBlock < content.size(); ++idxBlock){
-			if( content.get(idxBlock).contains(ins)){
-				return idxBlock;
-			}
-		}
-		return -1;
-	}
-
 	private void forward(String src, int dst){
-		String vals;
-		if( null != (vals = srctable.get( String.valueOf(dst) )) ){
-			vals += ",";
+		String srcs;
+		if( null != (srcs = srctable.get( String.valueOf(dst) )) ){
+			srcs += ",";
 		}else{
-			vals = "";
+			srcs = "";
 		}
-		vals += src;
-
-//System.out.println( "XXX null issue, vals " + vals ); // TODO rm
-		srctable.put( String.valueOf(dst), vals );
+		srcs += src;
+		srctable.put( String.valueOf(dst), srcs );
 		ptr = null;
 	}
 
-// TODO rn backwardJump
 	private void backward( String src, int dst){
-//		System.out.println( "XXX BACKWARD - src: " + src + ", dst: " + dst); // TODO rm
-// TODO check by comparing hash list if ge, then, go into corresponding list, find target node, and split list (insert second part after, w/ hashtable entry)
-
 		// find block index
 		int idxBlock = 1;
 		for( ; idxBlock < content.size(); ++idxBlock){
@@ -258,7 +188,6 @@ System.out.println("XXX find GOTO: src '"+ src + "', dst '" + dst + "'");
 		int idxIns = 0;
 		if(dst != Integer.valueOf( content.get(idxBlock).get(idxIns).split("> ")[0]).intValue()){
 			// splitting necessary, elem is not at idx 0
-// TODO test
 			for( idxIns = 1; idxIns < content.get(idxBlock).size(); ++idxIns){
 				if( dst == Integer.valueOf( content.get(idxBlock).get(idxIns).split("> ")[0]).intValue()){
 					break;
@@ -273,9 +202,7 @@ System.out.println("XXX find GOTO: src '"+ src + "', dst '" + dst + "'");
 			// split block at idxIns (first half)
 			ArrayList< String > secHalfBlock = new ArrayList< String >();
 			for( int idx=idxIns; idx < content.get(idxBlock).size(); ++idx){
-//				secHalfBlock.add(content.get(idxBlock).get(idx));
 				secHalfBlock.add( new String( content.get(idxBlock).get(idx) ));
-// TODO check
 			}
 
 			// clean secHalfElements still in former list
@@ -285,10 +212,7 @@ System.out.println("XXX find GOTO: src '"+ src + "', dst '" + dst + "'");
 
 			// insert new list
 			if( secHalfBlock.size() > 0){
-//				System.out.println( "AAA secHalfBlock.size() " + secHalfBlock.size() );
 				content.add(idxBlock+1, secHalfBlock);
-
-				System.out.println("XXX BACKWARD - check first val of secHalf: " + content.get(idxBlock+1).get(0)); // TODO rm
 				dstResolvMap.put(Integer.valueOf(idxIns), content.get(idxBlock+1).get(0));
 			}
 		} // splitting was necessary
@@ -301,21 +225,15 @@ System.out.println("XXX find GOTO: src '"+ src + "', dst '" + dst + "'");
 			vals = "";
 		}
 		vals += src;
-
 		srctable.put( String.valueOf(dst), vals );
-
 		ptr = null;
 	}
-
 
 	public void appendInstruction( final AbstractInsnNode ins, final int idx ){
 		final int opcode = ins.getOpcode();
 		String mnemonic = (opcode==-1 ? "" : Printer.OPCODES[this.instructions.get(idx).getOpcode()]);
-
-		// append to basicblocklist or start new basic block, when 
 		switch( ins.getType() ){
 		case AbstractInsnNode.JUMP_INSN:
-			// target jump addr
 			final LabelNode targetInstruction = ((JumpInsnNode)ins).label;
 			final int dest = instructions.indexOf(targetInstruction);
 			if( idx < dest ){
@@ -339,7 +257,7 @@ System.out.println("XXX find GOTO: src '"+ src + "', dst '" + dst + "'");
 			return;
 		}
 
-		// append other type of instructions and nops (-1)
+		// append other type of instructions -1
 		append( mnemonic, idx );
 	}
 }
