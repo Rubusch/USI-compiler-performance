@@ -263,5 +263,4 @@ public final class JavaClassDisassembler {
 		}		
 		System.out.println();
 	}
-	
 }
