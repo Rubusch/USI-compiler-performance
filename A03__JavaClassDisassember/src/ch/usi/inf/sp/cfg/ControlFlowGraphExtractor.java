@@ -48,7 +48,7 @@ public final class ControlFlowGraphExtractor {
 		ControlFlowGraphExtractor control = new ControlFlowGraphExtractor();
 		control.flow( cnode, methodNameAndDescriptor );
 
-		System.out.println( "\nREADY.");
+		System.out.println( "\n# READY.");
 	}
 
 	private void flow( ClassNode cnode, String methodNameAndDescriptor ){

@@ -82,7 +82,7 @@ public class ControlFlowGraphDataStructure {
 	}
 
 	public void dottyPrint(){
-		System.out.println("\n---");
+		System.out.println("\n# ---");
 		if( 0 == content.size() ) return;
 
 		// header
