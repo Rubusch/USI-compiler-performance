@@ -72,7 +72,8 @@ public class ControlFlowGraphDataStructure {
 
 			// just link start
 			String dst = String.valueOf(idx + ":" + mnemonic);
-			fallthruList.add("S->" + dst);
+			// no fallthruList, 'S' is covered by srcTable
+//			fallthruList.add("S->" + dst);
 		}
 
 		// a former forward link connected to this instruction, so we provoke starting a new block
@@ -160,9 +161,10 @@ public class ControlFlowGraphDataStructure {
 				System.out.println("  " + src + " -> " + dst);
 			}
 
-			for( String str : fallthruList){
-				System.out.println("  " + str);
-			}
+		}
+		for( String str : fallthruList){
+System.out.println("XXX size of fallthrulist " + fallthruList.size());
+			System.out.println("  " + str);
 		}
 		System.out.println("}");
 	}
@@ -175,6 +177,7 @@ public class ControlFlowGraphDataStructure {
 		}
 		vals += src;
 
+//System.out.println();
 		srctable.put( String.valueOf(dst), vals );
 		ptr = null;
 	}
