@@ -56,7 +56,7 @@ public final class ControlFlowGraphExtractor {
 		final List<MethodNode> methods = cnode.methods;
 		for( int idx=0; idx<methods.size(); ++idx){
 			final MethodNode method = methods.get(idx);
-			System.out.println( "method: " + method.name );
+//			System.out.println( "XXX method: " + method.name ); // TODO rm
 			if( methodNameAndDescriptor.equals( method.name ) ){
 				flowMethod(method);
 			}

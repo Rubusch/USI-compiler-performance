@@ -24,7 +24,8 @@ public class ControlFlowGraphDataStructure {
 // TODO
 	}
 
-	private void append( final String szIns, final int idx ){
+// TODO first idx, then szIns
+	private void append( final String mnemonic, final int idx ){
 		// new block or start
 		if( null == ptr){
 			ptr = new ArrayList<String>();
@@ -38,72 +39,72 @@ public class ControlFlowGraphDataStructure {
 		}
 
 		// append current item
-		ptr.add( String.valueOf(idx) + ":" + szIns );
+		ptr.add( String.valueOf(idx) + ":" + mnemonic );
 	}
 
 	public void printDotty(){
-		ControlFlowGraphExtractor.die("XXX"); // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+//		ControlFlowGraphExtractor.die("XXX"); // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 		if( 0 == content.size() ) return;
 
 		// header
-// TODO
+		System.out.println("digraph G {");
 		
 		for( int idx=0; idx < content.size(); ++idx){
 			// block header
-// TODO
+			System.out.print("node"+idx+" [label = \"{<n> ");
 			for( int jdx=0; jdx < content.get(idx).size(); ++jdx){
-				System.out.println( content.get(idx).get(jdx) );
+				System.out.print( content.get(idx).get(jdx) );
 // TODO test
+				if(jdx < content.get(idx).size() -1 ){
+					System.out.print(" | ");
+				}
 			}
-			// block trailer
-// TODO
+			System.out.print(" }\"];\n");
 		}
 
 		// print hashmap as references between groups
 // TODO
 
 		// trailer
+		System.out.println("}");
 // TODO
 	}
 
-	private void forward(){
-		// TODO
+	private void forward(int src, int dst){
+		// handle forward jumps
+		srctable.put( String.valueOf(dst), String.valueOf(src) );
+		ptr = null;
 	}
-	
-	private void backward(){
-		// TODO
+
+	private void backward(int src, int dst){
+// TODO check by comparing hash list if ge, then, go into corresponding list, find target node, and split list (insert second part after, w/ hashtable entry)
+		ptr = null;
 	}
 
 	public void appendInstruction( final AbstractInsnNode ins, final int idx, final InsnList instructions ){
 		final int opcode = ins.getOpcode();
 		final String mnemonic = (opcode==-1 ? "" : Printer.OPCODES[ins.getOpcode()]);
 
+// TODO rm
 		// start new list, when either in srctable.get(ins.getOpcode()) is not null, or for 'if' instrs
-		// if
-		// TODO
 //		System.out.println("XXX ins " + ins.getType() + ", mnemonic " + mnemonic);
 
 		// append to basicblocklist or start new basic block, when 
 		if( AbstractInsnNode.JUMP_INSN == ins.getType() ){
-			// extract dest addr, idx will be source
 
+			// target jump addr
 			final LabelNode targetInstruction = ((JumpInsnNode)ins).label;
 			final int dest = instructions.indexOf(targetInstruction);
 			if( idx < dest ){
-				// forward
-				srctable.put( String.valueOf(dest), String.valueOf(idx) );
-				ptr = null;
-// TODO
+				append( mnemonic, idx);
+				forward( idx, dest);
 			}else{
-				// backward
-// TODO check in other lists to where it points, break the list there in two lists (insert into content list)
+				append( mnemonic, idx);
+				backward( idx, dest);
 			}
-			System.out.println( "TODO" );
+			return;
 		}
-// TODO
 		append( mnemonic, idx );
 	}
-
-	
 }
