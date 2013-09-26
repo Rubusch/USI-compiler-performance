@@ -92,20 +92,30 @@ public class ControlFlowGraphDataStructure {
 		Iterator iter = set.iterator();
 		while( iter.hasNext() ){
 			Map.Entry me = (Map.Entry) iter.next();
-			System.out.println("  " + me.getValue() + " -> " + me.getKey());
+			String []vals = String.valueOf(me.getValue()).split(",");
+			for( String val : vals){
+// FIXME value is "null" something...
+				System.out.println("  " + val + " -> " + me.getKey());
+			}
 		}
 		System.out.println("}");
 	}
 
+// TODO rn forwardJump
 	private void forward(String src, int dst){
-		// handle forward jumps
-//		srctable.put( String.valueOf(dst), String.valueOf(src) );
-		srctable.put( String.valueOf(dst), src );
+		String vals = srctable.get( String.valueOf(dst) );
+		if( null != vals ){
+			vals += ",";
+		}
+		vals += src;
+
+		srctable.put( String.valueOf(dst), vals );
 		ptr = null;
 	}
 
-	private void backward(int src, int dst){
-		System.out.println( "XXX BACKWARD - src: " + src + ", dst: " + dst); // TODO rm
+// TODO rn backwardJump
+	private void backward( String src, int dst){
+//		System.out.println( "XXX BACKWARD - src: " + src + ", dst: " + dst); // TODO rm
 // TODO check by comparing hash list if ge, then, go into corresponding list, find target node, and split list (insert second part after, w/ hashtable entry)
 
 		// find block index
@@ -145,7 +155,17 @@ public class ControlFlowGraphDataStructure {
 
 		content.add(idxBlock+1, secHalfBlock);
 
-		System.out.println( "XXX BACKWARD - idxBlock " + idxBlock + ", idxIns " + idxIns);
+		// updating table
+		String vals = srctable.get( String.valueOf(dst) );
+		if( null != vals ){
+//			System.out.println( "XXX BACKWARD - vals not null!");
+			vals += ",";
+		}
+		vals += src;
+
+		srctable.put( String.valueOf(dst), vals );
+
+//		System.out.println( "XXX BACKWARD - idxBlock " + idxBlock + ", idxIns " + idxIns);
 
 
 		// get keys (dests) as list
@@ -164,24 +184,25 @@ public class ControlFlowGraphDataStructure {
 	public void appendInstruction( final AbstractInsnNode ins, final int idx, final InsnList instructions ){
 		final int opcode = ins.getOpcode();
 		final String mnemonic = (opcode==-1 ? "" : Printer.OPCODES[ins.getOpcode()]);
+// FIXME some instructions seem not to be in the OPCODES table
 
 // TODO rm
 		// start new list, when either in srctable.get(ins.getOpcode()) is not null, or for 'if' instrs
-		System.out.println("XXX ins " + ins.getType() + ", mnemonic " + mnemonic);
+//		System.out.println("XXX ins " + ins.getType() + ", mnemonic " + mnemonic);
 
 		// append to basicblocklist or start new basic block, when 
 		if( AbstractInsnNode.JUMP_INSN == ins.getType() ){
-			System.out.println( "XXX JUMP_INSN found ---" ); // TODO rm
+//			System.out.println( "XXX JUMP_INSN found" ); // TODO rm
 
 			// target jump addr
 			final LabelNode targetInstruction = ((JumpInsnNode)ins).label;
 			final int dest = instructions.indexOf(targetInstruction);
 			if( idx < dest ){
 				append( mnemonic, idx);
-				forward( new String(idx + ":" + mnemonic), dest);
+				forward( new String(idx + ":" + mnemonic), dest );
 			}else{
 				append( mnemonic, idx);
-				backward( idx, dest);
+				backward( new String(idx + ":" + mnemonic), dest);
 			}
 			return;
 		}
