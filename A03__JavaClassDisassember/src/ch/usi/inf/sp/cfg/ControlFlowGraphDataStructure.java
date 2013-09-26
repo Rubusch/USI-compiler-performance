@@ -35,8 +35,10 @@ public class ControlFlowGraphDataStructure {
 	// list of readymade strings for dotty for fallthrough connections for if_ instructions
 	private ArrayList< String > fallthruList;
 
+	// list of opcodes NOT to be considered with fallthrough property (e.g. GOTO)
 	private ArrayList<Integer> fallthruOpcodes;
-	
+
+	// the asm instruction list
 	private final InsnList instructions;
 
 	public ControlFlowGraphDataStructure( final InsnList instructions ){
@@ -48,12 +50,6 @@ public class ControlFlowGraphDataStructure {
 		fallthruList = new ArrayList< String >();
 		fallthruOpcodes = new ArrayList<Integer>();
 		{
-/*
-			// opcodes for branching
-			final int []iOpcodes = { 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166,
-					172, 173, 174, 175, 176, 177,
-					198, 199 };
-//*/
 			// opcodes for goto and jumps
 			final int []iOpcodes = { 167, 168, 169 };
 			for( int iOpcode : iOpcodes){
@@ -76,8 +72,8 @@ public class ControlFlowGraphDataStructure {
 
 			// just link start
 			String dst = String.valueOf(idx + ":" + mnemonic);
-			// no fallthruList, 'S' is covered by srcTable
-//			fallthruList.add("S->" + dst);
+
+			// no fallthruList for 'S' is covered by srcTable
 		}
 
 		// a former forward link connected to this instruction, so we provoke starting a new block
@@ -98,9 +94,7 @@ public class ControlFlowGraphDataStructure {
 			ptr = new ArrayList<String>();
 			content.add( ptr );
 
-//System.out.println( "XXX if-issue - ptr==null, opcode " + instructions.get(idx).getOpcode()); // TODO rm
 			if( 0 < idx && !fallthruOpcodes.contains( instructions.get(idx).getOpcode() )){
-//System.out.println( "XXX if-issue - opcode was branching"); // TODO rm
 				String src = String.valueOf(idx-1 + ":" + Printer.OPCODES[this.instructions.get(idx-1).getOpcode()]);
 				String dst = String.valueOf(idx + ":" + mnemonic);
 				fallthruList.add(src + " -> " + dst);
