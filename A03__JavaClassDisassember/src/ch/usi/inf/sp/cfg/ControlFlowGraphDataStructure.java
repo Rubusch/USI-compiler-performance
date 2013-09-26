@@ -120,7 +120,7 @@ public class ControlFlowGraphDataStructure {
 			String dst = "";
 			dst = dstResolvMap.get(Integer.valueOf(String.valueOf(me.getKey())));
 			for( String src : srces){
-				dottyEdge(src, dst);
+				dottyEdge(src, dst, "F");
 			}
 		}
 		System.out.println("");
@@ -128,7 +128,7 @@ public class ControlFlowGraphDataStructure {
 		for( String str : fallthruList){
 			String src = str.split("->")[0];
 			String dst = str.split("->")[1];
-			dottyEdge(src, dst);
+			dottyEdge(src, dst, "T");
 		}
 		System.out.println("");
 
@@ -139,8 +139,7 @@ public class ControlFlowGraphDataStructure {
 		System.out.println("}");
 	}
 
-	private void dottyEdge(String src, String dst){
-		
+	private void dottyEdge(String src, String dst, String edge){
 		String idxDst = "";
 		for( int idx = 0; idx < content.size(); ++idx){
 			if( content.get(idx).contains(dst)){
@@ -157,7 +156,11 @@ public class ControlFlowGraphDataStructure {
 			}
 		}
 		String idxSrcIns = src.split(">")[0];
-		System.out.println( "  node" + idxSrc + ":" + idxSrcIns + " -> node" + idxDst + ":" + idxDstIns );
+		if(src.split("> ")[1].equals("IRETURN") || src.split("> ")[1].equals("GOTO")){
+			System.out.println( "  node" + idxSrc + ":" + idxSrcIns + " -> node" + idxDst + ":" + idxDstIns );
+		}else{
+			System.out.println( "  node" + idxSrc + ":" + idxSrcIns + " -> node" + idxDst + ":" + idxDstIns + "[ label=" + edge + " ]");
+		}
 	}
 
 	private void forward(String src, int dst){

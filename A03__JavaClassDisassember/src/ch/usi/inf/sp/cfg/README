@@ -1,0 +1,14 @@
+Assignment03
+
+Lothar Rubusch
+
+Content:
+ - README
+ - Project
+ - screenshot
+
+The main approach was it to generate an ArrayList of Lists (basic blocks);
+in addition I tried to handle book keeping for the edges via hash maps;
+
+ Known issues:
+ - some branches do not seem to work well (e.g. LOOKUPSWITCH)
