@@ -13,6 +13,11 @@ import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.util.Printer;
 
 // TODO perhaps better inherit from ArrayList< ArrayList >
+
+/**
+ * 
+ * @author Lothar Rubusch
+ */
 public class ControlFlowGraphDataStructure {
 	// table of jump point sources, key = destination, value = source
 	private HashMap< String, String > srctable;
@@ -99,7 +104,51 @@ public class ControlFlowGraphDataStructure {
 	}
 
 	private void backward(int src, int dst){
+		System.out.println( "XXX BACKWARD - src: " + src + ", dst: " + dst); // TODO rm
 // TODO check by comparing hash list if ge, then, go into corresponding list, find target node, and split list (insert second part after, w/ hashtable entry)
+
+		// in which sub lists of content is dst?
+		int idxBlock = 1;
+		for( ; idxBlock < content.size(); ++idxBlock){
+// TODO in case catch out of bounds exp
+//			System.out.println("XXX BACKWARD - '" + content.get(idxBlock).get(0) + "'");  // TODO rm
+
+//			System.out.println( "XXX BACKWARD - string '" + content.get(idxBlock).get(0).split(":")[0] + "'");
+
+			if( dst < Integer.valueOf(content.get(idxBlock).get(0).split(":")[0] ).intValue()){
+				break;
+			}
+		}
+
+		// started from 1; if run through, the target must be in last (current) block
+		--idxBlock;
+
+		int idxIns = 0;
+		for( ; idxIns < content.get(idxBlock).size(); ++idxIns){
+//			System.out.println( "XXX BACKWARD - " + content.get(idxBlock).get(idxIns).split(":")[0] );
+			if( dst == Integer.valueOf( content.get(idxBlock).get(idxIns).split(":")[0]).intValue()){
+				break;
+			}
+		}
+
+		if( idxIns == content.get(idxBlock).size()){
+			ControlFlowGraphExtractor.die("something went wrong, refering a lower index that was not parsed already?! ");
+		}
+
+
+		System.out.println( "XXX BACKWARD - idxBlock " + idxBlock + ", idxIns " + idxIns);
+		
+
+		// get keys (dests) as list
+/*
+		ArrayList<String> arlist = new ArrayList<String>();
+		for(Map.Entry<String,String> map : hmap.entrySet()){
+			
+		}
+//*/
+		// if dests[idx] < dest
+		
+//ControlFlowGraphExtractor.die("XXX STOP XXX"); // TODO rm
 		ptr = null;
 	}
 
