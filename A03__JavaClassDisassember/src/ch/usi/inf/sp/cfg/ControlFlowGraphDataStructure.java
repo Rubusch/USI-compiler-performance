@@ -60,21 +60,21 @@ public class ControlFlowGraphDataStructure {
 
 	private void append( final String mnemonic, final int idx ){
 		// initial
-		if( 0 == content.size() ){
+//		if( 0 == content.size() ){
 			// first entry, the start link
-			ptr = new ArrayList<String>();
-			ptr.add( "S" );
-			content.add( ptr );
-			ptr = null;
+//			ptr = new ArrayList<String>();
+//			ptr.add( "S" );
+//			content.add( ptr );
+//			ptr = null;
 
 			// update source hashmap (for forward)
-			srctable.put( String.valueOf(idx), "S" );
+//			srctable.put( String.valueOf(idx), "S" );
 
 			// just link start
-			String dst = String.valueOf(idx + ":" + mnemonic);
+//			String dst = String.valueOf(idx + "> " + mnemonic);
 
 			// no fallthruList for 'S' is covered by srcTable
-		}
+//		}
 
 		// a former forward link connected to this instruction, so we provoke starting a new block
 		if( null != ptr){
@@ -88,53 +88,57 @@ public class ControlFlowGraphDataStructure {
 			// this starts a new block
 
 			// handle int dst to sz dst mapping, for dotty
-			dstResolvMap.put(Integer.valueOf(idx), String.valueOf(idx + ":" + mnemonic));
+			dstResolvMap.put(Integer.valueOf(idx), String.valueOf(idx + "> " + mnemonic));
 
 			// start a new block list
 			ptr = new ArrayList<String>();
 			content.add( ptr );
 
 			if( 0 < idx && !fallthruOpcodes.contains( instructions.get(idx).getOpcode() )){
-				String src = String.valueOf(idx-1 + ":" + Printer.OPCODES[this.instructions.get(idx-1).getOpcode()]);
-				String dst = String.valueOf(idx + ":" + mnemonic);
-				fallthruList.add(src + " -> " + dst);
+				String src = String.valueOf(idx-1 + "> " + Printer.OPCODES[this.instructions.get(idx-1).getOpcode()]);
+				String dst = String.valueOf(idx + "> " + mnemonic);
+				fallthruList.add(src + "->" + dst);
 			}
 		}
 
 		// append current item
-		ptr.add( String.valueOf(idx) + ":" + mnemonic );
+		ptr.add( String.valueOf(idx) + "> " + mnemonic );
 	}
 
 	public void printDotty(){
 		System.out.println("\n---");
 		if( 0 == content.size() ) return;
 
-// TODO better use String / Stringbuffer instead of this ;)
+// TODO better use String / Stringbuffer instead of this?
 
 		// header
-		System.out.println("digraph G {");
-		System.out.println("  nodesep=.5");
-		System.out.println("  rankdir=LR");
-		System.out.println("  node [shape=record,width=.1,height=.1]");
+		System.out.println( "digraph G {" );
+		System.out.println( "  nodesep=.5" );
+		System.out.println( "  rankdir=LR" );
+		System.out.println( "  node [shape=record,width=.1,height=.1]" );
 		System.out.println( "" ); // mark end of header
+
+		// start node
+		System.out.println( "  nodeS [label = \"{ <S> S }\"];" );
+		System.out.println( "  nodeE [label = \"{ <E> E }\"];" );
 
 		// body
 		for( int idx=0; idx < content.size(); ++idx){
 			// block header
-			System.out.print("  node" + idx + " [label = \"{<n> ");
-//			System.out.print("  node" + idx + " [label = \"{ ");
+			System.out.print("  node" + idx + " [label = \"{ <");
 			for( int jdx=0; jdx < content.get(idx).size(); ++jdx){
 				System.out.print( content.get(idx).get(jdx) );
 				if(jdx < content.get(idx).size() -1 ){
-					System.out.print(" | ");
+					System.out.print(" | <");
 				}
 			}
-			System.out.print(" | <p> }\"];\n");
-//			System.out.print(" }\"];\n");
+			System.out.print(" }\"];\n");
 		}
-		System.out.println( "" ); // mark end of body
+		System.out.println( "" );
 
 		// trailer
+		System.out.println("  nodeS:S -> node0:0");
+
 		// print hashmap as references between groups
 		Set set = srctable.entrySet();
 		Iterator iter = set.iterator();
@@ -144,22 +148,48 @@ public class ControlFlowGraphDataStructure {
 
 // TODO improve this by a hashmap
 			String dst = "";
-
 			if( null == (dst = dstResolvMap.get(Integer.valueOf(String.valueOf(me.getKey()))))){
 				dst = "TODO_" + me.getKey();
 				// TODO if dst == null?			
 			}
 
 			for( String src : srces){
-				System.out.println("  " + src + " -> " + dst);
+				String idxDst = String.valueOf( getBlockIndex( dst ));
+				String idxDstIns = dst.split(">")[0];
+				String idxSrc = String.valueOf( getBlockIndex( src ));
+				String idxSrcIns = src.split(">")[0];
+				System.out.println( "  node" + idxSrc + ":" + idxSrcIns + " -> node" + idxDst + ":" + idxDstIns );
 			}
 
 		}
 		for( String str : fallthruList){
-//System.out.println("XXX size of fallthrulist " + fallthruList.size());
-			System.out.println("  " + str);
+			String src = str.split("->")[0];
+			String dst = str.split("->")[1];
+//System.out.println("XXX str src '" + src + "', dst '" + dst + "'"); // TODO rm
+			String idxDst = String.valueOf( getBlockIndex( dst ));
+			String idxDstIns = dst.split(">")[0];
+			String idxSrc = String.valueOf( getBlockIndex( src ));
+			String idxSrcIns = src.split(">")[0];
+			System.out.println( "  node" + idxSrc + ":" + idxSrcIns + " -> node" + idxDst + ":" + idxDstIns );
 		}
+		
+		System.out.println("");
+		
+		System.out.println("  node" + String.valueOf(content.size()-1)
+				+ ":" + String.valueOf(content.get(content.size()-1).get(content.get(content.size()-1).size()-1).split(">")[0] )
+				+ " -> nodeE:E" );
+		
 		System.out.println("}");
+	}
+
+	private int getBlockIndex( String ins ){
+//		System.out.println( "XXX ins " + ins ); // TODO rm
+		for( int idxBlock = 0; idxBlock < content.size(); ++idxBlock){
+			if( content.get(idxBlock).contains(ins)){
+				return idxBlock;
+			}
+		}
+		return -1;
 	}
 
 	private void forward(String src, int dst){
@@ -184,7 +214,7 @@ public class ControlFlowGraphDataStructure {
 		// find block index
 		int idxBlock = 1;
 		for( ; idxBlock < content.size(); ++idxBlock){
-			if( dst < Integer.valueOf(content.get(idxBlock).get(0).split(":")[0] ).intValue()){
+			if( dst < Integer.valueOf(content.get(idxBlock).get(0).split("> ")[0] ).intValue()){
 				break;
 			}
 		}
@@ -194,12 +224,12 @@ public class ControlFlowGraphDataStructure {
 
 		// find instruction index, in block
 		int idxIns = 0;
-		if(dst != Integer.valueOf( content.get(idxBlock).get(idxIns).split(":")[0]).intValue()){
+		if(dst != Integer.valueOf( content.get(idxBlock).get(idxIns).split("> ")[0]).intValue()){
 			// splitting necessary, elem is not at idx 0
 // TODO test
 			for( idxIns = 1; idxIns < content.get(idxBlock).size(); ++idxIns){
-//				System.out.println( "XXX BACKWARD - " + content.get(idxBlock).get(idxIns).split(":")[0] );
-				if( dst == Integer.valueOf( content.get(idxBlock).get(idxIns).split(":")[0]).intValue()){
+//				System.out.println( "XXX BACKWARD - " + content.get(idxBlock).get(idxIns).split("> ")[0] );
+				if( dst == Integer.valueOf( content.get(idxBlock).get(idxIns).split("> ")[0]).intValue()){
 					break;
 				}
 			}
@@ -246,31 +276,26 @@ public class ControlFlowGraphDataStructure {
 		ptr = null;
 	}
 
+
+
+
 	public void appendInstruction( final AbstractInsnNode ins, final int idx ){
 		final int opcode = ins.getOpcode();
 		String mnemonic = (opcode==-1 ? "" : Printer.OPCODES[this.instructions.get(idx).getOpcode()]);
-// FIXME some instructions seem not to be in the OPCODES table
-
-// TODO rm
-		// start new list, when either in srctable.get(ins.getOpcode()) is not null, or for 'if' instrs
-//		System.out.println("XXX ins " + ins.getType() + ", mnemonic " + mnemonic);
 
 		// append to basicblocklist or start new basic block, when 
 		switch( ins.getType() ){
 		case AbstractInsnNode.JUMP_INSN:
-//		if( AbstractInsnNode.JUMP_INSN == ins.getType() ){ // TODO rm
-//			System.out.println( "XXX JUMP_INSN found" ); // TODO rm
-
 			// target jump addr
 			final LabelNode targetInstruction = ((JumpInsnNode)ins).label;
 			final int dest = instructions.indexOf(targetInstruction);
 			if( idx < dest ){
 				append( mnemonic, idx);
-				forward( new String(idx + ":" + mnemonic), dest );
+				forward( new String(idx + "> " + mnemonic), dest );
 				return; // already appended
 			}else{
 				append( mnemonic, idx);
-				backward( new String(idx + ":" + mnemonic), dest);
+				backward( new String(idx + "> " + mnemonic), dest);
 				return;
 			}
 
