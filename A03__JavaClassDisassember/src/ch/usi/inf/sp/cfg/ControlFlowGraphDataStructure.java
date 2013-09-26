@@ -48,9 +48,14 @@ public class ControlFlowGraphDataStructure {
 		fallthruList = new ArrayList< String >();
 		fallthruOpcodes = new ArrayList<Integer>();
 		{
+/*
+			// opcodes for branching
 			final int []iOpcodes = { 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166,
 					172, 173, 174, 175, 176, 177,
 					198, 199 };
+//*/
+			// opcodes for goto and jumps
+			final int []iOpcodes = { 167, 168, 169 };
 			for( int iOpcode : iOpcodes){
 				fallthruOpcodes.add(new Integer(iOpcode));
 			}
@@ -93,9 +98,9 @@ public class ControlFlowGraphDataStructure {
 			ptr = new ArrayList<String>();
 			content.add( ptr );
 
-System.out.println( "XXX if-issue - ptr==null, opcode " + instructions.get(idx).getOpcode()); // TODO rm
-			if( 0 < idx && fallthruOpcodes.contains( instructions.get(idx).getOpcode() )){
-System.out.println( "XXX if-issue - opcode was branching"); // TODO rm
+//System.out.println( "XXX if-issue - ptr==null, opcode " + instructions.get(idx).getOpcode()); // TODO rm
+			if( 0 < idx && !fallthruOpcodes.contains( instructions.get(idx).getOpcode() )){
+//System.out.println( "XXX if-issue - opcode was branching"); // TODO rm
 				String src = String.valueOf(idx-1 + ":" + Printer.OPCODES[this.instructions.get(idx-1).getOpcode()]);
 				String dst = String.valueOf(idx + ":" + mnemonic);
 				fallthruList.add(src + " -> " + dst);
@@ -157,7 +162,7 @@ System.out.println( "XXX if-issue - opcode was branching"); // TODO rm
 
 		}
 		for( String str : fallthruList){
-System.out.println("XXX size of fallthrulist " + fallthruList.size());
+//System.out.println("XXX size of fallthrulist " + fallthruList.size());
 			System.out.println("  " + str);
 		}
 		System.out.println("}");
@@ -172,7 +177,7 @@ System.out.println("XXX size of fallthrulist " + fallthruList.size());
 		}
 		vals += src;
 
-System.out.println( "XXX null issue, vals " + vals ); // TODO rm
+//System.out.println( "XXX null issue, vals " + vals ); // TODO rm
 		srctable.put( String.valueOf(dst), vals );
 		ptr = null;
 	}
@@ -257,7 +262,9 @@ System.out.println( "XXX null issue, vals " + vals ); // TODO rm
 //		System.out.println("XXX ins " + ins.getType() + ", mnemonic " + mnemonic);
 
 		// append to basicblocklist or start new basic block, when 
-		if( AbstractInsnNode.JUMP_INSN == ins.getType() ){
+		switch( ins.getType() ){
+		case AbstractInsnNode.JUMP_INSN:
+//		if( AbstractInsnNode.JUMP_INSN == ins.getType() ){ // TODO rm
 //			System.out.println( "XXX JUMP_INSN found" ); // TODO rm
 
 			// target jump addr
@@ -265,16 +272,31 @@ System.out.println( "XXX null issue, vals " + vals ); // TODO rm
 			final int dest = instructions.indexOf(targetInstruction);
 			if( idx < dest ){
 				append( mnemonic, idx);
-//System.out.println("XXX instruction " + Printer.OPCODES[instructions.get(idx).getOpcode()] + ", opcode " + instructions.get(idx).getOpcode());  // TODO rm
 				forward( new String(idx + ":" + mnemonic), dest );
+				return; // already appended
 			}else{
 				append( mnemonic, idx);
 				backward( new String(idx + ":" + mnemonic), dest);
+				return;
 			}
-			return;
-		}else if( AbstractInsnNode.LABEL == ins.getType() ){
+
+		//		}else if( AbstractInsnNode.LABEL == ins.getType() ){ // TODO rm
+		case AbstractInsnNode.LABEL:
 			// pseudo-instruction (branch or exception target)
 			mnemonic = "label";
+			break;
+//*
+		case AbstractInsnNode.FRAME:
+			// pseudo-instruction (stack frame map)
+			return;
+//			mnemonic = "stack-frame-map";
+//			break;
+		case AbstractInsnNode.LINE:
+			// pseudo-instruction (line number information)
+			return;
+//			mnemonic = "line-number-information";
+//			break;
+//*/
 		}
 		
 		// append other type of instructions and nops (-1)
