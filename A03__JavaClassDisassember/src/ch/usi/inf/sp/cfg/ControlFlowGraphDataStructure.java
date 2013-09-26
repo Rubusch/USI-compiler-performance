@@ -43,24 +43,31 @@ public class ControlFlowGraphDataStructure {
 	}
 
 	public void printDotty(){
+		System.out.println("\n---");
 //		ControlFlowGraphExtractor.die("XXX"); // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 		if( 0 == content.size() ) return;
 
+// TODO better use String / Stringbuffer instead of this ;)
+
 		// header
 		System.out.println("digraph G {");
-		
+		System.out.println("  nodesep=.5");
+		System.out.println("  rankdir=LR");
+		System.out.println("  node [shape=record,width=.1,height=.1]");
+
 		for( int idx=0; idx < content.size(); ++idx){
 			// block header
-			System.out.print("node"+idx+" [label = \"{<n> ");
+			System.out.print("  node" + idx + " [label = \"{<n> ");
+//			System.out.print("  node" + idx + " [label = \"{ ");
 			for( int jdx=0; jdx < content.get(idx).size(); ++jdx){
 				System.out.print( content.get(idx).get(jdx) );
-// TODO test
 				if(jdx < content.get(idx).size() -1 ){
 					System.out.print(" | ");
 				}
 			}
-			System.out.print(" }\"];\n");
+			System.out.print(" | <p> }\"];\n");
+//			System.out.print(" }\"];\n");
 		}
 
 		// print hashmap as references between groups
@@ -88,7 +95,7 @@ public class ControlFlowGraphDataStructure {
 
 // TODO rm
 		// start new list, when either in srctable.get(ins.getOpcode()) is not null, or for 'if' instrs
-//		System.out.println("XXX ins " + ins.getType() + ", mnemonic " + mnemonic);
+		System.out.println("XXX ins " + ins.getType() + ", mnemonic " + mnemonic);
 
 		// append to basicblocklist or start new basic block, when 
 		if( AbstractInsnNode.JUMP_INSN == ins.getType() ){
