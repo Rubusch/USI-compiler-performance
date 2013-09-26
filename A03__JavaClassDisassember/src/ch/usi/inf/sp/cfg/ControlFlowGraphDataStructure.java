@@ -97,9 +97,10 @@ public class ControlFlowGraphDataStructure {
 		System.out.println("}");
 	}
 
-	private void forward(int src, int dst){
+	private void forward(String src, int dst){
 		// handle forward jumps
-		srctable.put( String.valueOf(dst), String.valueOf(src) );
+//		srctable.put( String.valueOf(dst), String.valueOf(src) );
+		srctable.put( String.valueOf(dst), src );
 		ptr = null;
 	}
 
@@ -107,14 +108,9 @@ public class ControlFlowGraphDataStructure {
 		System.out.println( "XXX BACKWARD - src: " + src + ", dst: " + dst); // TODO rm
 // TODO check by comparing hash list if ge, then, go into corresponding list, find target node, and split list (insert second part after, w/ hashtable entry)
 
-		// in which sub lists of content is dst?
+		// find block index
 		int idxBlock = 1;
 		for( ; idxBlock < content.size(); ++idxBlock){
-// TODO in case catch out of bounds exp
-//			System.out.println("XXX BACKWARD - '" + content.get(idxBlock).get(0) + "'");  // TODO rm
-
-//			System.out.println( "XXX BACKWARD - string '" + content.get(idxBlock).get(0).split(":")[0] + "'");
-
 			if( dst < Integer.valueOf(content.get(idxBlock).get(0).split(":")[0] ).intValue()){
 				break;
 			}
@@ -123,6 +119,7 @@ public class ControlFlowGraphDataStructure {
 		// started from 1; if run through, the target must be in last (current) block
 		--idxBlock;
 
+		// find instruction index, in block
 		int idxIns = 0;
 		for( ; idxIns < content.get(idxBlock).size(); ++idxIns){
 //			System.out.println( "XXX BACKWARD - " + content.get(idxBlock).get(idxIns).split(":")[0] );
@@ -131,13 +128,25 @@ public class ControlFlowGraphDataStructure {
 			}
 		}
 
+		// checks
 		if( idxIns == content.get(idxBlock).size()){
 			ControlFlowGraphExtractor.die("something went wrong, refering a lower index that was not parsed already?! ");
 		}
 
+		// split block at idxIns (first half)
+		ArrayList< String > secHalfBlock = new ArrayList< String >();
+		for( int idx=idxIns+1; idx < content.get(idxBlock).size(); ++idx){
+			secHalfBlock.add(content.get(idxBlock).get(idx));
+		}
+
+		for( int idx = content.get(idxBlock).size()-1; idx > idxIns ; --idx){
+			content.get(idxBlock).remove(idx);
+		}
+
+		content.add(idxBlock+1, secHalfBlock);
 
 		System.out.println( "XXX BACKWARD - idxBlock " + idxBlock + ", idxIns " + idxIns);
-		
+
 
 		// get keys (dests) as list
 /*
@@ -169,7 +178,7 @@ public class ControlFlowGraphDataStructure {
 			final int dest = instructions.indexOf(targetInstruction);
 			if( idx < dest ){
 				append( mnemonic, idx);
-				forward( idx, dest);
+				forward( new String(idx + ":" + mnemonic), dest);
 			}else{
 				append( mnemonic, idx);
 				backward( idx, dest);
