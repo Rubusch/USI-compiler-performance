@@ -18,6 +18,7 @@ public class ControlFlowGraphDataStructure {
 
 	public ControlFlowGraphDataStructure(){
 		srctable = new HashMap< String, String >();
+		content = new ArrayList< ArrayList< String >>();
 // TODO
 	}
 
@@ -38,7 +39,9 @@ public class ControlFlowGraphDataStructure {
 		ptr.add( String.valueOf(idx) + ":" + szIns );
 	}
 
-	public void printContent(){
+	public void printDotty(){
+		ControlFlowGraphExtractor.die("XXX"); // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
 		if( 0 == content.size() ) return;
 
 		// header
@@ -65,7 +68,7 @@ public class ControlFlowGraphDataStructure {
 
 	public void appendInstruction( final AbstractInsnNode ins, final int idx, final InsnList instructions ){
 		final int opcode = ins.getOpcode();
-		final String mnemonic = (opcode==1 ? "" : Printer.OPCODES[ins.getOpcode()]);
+		final String mnemonic = (opcode==-1 ? "" : Printer.OPCODES[ins.getOpcode()]);
 
 		// start new list, when either in srctable.get(ins.getOpcode()) is not null, or for 'if' instrs
 		// if

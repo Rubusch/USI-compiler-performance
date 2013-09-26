@@ -20,11 +20,25 @@ import org.objectweb.asm.tree.MethodNode;
  * @author Lothar Rubusch
  */
 public final class ControlFlowGraphExtractor {
-	public static void main(final String[] args) throws FileNotFoundException, IOException {
-		final String classFileName = args[0];
+	public static void die( String msg ){
+		System.out.println( msg );
+		System.exit(-1);
+	}
 
-// TODO what shall we do with the.. ??
-		final String methodNameAndDescriptor = args[1];
+	public static void main(final String[] args) throws FileNotFoundException, IOException {
+		String classFileName = "";
+		try{
+			classFileName = args[0];
+		}catch( Exception exp ){
+			die( "check class file name (first argument)");
+		}
+
+		String methodNameAndDescriptor = "";
+		try{
+			methodNameAndDescriptor = args[1];
+		}catch( Exception exp ){
+			die("check method name and descriptor (second argument)");
+		}
 
 		final ClassReader cr = new ClassReader( new FileInputStream( classFileName ));
 		final ClassNode cnode = new ClassNode();
@@ -32,18 +46,23 @@ public final class ControlFlowGraphExtractor {
 		cr.accept(cnode, 0);
 
 		ControlFlowGraphExtractor control = new ControlFlowGraphExtractor();
-		control.flow( cnode );
+		control.flow( cnode, methodNameAndDescriptor );
 
 		System.out.println( "\nREADY.");
 	}
 
-	private void flow( ClassNode cnode ){
+
+	private void flow( ClassNode cnode, String methodNameAndDescriptor ){
 		final List<MethodNode> methods = cnode.methods;
 		for( int idx=0; idx<methods.size(); ++idx){
 			final MethodNode method = methods.get(idx);
-			flowMethod(method);
+			System.out.println( "method: " + method.name );
+			if( methodNameAndDescriptor.equals( method.name ) ){
+				flowMethod(method);
+			}
 		}
 	}
+
 
 	/**
 	 * analysis and data structure per method
@@ -51,12 +70,12 @@ public final class ControlFlowGraphExtractor {
 	 * @param method
 	 */
 	private void flowMethod( final MethodNode method ){
-		ControlFlowGraphDataStructure instrblocks = new ControlFlowGraphDataStructure();
-
+		ControlFlowGraphDataStructure controlFlow = new ControlFlowGraphDataStructure();
 		final InsnList instructions = method.instructions;
 		for( int idx=0; idx<instructions.size(); ++idx){
 			final AbstractInsnNode instruction = instructions.get(idx);
-			instrblocks.appendInstruction(instruction, idx, instructions);
+			controlFlow.appendInstruction(instruction, idx, instructions);
 		}
+		controlFlow.printDotty();
 	}
 }
