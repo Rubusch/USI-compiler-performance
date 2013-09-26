@@ -2,6 +2,9 @@ package ch.usi.inf.sp.cfg;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnList;
@@ -29,13 +32,18 @@ public class ControlFlowGraphDataStructure {
 		// new block or start
 		if( null == ptr){
 			ptr = new ArrayList<String>();
+			content.add( ptr );
 		}
 
-		// start
+		// initial
 		if( 0 == content.size() ){
 			content.add( ptr );
 			ptr.add( "S" );
 			srctable.put( String.valueOf(idx), "S" );
+
+			ptr = null;
+			ptr = new ArrayList<String>();
+			content.add( ptr );
 		}
 
 		// append current item
@@ -55,7 +63,9 @@ public class ControlFlowGraphDataStructure {
 		System.out.println("  nodesep=.5");
 		System.out.println("  rankdir=LR");
 		System.out.println("  node [shape=record,width=.1,height=.1]");
+		System.out.println( "" ); // mark end of header
 
+		// body
 		for( int idx=0; idx < content.size(); ++idx){
 			// block header
 			System.out.print("  node" + idx + " [label = \"{<n> ");
@@ -69,13 +79,17 @@ public class ControlFlowGraphDataStructure {
 			System.out.print(" | <p> }\"];\n");
 //			System.out.print(" }\"];\n");
 		}
-
-		// print hashmap as references between groups
-// TODO
+		System.out.println( "" ); // mark end of body
 
 		// trailer
+		// print hashmap as references between groups
+		Set set = srctable.entrySet();
+		Iterator iter = set.iterator();
+		while( iter.hasNext() ){
+			Map.Entry me = (Map.Entry) iter.next();
+			System.out.println("  " + me.getValue() + " -> " + me.getKey());
+		}
 		System.out.println("}");
-// TODO
 	}
 
 	private void forward(int src, int dst){
@@ -99,6 +113,7 @@ public class ControlFlowGraphDataStructure {
 
 		// append to basicblocklist or start new basic block, when 
 		if( AbstractInsnNode.JUMP_INSN == ins.getType() ){
+			System.out.println( "XXX JUMP_INSN found ---" ); // TODO rm
 
 			// target jump addr
 			final LabelNode targetInstruction = ((JumpInsnNode)ins).label;
