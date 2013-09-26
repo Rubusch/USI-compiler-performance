@@ -56,7 +56,6 @@ public final class ControlFlowGraphExtractor {
 		final List<MethodNode> methods = cnode.methods;
 		for( int idx=0; idx<methods.size(); ++idx){
 			final MethodNode method = methods.get(idx);
-//			System.out.println( "XXX method: " + method.name ); // TODO rm
 			if( methodNameAndDescriptor.equals( method.name ) ){
 				flowMethod(method);
 			}
@@ -73,10 +72,7 @@ public final class ControlFlowGraphExtractor {
 		final InsnList instructions = method.instructions;
 		ControlFlowGraphDataStructure controlFlow = new ControlFlowGraphDataStructure( instructions );
 		for( int idx=0; idx<instructions.size(); ++idx){
-//			if(-1 == instructions.get(idx).getOpcode() ){ continue; } // TODO rm
 			final AbstractInsnNode instruction = instructions.get(idx);
-//System.out.println( "XXX " + instructions.get(idx).getOpcode()); // TODO rm
-
 			controlFlow.appendInstruction(instruction, idx);
 		}
 		controlFlow.printDotty();

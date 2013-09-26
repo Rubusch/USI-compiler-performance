@@ -94,9 +94,13 @@ public class ControlFlowGraphDataStructure {
 			ptr = new ArrayList<String>();
 			content.add( ptr );
 
-			if( 0 < idx && !fallthruOpcodes.contains( instructions.get(idx).getOpcode() )){
+if(0 < idx) System.out.println("XXX before filter - opcode '"+instructions.get(idx).getOpcode()+"'"); //  ["+Printer.OPCODES[instructions.get(idx).getOpcode()]+"]");
+//			if( 0 < idx && !fallthruOpcodes.contains( instructions.get(idx).getOpcode() )){
+			if( 0 < idx && !fallthruOpcodes.contains( instructions.get(idx-1).getOpcode() )){
+System.out.println("XXX not filtered  - opcode '"+instructions.get(idx).getOpcode() ); //+"' ["+Printer.OPCODES[instructions.get(idx).getOpcode()]+"]");
 				String src = String.valueOf(idx-1 + "> " + Printer.OPCODES[this.instructions.get(idx-1).getOpcode()]);
 				String dst = String.valueOf(idx + "> " + mnemonic);
+System.out.println("XXX find GOTO: src '"+ src + "', dst '" + dst + "'");
 				fallthruList.add(src + "->" + dst);
 			}
 		}
@@ -154,23 +158,30 @@ public class ControlFlowGraphDataStructure {
 			}
 
 			for( String src : srces){
+				dottyEdge(src, dst);
+/* // TODO
 				String idxDst = String.valueOf( getBlockIndex( dst ));
 				String idxDstIns = dst.split(">")[0];
 				String idxSrc = String.valueOf( getBlockIndex( src ));
 				String idxSrcIns = src.split(">")[0];
 				System.out.println( "  node" + idxSrc + ":" + idxSrcIns + " -> node" + idxDst + ":" + idxDstIns );
+//*/
 			}
 
 		}
+
+		System.out.println("");
 		for( String str : fallthruList){
 			String src = str.split("->")[0];
 			String dst = str.split("->")[1];
-//System.out.println("XXX str src '" + src + "', dst '" + dst + "'"); // TODO rm
+			dottyEdge(src, dst);
+/* // TODO
 			String idxDst = String.valueOf( getBlockIndex( dst ));
 			String idxDstIns = dst.split(">")[0];
 			String idxSrc = String.valueOf( getBlockIndex( src ));
 			String idxSrcIns = src.split(">")[0];
 			System.out.println( "  node" + idxSrc + ":" + idxSrcIns + " -> node" + idxDst + ":" + idxDstIns );
+//*/
 		}
 		
 		System.out.println("");
@@ -182,7 +193,28 @@ public class ControlFlowGraphDataStructure {
 		System.out.println("}");
 	}
 
-	private int getBlockIndex( String ins ){
+	private void dottyEdge(String src, String dst){
+		
+		String idxDst = "";
+		for( int idx = 0; idx < content.size(); ++idx){
+			if( content.get(idx).contains(dst)){
+				idxDst = String.valueOf( idx);
+				break;
+			}
+		}
+		String idxDstIns = dst.split(">")[0];
+		String idxSrc = "";
+		for( int idx = 0; idx < content.size(); ++idx){
+			if( content.get(idx).contains(src)){
+				idxSrc = String.valueOf( idx);
+				break;
+			}
+		}
+		String idxSrcIns = src.split(">")[0];
+		System.out.println( "  node" + idxSrc + ":" + idxSrcIns + " -> node" + idxDst + ":" + idxDstIns );
+	}
+
+	private int _getBlockIndex( String ins ){
 //		System.out.println( "XXX ins " + ins ); // TODO rm
 		for( int idxBlock = 0; idxBlock < content.size(); ++idxBlock){
 			if( content.get(idxBlock).contains(ins)){
@@ -228,7 +260,6 @@ public class ControlFlowGraphDataStructure {
 			// splitting necessary, elem is not at idx 0
 // TODO test
 			for( idxIns = 1; idxIns < content.get(idxBlock).size(); ++idxIns){
-//				System.out.println( "XXX BACKWARD - " + content.get(idxBlock).get(idxIns).split("> ")[0] );
 				if( dst == Integer.valueOf( content.get(idxBlock).get(idxIns).split("> ")[0]).intValue()){
 					break;
 				}
@@ -277,8 +308,6 @@ public class ControlFlowGraphDataStructure {
 	}
 
 
-
-
 	public void appendInstruction( final AbstractInsnNode ins, final int idx ){
 		final int opcode = ins.getOpcode();
 		String mnemonic = (opcode==-1 ? "" : Printer.OPCODES[this.instructions.get(idx).getOpcode()]);
@@ -298,26 +327,18 @@ public class ControlFlowGraphDataStructure {
 				backward( new String(idx + "> " + mnemonic), dest);
 				return;
 			}
-
-		//		}else if( AbstractInsnNode.LABEL == ins.getType() ){ // TODO rm
 		case AbstractInsnNode.LABEL:
 			// pseudo-instruction (branch or exception target)
 			mnemonic = "label";
 			break;
-//*
 		case AbstractInsnNode.FRAME:
 			// pseudo-instruction (stack frame map)
 			return;
-//			mnemonic = "stack-frame-map";
-//			break;
 		case AbstractInsnNode.LINE:
 			// pseudo-instruction (line number information)
 			return;
-//			mnemonic = "line-number-information";
-//			break;
-//*/
 		}
-		
+
 		// append other type of instructions and nops (-1)
 		append( mnemonic, idx );
 	}
