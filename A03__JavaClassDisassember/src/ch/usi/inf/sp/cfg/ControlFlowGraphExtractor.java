@@ -51,7 +51,7 @@ public final class ControlFlowGraphExtractor {
 	 * @param method
 	 */
 	private void flowMethod( final MethodNode method ){
-		ControlFlowGraphDatastructure instrblocks = new ControlFlowGraphDatastructure();
+		ControlFlowGraphDataStructure instrblocks = new ControlFlowGraphDataStructure();
 
 		final InsnList instructions = method.instructions;
 		for( int idx=0; idx<instructions.size(); ++idx){

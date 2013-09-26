@@ -8,7 +8,7 @@ import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.util.Printer;
 
 // TODO perhaps better inherit from ArrayList< ArrayList >
-public class ControlFlowGraphDatastructure {
+public class ControlFlowGraphDataStructure {
 	// table of jump point sources, key = destination, value = source
 	private HashMap< String, String > srctable;
 
@@ -16,7 +16,7 @@ public class ControlFlowGraphDatastructure {
 	private ArrayList< ArrayList< String > > content;
 	private ArrayList< String > ptr;
 
-	public ControlFlowGraphDatastructure(){
+	public ControlFlowGraphDataStructure(){
 		srctable = new HashMap< String, String >();
 // TODO
 	}
