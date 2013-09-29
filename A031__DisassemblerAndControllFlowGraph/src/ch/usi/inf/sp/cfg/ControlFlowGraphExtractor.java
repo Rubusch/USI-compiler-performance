@@ -1,7 +1,6 @@
 package ch.usi.inf.sp.cfg;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.objectweb.asm.Opcodes;
@@ -47,58 +46,72 @@ public class ControlFlowGraphExtractor {
 		initInstructions();
 	}
 
+	private void branching( int targetIdx, int idx ){
+		String dotConnection = "";
+		dotConnection += String.valueOf( idx ) + ":" + String.valueOf(targetIdx);
+		this.dotJump.add(dotConnection);
+
+		if( targetIdx < idx ){
+			// backward jump
+			int idxLastFirstIns = 0;
+//					for( int listIdx = 1; listIdx < this.listlist.size(); ++listIdx ){ // TODO test
+			for( int listIdx = 1; listIdx < this.listlist.size()-1; ++listIdx ){
+				int idxFirstIns = this.listlist.indexOf( this.listlist.get(listIdx).get(0) );
+				if( targetIdx < idxFirstIns ){
+					int start = idxLastFirstIns;
+					int diff = targetIdx - start;
+					this.listlist.add( listIdx, new ArrayList<AbstractInsnNode>( this.listlist.get(listIdx-1).subList( diff, this.listlist.get(listIdx-1).size())));
+					this.listlist.get( listIdx-1 ).removeAll( this.listlist.get( listIdx ) );
+					break;
+				}
+				idxLastFirstIns = idxFirstIns;
+			}
+		}else if( targetIdx > idx){
+			// forward jump
+			this.forwardJump.add(new Integer(targetIdx));
+		} // no else: jump to next element
+	}
+
 	private void initInstructions(){
 //	public void appendInstruction( final AbstractInsnNode ins, final int idx ){
 		boolean branchNextIteration = false;
 		for( int idx = 0; idx < this.instructions.size(); ++idx ){
 			AbstractInsnNode ins = this.instructions.get(idx);
-			String dotConnection = "";
+//			String dotConnection = "";
 
+			// create new block
 			if(true == branchNextIteration){
 				listlist.add(new ArrayList<AbstractInsnNode>());
 				branchNextIteration = false;
 			}
 
 			if( ins.getType() == AbstractInsnNode.JUMP_INSN ){
-				LabelNode target = ((JumpInsnNode) ins).label;
-				int targetIdx = instructions.indexOf(target);
-				dotConnection += String.valueOf( idx ) + ":" + String.valueOf(targetIdx);
-
-				this.dotJump.add(dotConnection);
-				dotConnection = "";
+				String dotConnection = "";
 				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
 					dotConnection += String.valueOf( idx ) + ":" + String.valueOf( idx+1 );
 					this.dotJump.add(dotConnection);
 				}
+				LabelNode target = ((JumpInsnNode) ins).label;
+				int targetIdx = instructions.indexOf(target);
+				branching( targetIdx, idx );
 
-				if( targetIdx < idx ){
-					// backward jump
-					int idxLastFirstIns = 0;
-//					for( int listIdx = 1; listIdx < this.listlist.size(); ++listIdx ){
-// TODO test
-					for( int listIdx = 1; listIdx < this.listlist.size()-1; ++listIdx ){
-
-						int idxFirstIns = this.listlist.indexOf( this.listlist.get(listIdx).get(0) );
-						if( targetIdx < idxFirstIns ){
-							int start = idxLastFirstIns;
-							int diff = targetIdx - start;
-							this.listlist.add( listIdx, new ArrayList<AbstractInsnNode>( this.listlist.get(listIdx-1).subList( diff, this.listlist.get(listIdx-1).size())));
-							this.listlist.get( listIdx-1 ).removeAll( this.listlist.get( listIdx ) );
-							break;
-						}
-						idxLastFirstIns = idxFirstIns;
-					}
-				}else if( targetIdx > idx){
-					// forward jump
-					this.forwardJump.add(new Integer(targetIdx));
-				} // no else: jump to next element
-
-				// create a new basic block
-/*
-				listlist.add(new ArrayList<AbstractInsnNode>());
-/*/
+				// provoke a new basic block
 				branchNextIteration = true;
-//*/
+
+			}else if( ins.getType() == AbstractInsnNode.LOOKUPSWITCH_INSN){
+				final List<?> keys = ((LookupSwitchInsnNode)ins).keys;
+				final List<?> labels = ((LookupSwitchInsnNode)ins).labels;
+				for( int t=0; t<keys.size(); t++ ){
+					final LabelNode targetInstruction = (LabelNode)labels.get(t);
+					final int targetIdx = instructions.indexOf(targetInstruction);
+					branching( targetIdx, idx );
+				}
+
+				final LabelNode defaultTargetInstruction = ((LookupSwitchInsnNode)ins).dflt;
+				final int targetIdx = instructions.indexOf(defaultTargetInstruction);
+				branching( targetIdx, idx );
+				// create a new basic block
+				branchNextIteration = true;
 			}
 
 			// append
@@ -109,8 +122,6 @@ public class ControlFlowGraphExtractor {
 
 			// append instruction at last position
 			listlist.get( listlist.size()-1 ).add( ins );
-
-//			listlist.add(new ArrayList<AbstractInsnNode>()); // XXX
 		}
 	}
 
@@ -204,6 +215,7 @@ public class ControlFlowGraphExtractor {
 				case AbstractInsnNode.IINC_INSN:
 					// Opcodes: IINC.
 					System.out.print("IINC");
+					System.out.print(" ");
 					System.out.print(((IincInsnNode)ins).var);
 					System.out.println(" ");
 					System.out.print(((IincInsnNode)ins).incr);
@@ -212,6 +224,7 @@ public class ControlFlowGraphExtractor {
 					// Opcodes: NEW, ANEWARRAY, CHECKCAST or INSTANCEOF.
 //					System.out.print("NEWorANEWARRAYorCHECKCASTorINSTANCEOF");
 					System.out.print( Printer.OPCODES[opcode]);
+					System.out.print(" ");
 					System.out.print(((TypeInsnNode)ins).desc);
 					break;
 				case AbstractInsnNode.VAR_INSN:
@@ -221,6 +234,8 @@ public class ControlFlowGraphExtractor {
 					break;
 				case AbstractInsnNode.FIELD_INSN:
 					// Opcodes: GETSTATIC, PUTSTATIC, GETFIELD or PUTFIELD.
+					System.out.print(Printer.OPCODES[ins.getOpcode()]);
+					System.out.print(" ");
 					System.out.print(((FieldInsnNode)ins).owner);
 					System.out.print(".");
 					System.out.print(((FieldInsnNode)ins).name);
@@ -231,6 +246,7 @@ public class ControlFlowGraphExtractor {
 					// Opcodes: INVOKEVIRTUAL, INVOKESPECIAL, INVOKESTATIC,
 				    // INVOKEINTERFACE or INVOKEDYNAMIC.
 					System.out.print(Printer.OPCODES[ins.getOpcode()]);
+					System.out.print(" ");
 					System.out.print(((MethodInsnNode)ins).owner);
 					System.out.print(".");
 					System.out.print(((MethodInsnNode)ins).name);
@@ -240,6 +256,7 @@ public class ControlFlowGraphExtractor {
 				case AbstractInsnNode.MULTIANEWARRAY_INSN:
 					// Opcodes: MULTIANEWARRAY.
 					System.out.print(Printer.OPCODES[ins.getOpcode()]);
+					System.out.print(" ");
 					System.out.print(((MultiANewArrayInsnNode)ins).desc);
 					System.out.print(" ");
 					System.out.print(((MultiANewArrayInsnNode)ins).dims);
@@ -247,11 +264,10 @@ public class ControlFlowGraphExtractor {
 				case AbstractInsnNode.LOOKUPSWITCH_INSN:
 					// Opcodes: LOOKUPSWITCH.
 				{
-					final List keys = ((LookupSwitchInsnNode)ins).keys;
-					final List labels = ((LookupSwitchInsnNode)ins).labels;
-//					System.out.print("LOOKUPSWITCH ");
+					final List<?> keys = ((LookupSwitchInsnNode)ins).keys;
+					final List<?> labels = ((LookupSwitchInsnNode)ins).labels;
 					System.out.print(Printer.OPCODES[ins.getOpcode()]);
-// TODO is this actually branching?
+					System.out.print(" ");
 					for (int t=0; t<keys.size(); t++) {
 						final int key = (Integer)keys.get(t);
 						final LabelNode targetInstruction = (LabelNode)labels.get(t);
@@ -266,9 +282,10 @@ public class ControlFlowGraphExtractor {
 				case AbstractInsnNode.TABLESWITCH_INSN:
 					// Opcodes: TABLESWITCH.
 					System.out.println(Printer.OPCODES[ins.getOpcode()]);
+					System.out.print(" ");
 				{
 					final int minKey = ((TableSwitchInsnNode)ins).min;
-					final List labels = ((TableSwitchInsnNode)ins).labels;
+					final List<?> labels = ((TableSwitchInsnNode)ins).labels;
 					for (int t=0; t<labels.size(); t++) {
 						final int key = minKey+t;
 						final LabelNode targetInstruction = (LabelNode)labels.get(t);
@@ -281,8 +298,7 @@ public class ControlFlowGraphExtractor {
 					break;
 				}
 				}// end
-			
-// FIXME: connections
+
 				if(jdx < this.listlist.get(idx).size() -1 ){
 					System.out.print(" | <");
 				}
@@ -298,16 +314,7 @@ public class ControlFlowGraphExtractor {
 			String str = this.dotJump.get(idx);
 
 			int idxSrc = Integer.valueOf( str.split(":")[0] ).intValue();
-
-/*
-			int idxNodeSrc = 0;
-			for( int idxNode = 1; idxNode < this.listlist.size(); ++idxNode ){
-				if( this.instructions.indexOf( this.listlist.get( idxNode ).get(0) ) > idxSrc){
-					idxNodeSrc = idxNode-1;
-					break;
-				}
-			}
-/*/
+			
 			int idxNodeSrc = 1;
 			for( ; idxNodeSrc < this.listlist.size(); ++idxNodeSrc ){
 				if( this.instructions.indexOf( this.listlist.get( idxNodeSrc ).get(0) ) > idxSrc){
@@ -315,20 +322,9 @@ public class ControlFlowGraphExtractor {
 				}
 			}
 			--idxNodeSrc;
-//*/
 
 			int idxDst = Integer.valueOf( str.split(":")[1] ).intValue();
 
-/*
-			int idxNodeDst = 0;
-			int idxNode = 1;
-			for( idxNode = 1; idxNode < listlist.size(); ++idxNode ){
-				if( instructions.indexOf( listlist.get( idxNode ).get(0) ) > idxDst){
-					break;
-				}
-			}
-			idxNodeDst = idxNode-1;
-/*/
 			int idxNodeDst = 1;
 			for( ; idxNodeDst < listlist.size(); ++idxNodeDst ){
 				if( instructions.indexOf( listlist.get( idxNodeDst ).get(0) ) > idxDst){
@@ -336,7 +332,7 @@ public class ControlFlowGraphExtractor {
 				}
 			}
 			--idxNodeDst;
-//*/
+
 			System.out.println( "  node" +  idxNodeSrc +":" + idxSrc + " -> node" + idxNodeDst + ":" + idxDst );
 		}
 		System.out.println( "" );
