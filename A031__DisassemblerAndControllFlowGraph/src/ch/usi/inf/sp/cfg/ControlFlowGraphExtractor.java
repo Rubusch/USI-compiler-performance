@@ -37,7 +37,7 @@ public class ControlFlowGraphExtractor {
 		this.omitFallthruList = new ArrayList<Integer>();
 		{
 			// opcodes for goto and jumps
-//			final int []iOpcodes = { 167, 168, 169 };
+//			final int []iOpcodes = { 167, 168, 169 }; // 169 = ret
 			final int []iOpcodes = { 167, 168 };
 			for( int iOpcode : iOpcodes){
 				omitFallthruList.add(new Integer(iOpcode));
@@ -53,7 +53,7 @@ public class ControlFlowGraphExtractor {
 		for( int idx = 0; idx < this.instructions.size(); ++idx ){
 			AbstractInsnNode ins = this.instructions.get(idx);
 			String dotConnection = "";
-// TODO test
+
 			if(true == branchNextIteration){
 				listlist.add(new ArrayList<AbstractInsnNode>());
 				branchNextIteration = false;
@@ -63,6 +63,7 @@ public class ControlFlowGraphExtractor {
 				LabelNode target = ((JumpInsnNode) ins).label;
 				int targetIdx = instructions.indexOf(target);
 				dotConnection += String.valueOf( idx ) + ":" + String.valueOf(targetIdx);
+
 				this.dotJump.add(dotConnection);
 				dotConnection = "";
 				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
@@ -74,8 +75,8 @@ public class ControlFlowGraphExtractor {
 					// backward jump
 					int idxLastFirstIns = 0;
 //					for( int listIdx = 1; listIdx < this.listlist.size(); ++listIdx ){
+// TODO test
 					for( int listIdx = 1; listIdx < this.listlist.size()-1; ++listIdx ){
-						// TODO test
 
 						int idxFirstIns = this.listlist.indexOf( this.listlist.get(listIdx).get(0) );
 						if( targetIdx < idxFirstIns ){
@@ -168,14 +169,19 @@ public class ControlFlowGraphExtractor {
 					// FRETURN, DRETURN, ARETURN, RETURN, ARRAYLENGTH, ATHROW,
 					// MONITORENTER, or MONITOREXIT.
 					// zero operands, nothing to print
+					System.out.print(Printer.OPCODES[ins.getOpcode()]);
 					break;
 				case AbstractInsnNode.INT_INSN:
 					// Opcodes: NEWARRAY, BIPUSH, SIPUSH.
 					if( ins.getOpcode()==Opcodes.NEWARRAY) {
 						// NEWARRAY
+						System.out.print("NEWARRAY");
+						System.out.print(" ");
 						System.out.print(Printer.TYPES[((IntInsnNode)ins).operand]);
 					} else {
 						// BIPUSH or SIPUSH
+						System.out.print("BIPUSH SIPUSH");
+						System.out.print(" ");
 						System.out.print(((IntInsnNode)ins).operand);
 					}
 					break;
@@ -183,6 +189,8 @@ public class ControlFlowGraphExtractor {
 					// Opcodes: IFEQ, IFNE, IFLT, IFGE, IFGT, IFLE, IF_ICMPEQ,
 				    // IF_ICMPNE, IF_ICMPLT, IF_ICMPGE, IF_ICMPGT, IF_ICMPLE, IF_ACMPEQ,
 				    // IF_ACMPNE, GOTO, JSR, IFNULL or IFNONNULL.
+					System.out.print(Printer.OPCODES[ins.getOpcode()]);
+					System.out.print(" ");
 				{
 					final LabelNode targetInstruction = ((JumpInsnNode)ins).label;
 					final int targetId = instructions.indexOf(targetInstruction);
@@ -195,12 +203,15 @@ public class ControlFlowGraphExtractor {
 					break;
 				case AbstractInsnNode.IINC_INSN:
 					// Opcodes: IINC.
+					System.out.print("IINC");
 					System.out.print(((IincInsnNode)ins).var);
 					System.out.println(" ");
 					System.out.print(((IincInsnNode)ins).incr);
 					break;
 				case AbstractInsnNode.TYPE_INSN:
 					// Opcodes: NEW, ANEWARRAY, CHECKCAST or INSTANCEOF.
+//					System.out.print("NEWorANEWARRAYorCHECKCASTorINSTANCEOF");
+					System.out.print( Printer.OPCODES[opcode]);
 					System.out.print(((TypeInsnNode)ins).desc);
 					break;
 				case AbstractInsnNode.VAR_INSN:
@@ -219,6 +230,7 @@ public class ControlFlowGraphExtractor {
 				case AbstractInsnNode.METHOD_INSN:
 					// Opcodes: INVOKEVIRTUAL, INVOKESPECIAL, INVOKESTATIC,
 				    // INVOKEINTERFACE or INVOKEDYNAMIC.
+					System.out.print(Printer.OPCODES[ins.getOpcode()]);
 					System.out.print(((MethodInsnNode)ins).owner);
 					System.out.print(".");
 					System.out.print(((MethodInsnNode)ins).name);
@@ -227,6 +239,7 @@ public class ControlFlowGraphExtractor {
 					break;
 				case AbstractInsnNode.MULTIANEWARRAY_INSN:
 					// Opcodes: MULTIANEWARRAY.
+					System.out.print(Printer.OPCODES[ins.getOpcode()]);
 					System.out.print(((MultiANewArrayInsnNode)ins).desc);
 					System.out.print(" ");
 					System.out.print(((MultiANewArrayInsnNode)ins).dims);
@@ -236,7 +249,8 @@ public class ControlFlowGraphExtractor {
 				{
 					final List keys = ((LookupSwitchInsnNode)ins).keys;
 					final List labels = ((LookupSwitchInsnNode)ins).labels;
-					System.out.print("LOOKUPSWITCH ");
+//					System.out.print("LOOKUPSWITCH ");
+					System.out.print(Printer.OPCODES[ins.getOpcode()]);
 // TODO is this actually branching?
 					for (int t=0; t<keys.size(); t++) {
 						final int key = (Integer)keys.get(t);
@@ -251,6 +265,7 @@ public class ControlFlowGraphExtractor {
 				}
 				case AbstractInsnNode.TABLESWITCH_INSN:
 					// Opcodes: TABLESWITCH.
+					System.out.println(Printer.OPCODES[ins.getOpcode()]);
 				{
 					final int minKey = ((TableSwitchInsnNode)ins).min;
 					final List labels = ((TableSwitchInsnNode)ins).labels;
@@ -284,6 +299,7 @@ public class ControlFlowGraphExtractor {
 
 			int idxSrc = Integer.valueOf( str.split(":")[0] ).intValue();
 
+/*
 			int idxNodeSrc = 0;
 			for( int idxNode = 1; idxNode < this.listlist.size(); ++idxNode ){
 				if( this.instructions.indexOf( this.listlist.get( idxNode ).get(0) ) > idxSrc){
@@ -291,17 +307,36 @@ public class ControlFlowGraphExtractor {
 					break;
 				}
 			}
-
-			int idxDst = Integer.valueOf( str.split(":")[1] ).intValue();
-
-			int idxNodeDst = 0;
-			for( int idxNode = 1; idxNode < this.listlist.size(); ++idxNode ){
-				if( this.instructions.indexOf( this.listlist.get( idxNode ).get(0) ) > idxDst){
-					idxNodeDst = idxNode-1;
+/*/
+			int idxNodeSrc = 1;
+			for( ; idxNodeSrc < this.listlist.size(); ++idxNodeSrc ){
+				if( this.instructions.indexOf( this.listlist.get( idxNodeSrc ).get(0) ) > idxSrc){
 					break;
 				}
 			}
+			--idxNodeSrc;
+//*/
 
+			int idxDst = Integer.valueOf( str.split(":")[1] ).intValue();
+
+/*
+			int idxNodeDst = 0;
+			int idxNode = 1;
+			for( idxNode = 1; idxNode < listlist.size(); ++idxNode ){
+				if( instructions.indexOf( listlist.get( idxNode ).get(0) ) > idxDst){
+					break;
+				}
+			}
+			idxNodeDst = idxNode-1;
+/*/
+			int idxNodeDst = 1;
+			for( ; idxNodeDst < listlist.size(); ++idxNodeDst ){
+				if( instructions.indexOf( listlist.get( idxNodeDst ).get(0) ) > idxDst){
+					break;
+				}
+			}
+			--idxNodeDst;
+//*/
 			System.out.println( "  node" +  idxNodeSrc +":" + idxSrc + " -> node" + idxNodeDst + ":" + idxDst );
 		}
 		System.out.println( "" );
