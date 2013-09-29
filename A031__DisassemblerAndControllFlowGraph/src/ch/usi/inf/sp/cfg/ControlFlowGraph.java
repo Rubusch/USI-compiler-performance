@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodNode;
@@ -62,12 +61,6 @@ public class ControlFlowGraph {
 	private void flowMethod( final MethodNode method ){
 		final InsnList instructions = method.instructions;
 		ControlFlowGraphExtractor controlFlow = new ControlFlowGraphExtractor( instructions );
-/*
-		for( int idx=0; idx<instructions.size(); ++idx){
-			final AbstractInsnNode instruction = instructions.get(idx);
-			controlFlow.appendInstruction(instruction, idx);
-		}
-//*/
 		controlFlow.dottyPrint();
 	}
 }
