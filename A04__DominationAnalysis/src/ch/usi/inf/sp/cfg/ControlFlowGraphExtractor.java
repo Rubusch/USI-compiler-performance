@@ -321,33 +321,11 @@ public class ControlFlowGraphExtractor {
 
 		for( int idx = 0; idx < this.edgeslist.size(); ++idx ){
 			String str = this.edgeslist.get(idx);
-
 			int idxSrc = Integer.valueOf( str.split(":")[0] ).intValue();
-
-/*
-			int idxNodeSrc = 1;
-			for( ; idxNodeSrc < this.blocklist.size(); ++idxNodeSrc ){
-				if( this.instructions.indexOf( this.blocklist.get( idxNodeSrc ).get(0) ) > idxSrc){
-					break;
-				}
-			}
-			--idxNodeSrc;
-/*/
 			int idxNodeSrc = insId2NodeId( idxSrc );
-//*/
 			int idxDst = Integer.valueOf( str.split(":")[1] ).intValue();
-
-/*			
-			int idxNodeDst = 1;
-			for( ; idxNodeDst < blocklist.size(); ++idxNodeDst ){
-				if( instructions.indexOf( blocklist.get( idxNodeDst ).get(0) ) > idxDst){
-					break;
-				}
-			}
-			--idxNodeDst;
-/*/
 			int idxNodeDst = insId2NodeId( idxDst );
-//*/
+
 			System.out.println( "  node" +  idxNodeSrc +":" + idxSrc + " -> node" + idxNodeDst + ":" + idxDst );
 		}
 		System.out.println( "" );
