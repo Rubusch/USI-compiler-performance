@@ -323,7 +323,8 @@ public class ControlFlowGraphExtractor {
 			String str = this.edgeslist.get(idx);
 
 			int idxSrc = Integer.valueOf( str.split(":")[0] ).intValue();
-			
+
+/*
 			int idxNodeSrc = 1;
 			for( ; idxNodeSrc < this.blocklist.size(); ++idxNodeSrc ){
 				if( this.instructions.indexOf( this.blocklist.get( idxNodeSrc ).get(0) ) > idxSrc){
@@ -331,9 +332,12 @@ public class ControlFlowGraphExtractor {
 				}
 			}
 			--idxNodeSrc;
-
+/*/
+			int idxNodeSrc = insId2NodeId( idxSrc );
+//*/
 			int idxDst = Integer.valueOf( str.split(":")[1] ).intValue();
 
+/*			
 			int idxNodeDst = 1;
 			for( ; idxNodeDst < blocklist.size(); ++idxNodeDst ){
 				if( instructions.indexOf( blocklist.get( idxNodeDst ).get(0) ) > idxDst){
@@ -341,7 +345,9 @@ public class ControlFlowGraphExtractor {
 				}
 			}
 			--idxNodeDst;
-
+/*/
+			int idxNodeDst = insId2NodeId( idxDst );
+//*/
 			System.out.println( "  node" +  idxNodeSrc +":" + idxSrc + " -> node" + idxNodeDst + ":" + idxDst );
 		}
 		System.out.println( "" );
@@ -353,5 +359,16 @@ public class ControlFlowGraphExtractor {
 				+ " -> nodeE:E" );
 
 		System.out.println("}");
+	}
+
+	public int insId2NodeId( int insId ){
+		int nodeId = 1;
+		for( ; nodeId < blocklist.size(); ++nodeId ){
+			if( instructions.indexOf( blocklist.get( nodeId ).get(0) ) > insId){
+				break;
+			}
+		}
+		--nodeId;
+		return nodeId;
 	}
 }

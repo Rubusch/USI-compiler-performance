@@ -62,8 +62,11 @@ public class Analyzer {
 	private void flowMethod( final MethodNode method ){
 		final InsnList instructions = method.instructions;
 		ControlFlowGraphExtractor controlFlow = new ControlFlowGraphExtractor( instructions );
+//*
+		controlFlow.dotPrintCFG();
+/*/
 		DiGraph dominator = new DiGraph(controlFlow);
-//		controlFlow.dotPrintCFG();
 		dominator.dotPrintDA();
+//*/
 	}
 }
