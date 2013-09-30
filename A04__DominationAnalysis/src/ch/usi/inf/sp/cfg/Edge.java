@@ -14,6 +14,7 @@ public class Edge {
 	public Edge( Integer fromNodeId, Integer toNodeId ){
 		fromNode = fromNodeId;
 		toNode = toNodeId;
+		dotLabel = "";
 	}
 
 // TODO needed?
@@ -29,7 +30,7 @@ public class Edge {
 	public void dotPrint(){
 		String srcNode = "node" + fromNode;
 		String dstNode = "node" + toNode;
-		System.out.print( srcNode + " -> " + dstNode);
+		System.out.print( "  " + srcNode + " -> " + dstNode);
 		if( 0 < dotLabel.length() ){
 			System.out.println( "[" + dotLabel +"]" );
 		}else{
