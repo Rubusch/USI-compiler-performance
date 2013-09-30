@@ -23,7 +23,7 @@ import org.objectweb.asm.util.Printer;
 
 public class ControlFlowGraphExtractor {
 	private ArrayList< ArrayList<AbstractInsnNode>> blocklist;
-	private InsnList instructions;
+	private static InsnList instructions;
 	private ArrayList<Integer> forwardJump;
 	private ArrayList<String> edgeslist;
 	private ArrayList<Integer> omitFallthruList;
@@ -293,7 +293,7 @@ public class ControlFlowGraphExtractor {
 				case AbstractInsnNode.TABLESWITCH_INSN:
 					// Opcodes: TABLESWITCH.
 					System.out.println(Printer.OPCODES[ins.getOpcode()]);
-					System.out.print(" ");
+					System.out.print(" "); ArrayList<AbstractInsnNode> instructions
 				{
 					final int minKey = ((TableSwitchInsnNode)ins).min;
 					final List<?> labels = ((TableSwitchInsnNode)ins).labels;
@@ -346,14 +346,14 @@ public class ControlFlowGraphExtractor {
 
 // TODO idx = blockId
 // blocklist = inslist
-	public String dotPrintBlock( int idx, ArrayList<AbstractInsnNode> inslist){
+	public static String dotPrintBlock( int idx, ArrayList<AbstractInsnNode> blockinstructions ){
 		String szBlock = "";
 		szBlock += "  node" + idx;
 		szBlock += " [label = \"{ <"; 
-		for( int jdx=0; jdx < inslist.size(); ++jdx){
-			AbstractInsnNode ins = this.blocklist.get(idx).get(jdx);
+		for( int jdx=0; jdx < blockinstructions.size(); ++jdx){
+			AbstractInsnNode ins = blockinstructions.get(jdx);
 			int opcode = ins.getOpcode();
-			szBlock +=  this.instructions.indexOf( ins ) + "> ";
+			szBlock +=  instructions.indexOf( ins ) + "> ";
 			switch(ins.getType()){
 			case AbstractInsnNode.LABEL: 
 				// pseudo-instruction (branch or exception target)
@@ -501,7 +501,7 @@ public class ControlFlowGraphExtractor {
 			}
 			}// end
 
-			if(jdx < this.blocklist.get(idx).size() -1 ){
+			if(jdx < blockinstructions.size() -1 ){
 				szBlock += " | <";
 			}
 		}
