@@ -14,6 +14,11 @@ public class Node {
 	}
 
 	public void dotPrint(){
-		System.out.println( "  Node" + Id + " [label = TODO]");
+// TODO check, another label?
+		System.out.println( "  Node" + Id + " [label = \"" + Id + "\"]");
+	}
+	
+	public Integer id(){
+		return Id;
 	}
 }
