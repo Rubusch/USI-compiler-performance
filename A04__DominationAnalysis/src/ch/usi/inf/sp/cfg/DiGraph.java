@@ -1,13 +1,13 @@
 package ch.usi.inf.sp.cfg;
 
 public class DiGraph {
+	private ControlFlowGraphExtractor controlFlow;
 
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+	public DiGraph(ControlFlowGraphExtractor controlFlow){
+		this.controlFlow = controlFlow;
 	}
 
+	public void dotPrintDA(){
+		System.out.println( "TODO" );
+	}
 }

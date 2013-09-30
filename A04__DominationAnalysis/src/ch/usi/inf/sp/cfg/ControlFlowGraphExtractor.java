@@ -126,7 +126,7 @@ public class ControlFlowGraphExtractor {
 		}
 	}
 
-	public void dottyPrint(){
+	public void dotPrintCFG(){
 		System.out.println("\n# ---");
 		if( 0 == this.listlist.size() ) return;
 

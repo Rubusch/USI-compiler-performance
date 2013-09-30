@@ -12,7 +12,7 @@ import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodNode;
 
 
-public class ControlFlowGraph {
+public class Analyzer {
 	public static void die( String msg ){
 		System.out.println( msg );
 		System.exit(-1);
@@ -38,7 +38,7 @@ public class ControlFlowGraph {
 
 		cr.accept(cnode, 0);
 
-		ControlFlowGraph control = new ControlFlowGraph();
+		Analyzer control = new Analyzer();
 		control.flow( cnode, methodNameAndDescriptor );
 
 		System.out.println( "\n# READY.");
@@ -54,7 +54,6 @@ public class ControlFlowGraph {
 		}
 	}
 
-
 	/**
 	 * analysis and data structure per method
 	 * 
@@ -63,6 +62,8 @@ public class ControlFlowGraph {
 	private void flowMethod( final MethodNode method ){
 		final InsnList instructions = method.instructions;
 		ControlFlowGraphExtractor controlFlow = new ControlFlowGraphExtractor( instructions );
-		controlFlow.dottyPrint();
+		DiGraph dominator = new DiGraph(controlFlow);
+//		controlFlow.dotPrintCFG();
+		dominator.dotPrintDA();
 	}
 }
