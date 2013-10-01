@@ -86,7 +86,6 @@ public class Node {
 
 		// operate
 		
-
 //		for( int pos=1; true; ++pos ){ // TODO uncomment
 		for( int pos=1; pos<10; ++pos ){ // TODO debug, rm
 			for( int idxparent=0; idxparent < data.size(); ++idxparent){
