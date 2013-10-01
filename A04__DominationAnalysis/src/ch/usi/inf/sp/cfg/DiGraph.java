@@ -82,6 +82,7 @@ System.out.println( "XXX id:" + blockId + " else");
 	}
 
 	public void dotPrintDA(){
+		System.out.println("# ---");
 		if( 0 == this.nodelist.size() ) return;
 
 		// header

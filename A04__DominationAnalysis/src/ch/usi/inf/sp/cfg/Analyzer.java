@@ -74,6 +74,7 @@ public class Analyzer {
 	 * @param method
 	 */
 	private void flowMethod( final MethodNode method ){
+		System.out.println("\n# " + method.name);
 		final InsnList instructions = method.instructions;
 		ControlFlowGraphExtractor controlFlow = new ControlFlowGraphExtractor( instructions );
 /*
