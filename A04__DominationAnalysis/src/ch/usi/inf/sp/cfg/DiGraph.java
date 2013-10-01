@@ -34,6 +34,7 @@ System.out.println( "XXX blockId " + blockId);
 			Node current = nodelist.get(blockId);
 
 			if(0 == blockId){
+				// init start link
 				List<List<Integer>> inheritage = new ArrayList<List<Integer>>();
 				inheritage.add(new ArrayList<Integer>());
 				inheritage.get(0).add(new Integer( START ));
@@ -45,32 +46,52 @@ System.out.println( "XXX blockId " + blockId);
 // TODO fix for upward linking, loop detection - allow up, but when "contains" in one of the lists, stop ( = looping)
 			List<Edge> edges = new ArrayList<Edge>();
 			for( Edge edge: CFGedgelist){
+// TODO
+/*
+				if( blockId == edge.getToNode().id()){
+					if( -1 != edges.indexOf(edge)){
+						break;
+					}
+/*/
 				if( (blockId == edge.getToNode().id())
 						&& (edge.getFromNode().id() < edge.getToNode().id())){
+//*/
 					edges.add(edge);
 				}
 			}
 
-			// if there are more than 1 parents - merge inheritage, else init
-			if( 1 < edges.size() ){
+			// set heritage to the childs
+			if( 1 == edges.size()){
+				// only one parent
+				Node parent = edges.get(0).getFromNode();
+				if( 0 == parent.getInheritage().size()){
+					System.out.println( "FATAL - only 1 parent, but inheritage is empty");
+				}
+				current.inheritageInit( parent.getInheritage() );
+
+			}else if( 1 < edges.size() ){
+				// more than 1 parents - merge inheritage
 				final List<Node> parents = new ArrayList<Node>();
 				for( Edge edge : edges ){
 					parents.add(edge.getFromNode());
 				}
 				current.inheritageMerge(parents);
-			}else if( 1 == edges.size()){
-//System.out.println( "XXX id:" + blockId + " 1 == edges.size() " + edges.size()); // TODO rm
-				if( 0 < edges.get(0).getFromNode().getInheritage().size()){
-					current.inheritageInit(edges.get(0).getFromNode().getInheritage());
-				}else{
-					edges.get(0).getFromNode().inheritageInit( null );
-					current.inheritageInit( edges.get(0).getFromNode().getInheritage());
-				}
+
 			}else{
-// TODO is this needed?
-//System.out.println( "XXX id:" + blockId + " else");
-				current.inheritageInit( null );
-				continue;
+				// no downlink, just uplinks
+				System.out.println( "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+				System.out.println( "AAA edges.size() " + edges.size() + ", blockId " + blockId);
+
+
+				// may happen if node is inferior (no uplinking allowed)
+				for( Edge iedge: CFGedgelist){
+					if( blockId == iedge.getToNode().id()){
+						edges.add(iedge);
+					}
+				}
+//				current.inheritageInit(edges.get(0).getFromNode().getInheritage());
+
+
 			}
 		}
 

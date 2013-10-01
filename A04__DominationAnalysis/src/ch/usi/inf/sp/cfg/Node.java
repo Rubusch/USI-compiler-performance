@@ -22,7 +22,34 @@ public class Node {
 		return inheritage;
 	}
 
+	public void inheritageInit( List<List<Integer>> inheritage){
+System.out.println( "FFF inheritageInit()");
+// TODO handle first node, inheritage is what?
+		if( null == inheritage ){
+			System.out.println("FATAL - inheritage was null");
+		}
+		this.inheritage.addAll( inheritage );
+
+		// set dominator
+		if( 0 == this.inheritage.size() ){
+			System.out.println( "FATAL - inhertiage was empty");
+		}
+		List<Integer> inherit = this.inheritage.get(0);
+
+		if( 0 == inherit.size()){
+			System.out.println( "FATAL - first list in inheritage was empty");
+		}
+		Integer latestId = inherit.get( inherit.size()-1 );
+		this.idom = latestId;
+
+		// append own Id to all of the inheritage lists
+		for( List<Integer> list : this.inheritage ){
+			list.add(Id);
+		}
+	}
+
 	public void inheritageMerge( List<Node> parents ){
+System.out.println("FFF inheritageMerge()");
 		// add all parent inheritages
 		for( Node parent : parents ){
 			inheritageInit( parent.getInheritage() );
@@ -32,26 +59,6 @@ public class Node {
 		identifyDominator( parents );
 System.out.println( "XXX result idom = " + this.idom); // XXX
 	}
-//*/
-
-	public void inheritageInit( List<List<Integer>> inheritage){
-// TODO handle first node, inheritage is what?
-		if( null != inheritage ){
-			this.inheritage.addAll( inheritage );
-
-			// set dominator
-			try{
-				this.idom = this.inheritage.get(0).get(0);
-			}catch(IndexOutOfBoundsException exp){
-				this.idom = null;
-			}
-		}
-
-		// append own Id to all of the inheritage lists
-		for( List<Integer> list : this.inheritage ){
-			list.add(Id);
-		}
-	}
 
 	public Integer getIDom(){
 		if( null == idom ){ return 0; }
@@ -59,7 +66,7 @@ System.out.println( "XXX result idom = " + this.idom); // XXX
 	}
 
 	public void identifyDominator( List<Node> parents){
-
+System.out.println( "FFF identifyDominator()");
 
 // TODO rm
 // debugging dump
