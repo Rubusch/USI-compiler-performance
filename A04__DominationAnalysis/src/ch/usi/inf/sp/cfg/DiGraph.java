@@ -29,28 +29,25 @@ public class DiGraph {
 
 /******************************************************************************/
 		// CFG prepared
-//		for( int blockId = 1; blockId < nodelist.size(); ++blockId){ // TODO rm ?
 		for( int blockId = 0; blockId < nodelist.size(); ++blockId){
 System.out.println( "XXX blockId " + blockId);
 			Node current = nodelist.get(blockId);
-//* TODO
+
 			if(0 == blockId){
 				List<List<Integer>> inheritage = new ArrayList<List<Integer>>();
 				inheritage.add(new ArrayList<Integer>());
-				// START = -1
-				inheritage.get(0).add(new Integer(-1));
+				inheritage.get(0).add(new Integer( START ));
 				current.inheritageInit(inheritage);
+// TODO check if skipping the rest for the start connection is ok?!
 				continue;
 			}
-//*/
+
 			// find all edges ending directed to current (but not upward linking, to avoid loop issues)
 // TODO fix for upward linking - allow up, but when "contains" in one of the lists, stop ( = looping)
 			List<Edge> edges = new ArrayList<Edge>();
 			for( Edge edge: CFGedgelist){
-System.out.println( "XXX edge \t from " + edge.getFromNode().id() + ", to " + edge.getToNode().id());
 				if( (blockId == edge.getToNode().id())
 						&& (edge.getFromNode().id() < edge.getToNode().id())){
-System.out.println("XXX edge (taken) from " + edge.getFromNode().id() + ", to " + edge.getToNode().id());
 					edges.add(edge);
 				}
 			}

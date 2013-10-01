@@ -75,13 +75,10 @@ public class Node {
 				List<Integer> inherit = parent.getInheritage().get(idxinherit);
 
 				// per descendence lists
-//				data.add(new ArrayList<ArrayList<Integer>>());
 				data.get(idxparent).add(new ArrayList<Integer>());
-//				for( int idxids=0; idxids < parent.getInheritage().get(idxinherit).size(); ++idxids){
 				for( int idxid=0; idxid < inherit.size(); ++idxid){
 
 					// per item in particular descendence list
-//					data.get(idxparent).get(idxinherit).add( parent.getInheritage().get(idxinherit).get(idxids) );
 					data.get(idxparent).get(idxinherit).add( inherit.get(idxid) );
 				}
 			}
@@ -89,25 +86,49 @@ public class Node {
 
 
 		// operate
-//		for( int pos=1; true; ++pos ){ // TODO uncomment
-		for( int pos=1; pos<10; ++pos ){ // TODO debug, rm
+//		for( int pos=1; true; ++pos ){ // TODO uncomment - at most, up to largest list
+		for( int pos=0; pos<10; ++pos ){ // TODO debug, rm
 			for( int idxparent=0; idxparent < data.size(); ++idxparent){
-				for( int idxinherits=data.get(idxparent).size()-1; idxinherits > 0; --idxinherits){
-
+				ArrayList<ArrayList<Integer>> parent = data.get(idxparent);
+//				for( int idxinherit=data.get(idxparent).size()-1; idxinherit > 0; --idxinherit){
+				for( int idxinherit = parent.size()-1; idxinherit > 0; --idxinherit){
+					ArrayList<Integer> inherit = parent.get(idxinherit);
 // TODO size checks
-					Integer id = -1;
-					try{
-						id = data.get(idxparent).get(idxinherits).get(pos);
-					}catch( Exception exp){
-						if(1 == data.get(idxparent).size() ){
-							this.idom = data.get(idxparent).get(idxinherits).get(pos-1);
+					Integer id = -1; // TODO START?
+//					try{
+//						id = parent.get(idxinherit).get(pos);
+					if(pos >= inherit.size()){
+						if(1 == parent.size()){
+							// this parent has played its last inherit list, last element is dominator
+							if(0 < pos){
+								this.idom = inherit.get(pos -1);
+							}else{
+								// list was empty - an ERROR
+								System.out.println( "FIXME: a node had just one inherit list, which was empty");
+							}
 							return;
-//							return data.get(idxparent).get(idxinherits).get(pos-1);
 						}else{
-							data.get(idxparent).remove(idxinherits);
+							parent.remove(idxinherit);
+							continue;
 						}
-						continue;
 					}
+					id = inherit.get(pos);
+
+
+
+
+//					}catch( Exception exp){
+//						if(1 == data.get(idxparent).size() ){
+//						if(1 == parent.size() ){
+//							this.idom = data.get(idxparent).get(idxinherit).get(pos-1);
+//							this.idom = inherit.get(pos-1);
+//							return;
+//							return data.get(idxparent).get(idxinherits).get(pos-1);
+//						}else{
+//							data.get(idxparent).remove(idxinherit);
+//						}
+//						continue;
+//					}
 
 					// check now if id is containent in other parent at this position or not ( = discard whole vector)
 					for( int jdxparent = idxparent + 1; jdxparent < data.size(); ++jdxparent){
@@ -120,11 +141,11 @@ public class Node {
 							// not contained = remove whole vector
 							if(1 == data.get(idxparent).size()){
 // TODO check pos > 1
-								this.idom = data.get(idxparent).get(idxinherits).get(pos -1 );
+								this.idom = data.get(idxparent).get(idxinherit).get(pos -1 );
 								return;
 //								return data.get(idxparent).get(idxinherits).get(pos -1 );
 							}else{
-								data.get(idxparent).remove(idxinherits);
+								data.get(idxparent).remove(idxinherit);
 								break;
 							}
 						}
