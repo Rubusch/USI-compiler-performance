@@ -8,6 +8,7 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 public class Node {
 	private ArrayList<AbstractInsnNode> blockinstructions;
 	private final Integer Id; // TODO how to identify this node
+// TODO why is idom a Integer?
 	private Integer idom; // immediate dominator
 	private List<List<Integer>> inheritage;
 
@@ -60,7 +61,8 @@ public class Node {
 		return idom;
 	}
 
-	public Integer findDominator( List<Node> parents){
+//	public Integer findDominator( List<Node> parents){
+	public void findDominator( List<Node> parents){
 		// list of parents, each parent lists severan "inheritages", each is a list of Integers
 		ArrayList<ArrayList<ArrayList<Integer>>> data = new ArrayList<ArrayList<ArrayList<Integer>>>();
 
@@ -96,7 +98,9 @@ public class Node {
 						id = data.get(idxparent).get(idxinherits).get(pos);
 					}catch( Exception exp){
 						if(1 == data.get(idxparent).size() ){
-							return data.get(idxparent).get(idxinherits).get(pos-1);
+							this.idom = data.get(idxparent).get(idxinherits).get(pos-1);
+							return;
+//							return data.get(idxparent).get(idxinherits).get(pos-1);
 						}else{
 							data.get(idxparent).remove(idxinherits);
 						}
@@ -114,7 +118,9 @@ public class Node {
 							// not contained = remove whole vector
 							if(1 == data.get(idxparent).size()){
 // TODO check pos > 1
-								return data.get(idxparent).get(idxinherits).get(pos -1 );
+								this.idom = data.get(idxparent).get(idxinherits).get(pos -1 );
+								return;
+//								return data.get(idxparent).get(idxinherits).get(pos -1 );
 							}else{
 								data.get(idxparent).remove(idxinherits);
 								break;
@@ -125,7 +131,6 @@ public class Node {
 				}
 			}
 		}
-		return -1;
 	}
 
 
