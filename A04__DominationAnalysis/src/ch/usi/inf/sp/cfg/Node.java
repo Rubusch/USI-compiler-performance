@@ -112,10 +112,9 @@ public class Node {
 							continue;
 						}
 					}
+
+					// now get an id and check with other parents
 					id = inherit.get(pos);
-
-
-
 
 //					}catch( Exception exp){
 //						if(1 == data.get(idxparent).size() ){
@@ -132,14 +131,34 @@ public class Node {
 
 					// check now if id is containent in other parent at this position or not ( = discard whole vector)
 					for( int jdxparent = idxparent + 1; jdxparent < data.size(); ++jdxparent){
-						ArrayList<Integer> jids = new ArrayList<Integer>();
-						for( int jdxinherits = 0; jdxinherits < data.get(jdxparent).size(); ++jdxinherits){
-							jids.add( data.get(jdxparent).get(jdxinherits).get(pos) );
-						}
+						ArrayList<ArrayList<Integer>> cmpParent = data.get(jdxparent);
 
-						if(-1 == jids.indexOf(id)){
-							// not contained = remove whole vector
-							if(1 == data.get(idxparent).size()){
+						ArrayList<Integer> cmpParentIds = new ArrayList<Integer>();
+//						for( int jdxinherit = 0; jdxinherit < data.get(jdxparent).size(); ++jdxinherit){
+						for( int jdxinherit = 0; jdxinherit < cmpParent.size(); ++jdxinherit){
+							ArrayList<Integer> cmpInherit = cmpParent.get(jdxinherit);
+//							jids.add( data.get(jdxparent).get(jdxinherit).get(pos) );
+							cmpParentIds.add( cmpInherit.get(pos) );
+						}
+// TODO wtf?!
+						if( -1 == cmpParentIds.indexOf(id)){
+							// not contained in entire of this parents' sets, means we have the idom: pos-1
+							if(0 < pos){
+								this.idom = inherit.get(pos -1);
+							}else{
+								// list was empty - an ERROR
+								System.out.println( "FIXME: a node had just one inherit list, which was empty");
+							}
+							return;
+						}
+							
+							
+							
+							
+							
+/*
+//							if(1 == data.get(idxparent).size()){
+							if(1 == parent.size()){
 // TODO check pos > 1
 								this.idom = data.get(idxparent).get(idxinherit).get(pos -1 );
 								return;
@@ -149,6 +168,9 @@ public class Node {
 								break;
 							}
 						}
+//*/
+
+
 					}
 
 				}
