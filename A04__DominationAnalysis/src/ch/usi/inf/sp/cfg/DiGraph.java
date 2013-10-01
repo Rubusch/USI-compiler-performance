@@ -88,7 +88,6 @@ System.out.println( "XXX id:" + blockId + " else");
 		// header
 		System.out.println( "digraph G {" );
 		System.out.println( "  nodesep=.5" );
-//		System.out.println( "  rankdir=LR" );
 		System.out.println( "  node [shape=record,width=.1,height=.1]" );
 
 		// nodes

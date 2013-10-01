@@ -137,7 +137,6 @@ public class ControlFlowGraphExtractor {
 				// fallthrough edge
 // TODO are there instructions that cannot fall through here? check!
 				this.edgeslist.add(String.valueOf( idx-1 ) + ":" + String.valueOf(idx));
-
 			}
 
 			// append instruction at last position
