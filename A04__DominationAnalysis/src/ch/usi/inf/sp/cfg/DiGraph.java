@@ -6,17 +6,17 @@ import java.util.List;
 import org.objectweb.asm.tree.AbstractInsnNode;
 
 public class DiGraph {
-	private final ControlFlowGraphExtractor controlFlow;
 	private final ArrayList<Node> nodelist;
 	private final ArrayList<Edge> CFGedgelist;
 	private final ArrayList<Edge> DAedgelist;
 
-	public DiGraph(ControlFlowGraphExtractor controlFlow){
-		this.controlFlow = controlFlow;
+	public final static int START = -1;
+	public final static int END = -2;
 
+	public DiGraph(ControlFlowGraphExtractor controlFlow){
 		this.nodelist = new ArrayList<Node>();
 		for( int nodeId = 0; nodeId < controlFlow.getBlocklist().size(); ++nodeId){
-			nodelist.add(new Node( controlFlow.getBlocklist().get(nodeId), nodeId)); // XXX 1
+			nodelist.add(new Node( controlFlow.getBlocklist().get(nodeId), nodeId));
 		}
 
 		this.CFGedgelist = new ArrayList<Edge>();
@@ -29,14 +29,28 @@ public class DiGraph {
 
 /******************************************************************************/
 		// CFG prepared
-		for( int blockId = 1; blockId < nodelist.size(); ++blockId){
+//		for( int blockId = 1; blockId < nodelist.size(); ++blockId){ // TODO rm ?
+		for( int blockId = 0; blockId < nodelist.size(); ++blockId){
+System.out.println( "XXX blockId " + blockId);
 			Node current = nodelist.get(blockId);
-
-			// find all edges ending at current (and no upward linking, to avoid loop issues)
+//* TODO
+			if(0 == blockId){
+				List<List<Integer>> inheritage = new ArrayList<List<Integer>>();
+				inheritage.add(new ArrayList<Integer>());
+				// START = -1
+				inheritage.get(0).add(new Integer(-1));
+				current.inheritageInit(inheritage);
+				continue;
+			}
+//*/
+			// find all edges ending directed to current (but not upward linking, to avoid loop issues)
+// TODO fix for upward linking - allow up, but when "contains" in one of the lists, stop ( = looping)
 			List<Edge> edges = new ArrayList<Edge>();
 			for( Edge edge: CFGedgelist){
+System.out.println( "XXX edge \t from " + edge.getFromNode().id() + ", to " + edge.getToNode().id());
 				if( (blockId == edge.getToNode().id())
 						&& (edge.getFromNode().id() < edge.getToNode().id())){
+System.out.println("XXX edge (taken) from " + edge.getFromNode().id() + ", to " + edge.getToNode().id());
 					edges.add(edge);
 				}
 			}
@@ -50,7 +64,7 @@ public class DiGraph {
 				}
 				current.inheritageMerge(parents);
 			}else if( 1 == edges.size()){
-System.out.println( "XXX id:" + blockId + " 1 == edges.size() " + edges.size()); // TODO rm
+//System.out.println( "XXX id:" + blockId + " 1 == edges.size() " + edges.size()); // TODO rm
 				if( 0 < edges.get(0).getFromNode().getInheritage().size()){
 					current.inheritageInit(edges.get(0).getFromNode().getInheritage());
 				}else{
@@ -59,7 +73,7 @@ System.out.println( "XXX id:" + blockId + " 1 == edges.size() " + edges.size());
 				}
 			}else{
 // TODO is this needed?
-System.out.println( "XXX id:" + blockId + " else");
+//System.out.println( "XXX id:" + blockId + " else");
 				current.inheritageInit( null );
 				continue;
 			}
@@ -73,7 +87,16 @@ System.out.println( "XXX id:" + blockId + " else");
 		for( int blockId = nodelist.size()-1; blockId > 0; --blockId){
 			// find all edges ending at current (and no upward linking, to avoid loop issues)
 			Node current = nodelist.get(blockId);
-			DAedgelist.add( new Edge( nodelist.get( current.getIDom().intValue()), current ));
+//			DAedgelist.add( new Edge( nodelist.get( current.getIDom().intValue()), current )); // XXX -1
+			
+			Integer idxidom = current.getIDom();
+			final Node idom;
+			if( START == idxidom){
+				idom = new Node(null, START);
+			}else{
+				idom = nodelist.get(idxidom);
+			}
+			DAedgelist.add( new Edge(idom, current) );
 		}
 	}
 

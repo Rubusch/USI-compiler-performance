@@ -61,7 +61,6 @@ public class Node {
 		return idom;
 	}
 
-//	public Integer findDominator( List<Node> parents){
 	public void findDominator( List<Node> parents){
 		// list of parents, each parent lists severan "inheritages", each is a list of Integers
 		ArrayList<ArrayList<ArrayList<Integer>>> data = new ArrayList<ArrayList<ArrayList<Integer>>>();
@@ -72,21 +71,24 @@ public class Node {
 			Node parent = parents.get(idxparent);
 			data.add(new ArrayList<ArrayList<Integer>>());
 
-			for( int idxinherits=0; idxinherits < parent.getInheritage().size(); ++idxinherits){
+			for( int idxinherit=0; idxinherit < parent.getInheritage().size(); ++idxinherit){
+				List<Integer> inherit = parent.getInheritage().get(idxinherit);
 
 				// per descendence lists
-				data.add(new ArrayList<ArrayList<Integer>>());
-				for( int idxids=0; idxids < parent.getInheritage().get(idxinherits).size(); ++idxids){
+//				data.add(new ArrayList<ArrayList<Integer>>());
+				data.get(idxparent).add(new ArrayList<Integer>());
+//				for( int idxids=0; idxids < parent.getInheritage().get(idxinherit).size(); ++idxids){
+				for( int idxid=0; idxid < inherit.size(); ++idxid){
 
 					// per item in particular descendence list
-					data.get(idxparent).get(idxinherits).add( parent.getInheritage().get(idxinherits).get(idxids) );
+//					data.get(idxparent).get(idxinherit).add( parent.getInheritage().get(idxinherit).get(idxids) );
+					data.get(idxparent).get(idxinherit).add( inherit.get(idxid) );
 				}
 			}
 		}
 
 
 		// operate
-		
 //		for( int pos=1; true; ++pos ){ // TODO uncomment
 		for( int pos=1; pos<10; ++pos ){ // TODO debug, rm
 			for( int idxparent=0; idxparent < data.size(); ++idxparent){

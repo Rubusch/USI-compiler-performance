@@ -26,8 +26,19 @@ public class Edge {
 	}
 
 	public void dotPrint(){
-		String srcNode = "node" + fromNode.id();
-		String dstNode = "node" + toNode.id();
+		final String srcNode;
+		if( DiGraph.START == fromNode.id() ){
+			srcNode = "nodeS";
+		}else{
+			srcNode = "node" + fromNode.id();
+		}
+
+		String dstNode;
+		if( DiGraph.END == toNode.id() ){
+			dstNode = "nodeE";
+		}else{
+			dstNode = "node" + toNode.id();
+		}
 		System.out.print( "  " + srcNode + " -> " + dstNode);
 		if( 0 < dotLabel.length() ){
 			System.out.println( "[" + dotLabel +"]" );
