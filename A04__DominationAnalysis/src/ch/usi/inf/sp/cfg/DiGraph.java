@@ -77,9 +77,6 @@ System.out.println( "XXX id:" + blockId + " else");
 		}
 	}
 
-	private void dominationAnalysis(){
-		
-	}
 
 	public void dotPrintDA(){
 		System.out.println("# ---");

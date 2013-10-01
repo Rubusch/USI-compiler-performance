@@ -15,7 +15,6 @@ public class Node {
 		this.blockinstructions = blockinstructions;
 		this.Id = startId;
 		this.inheritage = new ArrayList<List<Integer>>();
-//		this.inheritage.add(new ArrayList<Integer>());
 	}
 
 	public List<List<Integer>> getInheritage(){
