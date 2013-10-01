@@ -2,6 +2,7 @@ package ch.usi.inf.sp.cfg;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 
@@ -26,34 +27,75 @@ public class DiGraph {
 			CFGedgelist.add(new Edge( nodelist.get(srcId), nodelist.get( dstId )));
 		}
 
-
 /******************************************************************************/
 		// CFG prepared
-		for( int blockId = 0; blockId < nodelist.size(); ++blockId){
-System.out.println( "XXX blockId " + blockId);
-			Node current = nodelist.get(blockId);
+		Node currCFG = nodelist.get(0);
+		ArrayList<Integer> passedIds = new ArrayList<Integer>();
+		Stack<Edge> stack = new Stack<Edge>();
+//		for( int blockId = 0; blockId < nodelist.size(); ++blockId){
+		for( int blockId = 0; true; ++blockId){
 
+			// "traverser"
 			if(0 == blockId){
 				// init start link
 				List<List<Integer>> inheritage = new ArrayList<List<Integer>>();
 				inheritage.add(new ArrayList<Integer>());
 				inheritage.get(0).add(new Integer( START ));
-				current.inheritageInit(inheritage);
+				currCFG.inheritageInit(inheritage);
+
+				// keep track of passed nodes
+				passedIds.add(currCFG.id());
+System.out.println( "AAA currCFG " + currCFG.id());
 				continue;
+
+			}else{
+				// get all possible next elements, and push them to stack
+				for( Edge peekEdge : CFGedgelist){
+					if( currCFG.id() == peekEdge.getFromNode().id() ){
+						if( -1 == passedIds.indexOf(peekEdge.getToNode().id())){
+							stack.push(peekEdge);
+						}else{
+							continue;
+						}
+					}
+				}
+
+				// check stack, and fetch next candidate
+				if( stack.isEmpty() ){ 
+					// we're done, this is a dead end
+System.out.println( "XXX stack was empty - we're done");
+//					return;
+					break;
+//					continue; // continue, to let it finish by for index
+				}
+System.out.println( "TEST stacksize " + stack.size() + "[before]");
+				Edge followEdge = stack.pop();
+System.out.println( "TEST stacksize " + stack.size() + "[after]");
+				currCFG = followEdge.getToNode();
+
+				// check if we've seen that node already
+//				if( -1 != passedIds.indexOf( currCFG.id() )){
+//					continue;
+//				}
+
+				// candidate was ok
+				passedIds.add( currCFG.id() );
 			}
+
+System.out.println( "BBB currCFG " + currCFG.id());
 
 			// find all edges ending directed to current (but not upward linking, to avoid loop issues)
 // TODO fix for upward linking, loop detection - allow up, but when "contains" in one of the lists, stop ( = looping)
 			List<Edge> edges = new ArrayList<Edge>();
 			for( Edge edge: CFGedgelist){
 // TODO
-/*
-				if( blockId == edge.getToNode().id()){
+//*
+				if( currCFG.id() == edge.getToNode().id()){
 					if( -1 != edges.indexOf(edge)){
 						break;
 					}
 /*/
-				if( (blockId == edge.getToNode().id())
+				if( (currCFG.id() == edge.getToNode().id())
 						&& (edge.getFromNode().id() < edge.getToNode().id())){
 //*/
 					edges.add(edge);
@@ -67,7 +109,7 @@ System.out.println( "XXX blockId " + blockId);
 				if( 0 == parent.getInheritage().size()){
 					System.out.println( "FATAL - only 1 parent, but inheritage is empty");
 				}
-				current.inheritageInit( parent.getInheritage() );
+				currCFG.inheritageInit( parent.getInheritage() );
 
 			}else if( 1 < edges.size() ){
 				// more than 1 parents - merge inheritage
@@ -75,44 +117,38 @@ System.out.println( "XXX blockId " + blockId);
 				for( Edge edge : edges ){
 					parents.add(edge.getFromNode());
 				}
-				current.inheritageMerge(parents);
+				currCFG.inheritageMerge(parents);
 
 			}else{
 				// no downlink, just uplinks
 				System.out.println( "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-				System.out.println( "AAA edges.size() " + edges.size() + ", blockId " + blockId);
 
 
 				// may happen if node is inferior (no uplinking allowed)
 				for( Edge iedge: CFGedgelist){
-					if( blockId == iedge.getToNode().id()){
+					if( currCFG.id() == iedge.getToNode().id()){
 						edges.add(iedge);
 					}
 				}
 //				current.inheritageInit(edges.get(0).getFromNode().getInheritage());
-
-
 			}
 		}
-
-
 
 /******************************************************************************/
 		// map CFG to DA
 		this.DAedgelist = new ArrayList<Edge>();
 		for( int blockId = nodelist.size()-1; blockId > 0; --blockId){
 			// find all edges ending at current (and no upward linking, to avoid loop issues)
-			Node current = nodelist.get(blockId);
+			Node currDA = nodelist.get(blockId);
 //			DAedgelist.add( new Edge( nodelist.get( current.getIDom().intValue()), current )); // XXX -1
-			
-			Integer idxidom = current.getIDom();
+			Integer idxidom = currDA.getIDom();
 			final Node idom;
 			if( START == idxidom){
 				idom = new Node(null, START);
 			}else{
 				idom = nodelist.get(idxidom);
 			}
-			DAedgelist.add( new Edge(idom, current) );
+			DAedgelist.add( new Edge(idom, currDA) );
 		}
 	}
 
