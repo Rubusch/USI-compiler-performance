@@ -92,8 +92,8 @@ System.out.println( "XXX id:" + blockId + " else");
 		System.out.println( "  node [shape=record,width=.1,height=.1]" );
 
 		// nodes
-		System.out.println( "  nodeS [label = \"{ <S> S }\"];" );
-		System.out.println( "  nodeE [label = \"{ <E> E }\"];" );
+		System.out.println( "  nodeS [label = \"start\"];" );
+		System.out.println( "  nodeE [label = \"end\"];" );
 		for( Node node : nodelist ){
 			node.dotPrint();
 // TODO another label?
@@ -111,9 +111,12 @@ System.out.println( "XXX id:" + blockId + " else");
 		System.out.println("}");
 	}
 
-	public void findLoops(){
-// TODO
+
+// in order to detect the loops, a separate traverser class should be implemented, walking down the DAedges
+//	public void findLoops(){
+// TODO not implemented so far
 //		Stack<Edges> stack;
-//		ArrayList<> already;
-	}
+//		ArrayList<> alreadyPassed;
+//		ArrayList<> currenthistory
+// 	}
 }

@@ -77,7 +77,7 @@ public class Analyzer {
 		System.out.println("\n# " + method.name);
 		final InsnList instructions = method.instructions;
 		ControlFlowGraphExtractor controlFlow = new ControlFlowGraphExtractor( instructions );
-/*
+//*
 		controlFlow.dotPrintCFG();
 /*/
 		DiGraph dominator = new DiGraph(controlFlow);

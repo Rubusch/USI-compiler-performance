@@ -134,7 +134,7 @@ public class Node {
 	public void dotPrint(){
 // TODO check, another label?
 //*
-		System.out.println( "  node" + Id + " [label = \"Block" + Id + "\"]");
+		System.out.println( "  node" + Id + " [label = \"block" + Id + "\"]");
 /*/
 		System.out.println( ControlFlowGraphExtractor.dotPrintBlock(Id, blockinstructions));
 //*/

@@ -141,19 +141,17 @@ public class ControlFlowGraphExtractor {
 		// header
 		System.out.println( "digraph G {" );
 		System.out.println( "  nodesep=.5" );
-		System.out.println( "  rankdir=LR" );
 		System.out.println( "  node [shape=record,width=.1,height=.1]" );
 		System.out.println( "" );
 
 		// start node
-		System.out.println( "  nodeS [label = \"{ <S> S }\"];" );
-		System.out.println( "  nodeE [label = \"{ <E> E }\"];" );
+		System.out.println( "  nodeS [label = \"{ <S> start }\"];" );
+		System.out.println( "  nodeE [label = \"{ <E> end }\"];" );
 		System.out.println( "" );
 
 		for( int idx=0; idx < this.blocklist.size(); ++idx){
 			System.out.print( dotPrintBlock( idx, blocklist.get(idx)) );
 		}
-//		System.out.println( "" );
 
 		// connections
 		System.out.println( "  nodeS:S -> node0:0" );
@@ -167,7 +165,6 @@ public class ControlFlowGraphExtractor {
 
 			System.out.println( "  node" +  idxNodeSrc +":" + idxSrc + " -> node" + idxNodeDst + ":" + idxDst );
 		}
-		System.out.println( "" );
 
 		// trailer
 // TODO back from RETURN, here just the forelast instruction
@@ -178,12 +175,10 @@ public class ControlFlowGraphExtractor {
 		System.out.println("}");
 	}
 
-// TODO idx = blockId
-// blocklist = inslist
-	public static String dotPrintBlock( int idx, ArrayList<AbstractInsnNode> blockinstructions ){
+	public static String dotPrintBlock( int blockId, ArrayList<AbstractInsnNode> blockinstructions ){
 		String szBlock = "";
-		szBlock += "  node" + idx;
-		szBlock += " [label = \"{ <"; 
+		szBlock += "  node" + blockId;
+		szBlock += " [label = \"block" + blockId + " | { <";
 		for( int jdx=0; jdx < blockinstructions.size(); ++jdx){
 			AbstractInsnNode ins = blockinstructions.get(jdx);
 			int opcode = ins.getOpcode();
