@@ -30,7 +30,8 @@ public class Node {
 // TODO in case find matching between the parents! for all sets in a parent compared to all sets of another one -> extract "stem"
 		}
 		
-		findDominator( parents );
+		identifyDominator( parents );
+System.out.println( "XXX result idom = " + this.idom); // XXX
 
 		// find dominator (reset dominator)
 // TODO extract last Id from the matching stem
@@ -61,11 +62,35 @@ public class Node {
 		return idom;
 	}
 
-	public void findDominator( List<Node> parents){
+	public void identifyDominator( List<Node> parents){
+
+
+// TODO rm
+// debugging dump
+System.out.println( "AAA ---");
+for( int idxparent=0; idxparent < parents.size(); ++idxparent ){
+	System.out.println( "parent " + idxparent);
+	final List<List<Integer>> parent = parents.get(idxparent).getInheritage();
+	for( int idxinherit=0; idxinherit < parent.size(); ++idxinherit){
+		System.out.print("\tinherit" + idxinherit + ": ");
+		final List<Integer> inherit = parent.get(idxinherit);
+		for( int idxid=0; idxid < inherit.size(); ++idxid){
+			System.out.print( inherit.get(idxid) + " ");
+		}
+		System.out.println( "" );
+	}
+	System.out.println( "" );
+}
+System.out.println( "BBB ---");
+
+
+
+
+		
 		if( 2 > parents.size() ){
 			System.out.println("FATAL - compare at least 2 nodes, passed were " + parents.size());
 		}
-System.out.println( "XXX #parents " + parents.size()); // TODO rm
+
 		// list of parents, each parent lists severan "inheritages", each is a list of Integers
 		ArrayList<ArrayList<ArrayList<Integer>>> data = new ArrayList<ArrayList<ArrayList<Integer>>>();
 
@@ -88,37 +113,21 @@ System.out.println( "XXX #parents " + parents.size()); // TODO rm
 			}
 		}
 
-
 		// operate
-//		for( int pos=1; true; ++pos ){ // TODO uncomment - at most, up to largest list
-		for( int pos=0; pos<10; ++pos ){ // TODO debug, rm
-System.out.println( "XXX pos " + pos); // XXX 
-			ArrayList<ArrayList<Integer>> parent = data.get(0);
-
-System.out.println( "XXX parent size " + parent.size() );
-System.out.println( "XXX inherits size " + parent.get(0).size());
-
-				for( int idxinherit = parent.size()-1; idxinherit > 0; --idxinherit){
-					ArrayList<Integer> inherit = parent.get(idxinherit);
-
-
-
-for( Integer i : inherit){
-	System.out.println("XXX\t\tid " + i);
-}
-
-
-
-					if(pos >= inherit.size()){
-						if(1 == parent.size()){
-							// this parent has played its last inherit list, last element is dominator
+		ArrayList<ArrayList<Integer>> parent = data.get(0);
+		for( int pos=1; 0 < parent.size(); ++pos ){ // don't enter here if parent - index == 0 - is empty
+			for( int idxinherit = parent.size()-1; 0 <= idxinherit; --idxinherit){
+				ArrayList<Integer> inherit = parent.get(idxinherit);
+				if(pos >= inherit.size()){
+					if(1 == parent.size()){
+						// this parent has played its last inherit list, last element is dominator
 						if(0 < pos){
 							this.idom = inherit.get(pos -1);
 						}else{
 							// list was empty - an ERROR
 							System.out.println( "FIXME: a node had just one inherit list, which was empty");
 						}
-						return;
+					return;
 					}else{
 						parent.remove(idxinherit);
 						continue;
@@ -133,10 +142,8 @@ for( Integer i : inherit){
 					ArrayList<ArrayList<Integer>> cmpParent = data.get(jdxparent);
 
 					ArrayList<Integer> cmpParentIds = new ArrayList<Integer>();
-//						for( int jdxinherit = 0; jdxinherit < data.get(jdxparent).size(); ++jdxinherit){
 					for( int jdxinherit = 0; jdxinherit < cmpParent.size(); ++jdxinherit){
 						ArrayList<Integer> cmpInherit = cmpParent.get(jdxinherit);
-//							jids.add( data.get(jdxparent).get(jdxinherit).get(pos) );
 						cmpParentIds.add( cmpInherit.get(pos) );
 					}
 					if( -1 == cmpParentIds.indexOf(id)){
