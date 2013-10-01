@@ -73,11 +73,9 @@ public class ControlFlowGraphExtractor {
 	}
 
 	private void initInstructions(){
-//	public void appendInstruction( final AbstractInsnNode ins, final int idx ){
 		boolean branchNextIteration = false;
 		for( int idx = 0; idx < this.instructions.size(); ++idx ){
 			AbstractInsnNode ins = this.instructions.get(idx);
-//			String dotConnection = "";
 
 			// create new block
 			if(true == branchNextIteration){
@@ -118,6 +116,8 @@ public class ControlFlowGraphExtractor {
 			if( -1 < this.forwardJump.indexOf( idx ) && this.listlist.get( this.listlist.size() -1 ).size() > 1 ){
 				// there was a forward jump to this address
 				this.listlist.add( new ArrayList<AbstractInsnNode>() );
+
+				this.dotJump.add(String.valueOf( idx-1 ) + ":" + String.valueOf(idx));
 			}
 
 			// append instruction at last position
@@ -217,7 +217,7 @@ public class ControlFlowGraphExtractor {
 					System.out.print("IINC");
 					System.out.print(" ");
 					System.out.print(((IincInsnNode)ins).var);
-					System.out.println(" ");
+					System.out.print(" ");
 					System.out.print(((IincInsnNode)ins).incr);
 					break;
 				case AbstractInsnNode.TYPE_INSN:
