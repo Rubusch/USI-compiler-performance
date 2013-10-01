@@ -26,16 +26,14 @@ public class Node {
 		// add all parent inheritages
 		for( Node parent : parents ){
 			inheritageInit( parent.getInheritage() );
-
-// TODO in case find matching between the parents! for all sets in a parent compared to all sets of another one -> extract "stem"
 		}
-		
+
 		identifyDominator( parents );
 System.out.println( "XXX result idom = " + this.idom); // XXX
 
 		// find dominator (reset dominator)
 // TODO extract last Id from the matching stem
-		this.idom = new Integer(0); // TODO set correct value
+//		this.idom = new Integer(0); // TODO set correct value
 	}
 
 	public void inheritageInit( List<List<Integer>> inheritage){
