@@ -62,6 +62,10 @@ public class Node {
 	}
 
 	public void findDominator( List<Node> parents){
+		if( 2 > parents.size() ){
+			System.out.println("FATAL - compare at least 2 nodes, passed were " + parents.size());
+		}
+System.out.println( "XXX #parents " + parents.size()); // TODO rm
 		// list of parents, each parent lists severan "inheritages", each is a list of Integers
 		ArrayList<ArrayList<ArrayList<Integer>>> data = new ArrayList<ArrayList<ArrayList<Integer>>>();
 
@@ -88,16 +92,57 @@ public class Node {
 		// operate
 //		for( int pos=1; true; ++pos ){ // TODO uncomment - at most, up to largest list
 		for( int pos=0; pos<10; ++pos ){ // TODO debug, rm
-			for( int idxparent=0; idxparent < data.size(); ++idxparent){
-				ArrayList<ArrayList<Integer>> parent = data.get(idxparent);
-//				for( int idxinherit=data.get(idxparent).size()-1; idxinherit > 0; --idxinherit){
+System.out.println( "XXX pos " + pos); // XXX 
+			ArrayList<ArrayList<Integer>> parent = data.get(0);
+
+System.out.println( "XXX parent size " + parent.size() );
+System.out.println( "XXX inherits size " + parent.get(0).size());
+
 				for( int idxinherit = parent.size()-1; idxinherit > 0; --idxinherit){
 					ArrayList<Integer> inherit = parent.get(idxinherit);
-// TODO size checks
-					Integer id = -1; // TODO START?
-//					try{
-//						id = parent.get(idxinherit).get(pos);
+
+
+
+for( Integer i : inherit){
+	System.out.println("XXX\t\tid " + i);
+}
+
+
+
 					if(pos >= inherit.size()){
+						if(1 == parent.size()){
+							// this parent has played its last inherit list, last element is dominator
+						if(0 < pos){
+							this.idom = inherit.get(pos -1);
+						}else{
+							// list was empty - an ERROR
+							System.out.println( "FIXME: a node had just one inherit list, which was empty");
+						}
+						return;
+					}else{
+						parent.remove(idxinherit);
+						continue;
+					}
+				}
+
+				// now get an id and check with other parents
+				Integer id = inherit.get(pos);
+
+				// check now if id is containent in other parent at this position or not ( = discard whole vector)
+				for( int jdxparent = 1; jdxparent < data.size(); ++jdxparent){
+					ArrayList<ArrayList<Integer>> cmpParent = data.get(jdxparent);
+
+					ArrayList<Integer> cmpParentIds = new ArrayList<Integer>();
+//						for( int jdxinherit = 0; jdxinherit < data.get(jdxparent).size(); ++jdxinherit){
+					for( int jdxinherit = 0; jdxinherit < cmpParent.size(); ++jdxinherit){
+						ArrayList<Integer> cmpInherit = cmpParent.get(jdxinherit);
+//							jids.add( data.get(jdxparent).get(jdxinherit).get(pos) );
+						cmpParentIds.add( cmpInherit.get(pos) );
+					}
+					if( -1 == cmpParentIds.indexOf(id)){
+						// not contained in entire set of this parent
+						// this means, remove the list from parent, and take next item
+						// if this was the last inherit list of parent, then we have idom
 						if(1 == parent.size()){
 							// this parent has played its last inherit list, last element is dominator
 							if(0 < pos){
@@ -112,67 +157,6 @@ public class Node {
 							continue;
 						}
 					}
-
-					// now get an id and check with other parents
-					id = inherit.get(pos);
-
-//					}catch( Exception exp){
-//						if(1 == data.get(idxparent).size() ){
-//						if(1 == parent.size() ){
-//							this.idom = data.get(idxparent).get(idxinherit).get(pos-1);
-//							this.idom = inherit.get(pos-1);
-//							return;
-//							return data.get(idxparent).get(idxinherits).get(pos-1);
-//						}else{
-//							data.get(idxparent).remove(idxinherit);
-//						}
-//						continue;
-//					}
-
-					// check now if id is containent in other parent at this position or not ( = discard whole vector)
-					for( int jdxparent = idxparent + 1; jdxparent < data.size(); ++jdxparent){
-						ArrayList<ArrayList<Integer>> cmpParent = data.get(jdxparent);
-
-						ArrayList<Integer> cmpParentIds = new ArrayList<Integer>();
-//						for( int jdxinherit = 0; jdxinherit < data.get(jdxparent).size(); ++jdxinherit){
-						for( int jdxinherit = 0; jdxinherit < cmpParent.size(); ++jdxinherit){
-							ArrayList<Integer> cmpInherit = cmpParent.get(jdxinherit);
-//							jids.add( data.get(jdxparent).get(jdxinherit).get(pos) );
-							cmpParentIds.add( cmpInherit.get(pos) );
-						}
-// TODO wtf?!
-						if( -1 == cmpParentIds.indexOf(id)){
-							// not contained in entire of this parents' sets, means we have the idom: pos-1
-							if(0 < pos){
-								this.idom = inherit.get(pos -1);
-							}else{
-								// list was empty - an ERROR
-								System.out.println( "FIXME: a node had just one inherit list, which was empty");
-							}
-							return;
-						}
-							
-							
-							
-							
-							
-/*
-//							if(1 == data.get(idxparent).size()){
-							if(1 == parent.size()){
-// TODO check pos > 1
-								this.idom = data.get(idxparent).get(idxinherit).get(pos -1 );
-								return;
-//								return data.get(idxparent).get(idxinherits).get(pos -1 );
-							}else{
-								data.get(idxparent).remove(idxinherit);
-								break;
-							}
-						}
-//*/
-
-
-					}
-
 				}
 			}
 		}
