@@ -8,7 +8,7 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 public class Node {
 	private ArrayList<AbstractInsnNode> blockinstructions;
 	private final Integer Id; // TODO how to identify this node
-// TODO why is idom a Integer?
+// TODO why is idom a Integer, and not a Node?
 	private Integer idom; // immediate dominator
 	private List<List<Integer>> inheritage;
 
@@ -28,13 +28,11 @@ public class Node {
 			inheritageInit( parent.getInheritage() );
 		}
 
+		// find dominator (reset dominator)
 		identifyDominator( parents );
 System.out.println( "XXX result idom = " + this.idom); // XXX
-
-		// find dominator (reset dominator)
-// TODO extract last Id from the matching stem
-//		this.idom = new Integer(0); // TODO set correct value
 	}
+//*/
 
 	public void inheritageInit( List<List<Integer>> inheritage){
 // TODO handle first node, inheritage is what?

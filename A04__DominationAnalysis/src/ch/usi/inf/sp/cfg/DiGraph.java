@@ -38,12 +38,11 @@ System.out.println( "XXX blockId " + blockId);
 				inheritage.add(new ArrayList<Integer>());
 				inheritage.get(0).add(new Integer( START ));
 				current.inheritageInit(inheritage);
-// TODO check if skipping the rest for the start connection is ok?!
 				continue;
 			}
 
 			// find all edges ending directed to current (but not upward linking, to avoid loop issues)
-// TODO fix for upward linking - allow up, but when "contains" in one of the lists, stop ( = looping)
+// TODO fix for upward linking, loop detection - allow up, but when "contains" in one of the lists, stop ( = looping)
 			List<Edge> edges = new ArrayList<Edge>();
 			for( Edge edge: CFGedgelist){
 				if( (blockId == edge.getToNode().id())
@@ -54,7 +53,6 @@ System.out.println( "XXX blockId " + blockId);
 
 			// if there are more than 1 parents - merge inheritage, else init
 			if( 1 < edges.size() ){
-				// get all parents
 				final List<Node> parents = new ArrayList<Node>();
 				for( Edge edge : edges ){
 					parents.add(edge.getFromNode());
