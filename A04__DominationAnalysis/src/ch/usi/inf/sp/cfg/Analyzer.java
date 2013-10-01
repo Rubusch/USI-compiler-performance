@@ -25,22 +25,29 @@ public class Analyzer {
 		}catch( Exception exp ){
 			die( "check class file name (first argument)");
 		}
-
+/*
 		String methodNameAndDescriptor = "";
 		try{
 			methodNameAndDescriptor = args[1];
 		}catch( Exception exp ){
+			// no specific method provided, do all methods
 			die("check method name and descriptor (second argument)");
 		}
-
+//*/
 		final ClassReader cr = new ClassReader( new FileInputStream( classFileName ));
 		final ClassNode cnode = new ClassNode();
-
 		cr.accept(cnode, 0);
-
 		Analyzer control = new Analyzer();
-		control.flow( cnode, methodNameAndDescriptor );
 
+
+		String methodNameAndDescriptor = "";
+		try{
+			methodNameAndDescriptor = args[1];
+			control.flow( cnode, methodNameAndDescriptor );
+		}catch( Exception exp ){
+			// no specific method provided, do all methods
+			control.flow( cnode );			
+		}
 		System.out.println( "\n# READY.");
 	}
 
@@ -51,6 +58,13 @@ public class Analyzer {
 			if( methodNameAndDescriptor.equals( method.name ) ){
 				flowMethod(method);
 			}
+		}
+	}
+
+	private void flow( ClassNode cnode ){
+		final List<MethodNode> methods = cnode.methods;
+		for( int idx=0; idx<methods.size(); ++idx){
+			flowMethod(methods.get(idx));
 		}
 	}
 
