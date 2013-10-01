@@ -63,14 +63,23 @@ public class ControlFlowGraphExtractor {
 		if( targetIdx < idx ){
 			// backward jump
 			int idxLastFirstIns = 0;
-//					for( int listIdx = 1; listIdx < this.listlist.size(); ++listIdx ){ // TODO test
 			for( int listIdx = 1; listIdx < this.blocklist.size()-1; ++listIdx ){
-				int idxFirstIns = this.blocklist.indexOf( this.blocklist.get(listIdx).get(0) );
+				AbstractInsnNode firstIns = this.blocklist.get(listIdx).get(0);
+				int idxFirstIns = this.blocklist.indexOf( firstIns );
 				if( targetIdx < idxFirstIns ){
+					// we ultrapassed one, so the last one is it: go back
 					int start = idxLastFirstIns;
 					int diff = targetIdx - start;
-					this.blocklist.add( listIdx, new ArrayList<AbstractInsnNode>( this.blocklist.get(listIdx-1).subList( diff, this.blocklist.get(listIdx-1).size())));
+					// break sublist, and insert new sublist
+					List<AbstractInsnNode> sublist = this.blocklist.get(listIdx-1).subList( diff, this.blocklist.get(listIdx-1).size());
+					this.blocklist.add( listIdx, new ArrayList<AbstractInsnNode>( sublist ));
+					// now remove sublist from old location
 					this.blocklist.get( listIdx-1 ).removeAll( this.blocklist.get( listIdx ) );
+
+// TODO is this necessary?
+					// fallthrough edge
+					this.edgeslist.add(String.valueOf( targetIdx-1 ) + ":" + String.valueOf(targetIdx));
+
 					break;
 				}
 				idxLastFirstIns = idxFirstIns;
@@ -82,11 +91,9 @@ public class ControlFlowGraphExtractor {
 	}
 
 	private void initInstructions(){
-//	public void appendInstruction( final AbstractInsnNode ins, final int idx ){
 		boolean branchNextIteration = false;
 		for( int idx = 0; idx < this.instructions.size(); ++idx ){
 			AbstractInsnNode ins = this.instructions.get(idx);
-//			String dotConnection = "";
 
 			// create new block
 			if(true == branchNextIteration){
@@ -127,6 +134,10 @@ public class ControlFlowGraphExtractor {
 			if( -1 < this.forwardJump.indexOf( idx ) && this.blocklist.get( this.blocklist.size() -1 ).size() > 1 ){
 				// there was a forward jump to this address
 				this.blocklist.add( new ArrayList<AbstractInsnNode>() );
+				// fallthrough edge
+// TODO are there instructions that cannot fall through here? check!
+				this.edgeslist.add(String.valueOf( idx-1 ) + ":" + String.valueOf(idx));
+
 			}
 
 			// append instruction at last position
