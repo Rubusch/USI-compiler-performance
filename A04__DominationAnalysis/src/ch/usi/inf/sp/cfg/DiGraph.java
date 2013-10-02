@@ -49,40 +49,39 @@ System.out.println( "AAA currCFG " + currCFG.id());
 				continue;
 
 			}else{
-				// get all possible next elements, and push them to stack
-				for( Edge peekEdge : CFGedgelist){
-					if( currCFG.id() == peekEdge.getFromNode().id() ){
-						if( -1 == passedIds.indexOf(peekEdge.getToNode().id())){
-							stack.push(peekEdge);
-						}else{
-							continue;
+
+				if( stack.isEmpty()){
+					// stack is empty discover next tier
+					for( Edge peekEdge : CFGedgelist){
+						if( currCFG.id() == peekEdge.getFromNode().id() ){
+							if( -1 == passedIds.indexOf(peekEdge.getToNode().id())){
+								stack.push(peekEdge);
+							}else{
+								continue;
+							}
 						}
 					}
+					
+					if( stack.isEmpty()){
+						// we're done when the stack can't be filled anymore
+						break;
+					}
+					continue;
+				}else{
+					// candidate was ok
+					Edge followEdge = stack.pop();
+					currCFG = followEdge.getToNode();
+					passedIds.add( currCFG.id() );
 				}
-
-				// check stack, and fetch next candidate
-				if( stack.isEmpty() ){ 
-					// we're done, this is a dead end
-System.out.println( "XXX stack was empty - we're done");
-//					return;
-					break;
-//					continue; // continue, to let it finish by for index
-				}
-System.out.println( "TEST stacksize " + stack.size() + "[before]");
-				Edge followEdge = stack.pop();
-System.out.println( "TEST stacksize " + stack.size() + "[after]");
-				currCFG = followEdge.getToNode();
-
-				// check if we've seen that node already
-//				if( -1 != passedIds.indexOf( currCFG.id() )){
-//					continue;
-//				}
-
-				// candidate was ok
-				passedIds.add( currCFG.id() );
 			}
 
 System.out.println( "BBB currCFG " + currCFG.id());
+
+
+
+
+
+
 
 			// find all edges ending directed to current (but not upward linking, to avoid loop issues)
 // TODO fix for upward linking, loop detection - allow up, but when "contains" in one of the lists, stop ( = looping)
@@ -120,9 +119,9 @@ System.out.println( "BBB currCFG " + currCFG.id());
 				currCFG.inheritageMerge(parents);
 
 			}else{
-				// no downlink, just uplinks
+				// this should not happen...
 				System.out.println( "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-
+/*
 
 				// may happen if node is inferior (no uplinking allowed)
 				for( Edge iedge: CFGedgelist){
@@ -131,6 +130,7 @@ System.out.println( "BBB currCFG " + currCFG.id());
 					}
 				}
 //				current.inheritageInit(edges.get(0).getFromNode().getInheritage());
+//*/
 			}
 		}
 
