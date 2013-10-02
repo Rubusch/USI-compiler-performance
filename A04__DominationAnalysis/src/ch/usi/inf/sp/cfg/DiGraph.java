@@ -32,7 +32,6 @@ public class DiGraph {
 		Node currCFG = nodelist.get(0);
 		ArrayList<Integer> passedIds = new ArrayList<Integer>();
 		Stack<Edge> stack = new Stack<Edge>();
-//		for( int blockId = 0; blockId < nodelist.size(); ++blockId){
 		for( int blockId = 0; true; ++blockId){
 
 			// "traverser"
@@ -82,11 +81,6 @@ public class DiGraph {
 			List<Edge> edges = new ArrayList<Edge>();
 			for( Edge edge: CFGedgelist){
 				if( currCFG.id() == edge.getToNode().id()){
-/*
-					if( -1 != edges.indexOf(edge)){
-						break;
-					}
-//*/
 					edges.add(edge);
 				}
 			}
@@ -107,21 +101,10 @@ public class DiGraph {
 				for( Edge edge : edges ){
 					parents.add(edge.getFromNode());
 				}
-				currCFG.inheritageMerge(parents);
-
-			}else{
-				// this should not happen...
-				System.out.println( "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-/*
-
-				// may happen if node is inferior (no uplinking allowed)
-				for( Edge iedge: CFGedgelist){
-					if( currCFG.id() == iedge.getToNode().id()){
-						edges.add(iedge);
-					}
+				if( false == currCFG.inheritageMerge(parents) ){
+// TODO parse this node later again
+					passedIds.remove(passedIds.indexOf(currCFG.id()));
 				}
-//				current.inheritageInit(edges.get(0).getFromNode().getInheritage());
-//*/
 			}
 		}
 
@@ -172,13 +155,4 @@ public class DiGraph {
 
 		System.out.println("}");
 	}
-
-
-// in order to detect the loops, a separate traverser class should be implemented, walking down the DAedges
-//	public void findLoops(){
-// TODO not implemented so far
-//		Stack<Edges> stack;
-//		ArrayList<> alreadyPassed;
-//		ArrayList<> currenthistory
-// 	}
 }

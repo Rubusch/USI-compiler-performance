@@ -65,7 +65,7 @@ for(int jik=0; jik<inheritage.size(); jik++){
 		}
 	}
 
-	public void inheritageMerge( List<Node> parents ){
+	public boolean inheritageMerge( List<Node> parents ){
 System.out.println("FFF inheritageMerge()");
 		// add all parent inheritages
 		for( Node parent : parents ){
@@ -73,8 +73,8 @@ System.out.println("FFF inheritageMerge()");
 		}
 
 		// find dominator (reset dominator)
-		identifyDominator( parents );
-System.out.println( "XXX result idom = " + this.idom); // XXX
+		return identifyDominator( parents );
+//System.out.println( "XXX result idom = " + this.idom); // XXX
 	}
 
 	public Integer getIDom(){
@@ -82,29 +82,41 @@ System.out.println( "XXX result idom = " + this.idom); // XXX
 		return idom;
 	}
 
-	public void identifyDominator( List<Node> parents){
+	
+	// return false, if was not mergeable (still), needs to be redone later
+	// this means basically a "false" shall provoke the remove from the
+	// "passedIds" list
+//	public void identifyDominator( List<Node> parents){
+	public boolean identifyDominator( List<Node> parents){
 System.out.println( "FFF identifyDominator()");
 
+		for( Node nd : parents){
+			boolean pending=false; // more ugly quickfixes
+			if( 0 == nd.getInheritage().size()){
+// TODO in case one parent is still not parsed (upward link), just postpone this 
+// node, and generate the merge later (to be implemented), so far, simply omited, 
+// since it works anyway +/-
+				pending = true;
+			}else{
+				this.idom = nd.getInheritage().get(0).get( nd.getInheritage().get(0).size()-1 );
+			}
+			if( pending ) return false;
+		}
+/*
 // TODO rm
 // debugging dump
 System.out.println( "AAA ---");
 for( int idxparent=0; idxparent < parents.size(); ++idxparent ){
-	System.out.println( "parent " + idxparent);
+	System.out.println( "parent id: " + idxparent);
 	final List<List<Integer>> parent = parents.get(idxparent).getInheritage();
 	for( int idxinherit=0; idxinherit < parent.size(); ++idxinherit){
-		System.out.print("\tinherit" + idxinherit + ": ");
-		final List<Integer> inherit = parent.get(idxinherit);
-		for( int idxid=0; idxid < inherit.size(); ++idxid){
-			System.out.print( inherit.get(idxid) + " ");
-		}
+		System.out.print("\tinherit idx: " + idxinherit + ": " + parent.get(idxinherit));
 		System.out.println( "" );
 	}
 	System.out.println( "" );
 }
 System.out.println( "BBB ---");
-
-
-
+//*/
 
 		
 		if( 2 > parents.size() ){
@@ -147,7 +159,7 @@ System.out.println( "BBB ---");
 							// list was empty - an ERROR
 							System.out.println( "FIXME: a node had just one inherit list, which was empty");
 						}
-					return;
+					return true;
 					}else{
 						parent.remove(idxinherit);
 						continue;
@@ -178,7 +190,7 @@ System.out.println( "BBB ---");
 								// list was empty - an ERROR
 								System.out.println( "FIXME: a node had just one inherit list, which was empty");
 							}
-							return;
+							return true;
 						}else{
 							parent.remove(idxinherit);
 							continue;
@@ -187,6 +199,7 @@ System.out.println( "BBB ---");
 				}
 			}
 		}
+		return true;
 	}
 
 
