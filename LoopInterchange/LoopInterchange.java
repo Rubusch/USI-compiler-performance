@@ -1,3 +1,15 @@
+/**
+ * Loop Interchange
+ * 
+ * measures execution time and shows differences in looping along nested for
+ * loops, looping cols by rows or rows by cols.
+ * 
+ * This is called Loop Interchange, and theoretically can be optimized by a
+ * compiler, but practically is rarely performed, due to certain complexities.
+ * 
+ * @author Lothar Rubusch
+ */
+
 public class LoopInterchange {
     private final int maxRows = 4000;
     private final int maxCols = 1000;
