@@ -25,15 +25,7 @@ public class Analyzer {
 		}catch( Exception exp ){
 			die( "check class file name (first argument)");
 		}
-/*
-		String methodNameAndDescriptor = "";
-		try{
-			methodNameAndDescriptor = args[1];
-		}catch( Exception exp ){
-			// no specific method provided, do all methods
-			die("check method name and descriptor (second argument)");
-		}
-//*/
+
 		final ClassReader cr = new ClassReader( new FileInputStream( classFileName ));
 		final ClassNode cnode = new ClassNode();
 		cr.accept(cnode, 0);

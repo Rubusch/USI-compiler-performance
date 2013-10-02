@@ -45,7 +45,6 @@ public class DiGraph {
 
 				// keep track of passed nodes
 				passedIds.add(currCFG.id());
-//System.out.println( "AAA currCFG " + currCFG.id());
 				continue;
 
 			}else{
@@ -75,8 +74,6 @@ public class DiGraph {
 				}
 			}
 
-//System.out.println( "BBB currCFG " + currCFG.id());
-
 			// find all edges ending directed to current (but not upward linking, to avoid loop issues)
 			List<Edge> edges = new ArrayList<Edge>();
 			for( Edge edge: CFGedgelist){
@@ -92,7 +89,6 @@ public class DiGraph {
 				if( 0 == parent.getInheritage().size()){
 					System.out.println( "FATAL - only 1 parent, but inheritage is empty");
 				}
-//System.out.println( "CCC currCFG " + currCFG.id());
 				currCFG.inheritageInit( parent.getInheritage() );
 
 			}else if( 1 < edges.size() ){
