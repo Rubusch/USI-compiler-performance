@@ -37,6 +37,7 @@ public class DiGraph {
 
 			// "traverser"
 			if(0 == blockId){
+				++blockId;
 				// init start link
 				List<List<Integer>> inheritage = new ArrayList<List<Integer>>();
 				inheritage.add(new ArrayList<Integer>());
@@ -45,7 +46,7 @@ public class DiGraph {
 
 				// keep track of passed nodes
 				passedIds.add(currCFG.id());
-System.out.println( "AAA currCFG " + currCFG.id());
+//System.out.println( "AAA currCFG " + currCFG.id());
 				continue;
 
 			}else{
@@ -75,27 +76,16 @@ System.out.println( "AAA currCFG " + currCFG.id());
 				}
 			}
 
-System.out.println( "BBB currCFG " + currCFG.id());
-
-
-
-
-
-
+//System.out.println( "BBB currCFG " + currCFG.id());
 
 			// find all edges ending directed to current (but not upward linking, to avoid loop issues)
-// TODO fix for upward linking, loop detection - allow up, but when "contains" in one of the lists, stop ( = looping)
 			List<Edge> edges = new ArrayList<Edge>();
 			for( Edge edge: CFGedgelist){
-// TODO
-//*
 				if( currCFG.id() == edge.getToNode().id()){
+/*
 					if( -1 != edges.indexOf(edge)){
 						break;
 					}
-/*/
-				if( (currCFG.id() == edge.getToNode().id())
-						&& (edge.getFromNode().id() < edge.getToNode().id())){
 //*/
 					edges.add(edge);
 				}
@@ -108,6 +98,7 @@ System.out.println( "BBB currCFG " + currCFG.id());
 				if( 0 == parent.getInheritage().size()){
 					System.out.println( "FATAL - only 1 parent, but inheritage is empty");
 				}
+//System.out.println( "CCC currCFG " + currCFG.id());
 				currCFG.inheritageInit( parent.getInheritage() );
 
 			}else if( 1 < edges.size() ){

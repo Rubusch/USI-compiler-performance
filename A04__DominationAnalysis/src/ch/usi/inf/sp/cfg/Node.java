@@ -22,29 +22,46 @@ public class Node {
 		return inheritage;
 	}
 
+
+
 	public void inheritageInit( List<List<Integer>> inheritage){
 System.out.println( "FFF inheritageInit()");
-// TODO handle first node, inheritage is what?
+for(int jik=0; jik<inheritage.size(); jik++){
+	System.out.println("id "+this.Id +"\t: '" + inheritage.get(jik) + "'");
+}
+
 		if( null == inheritage ){
 			System.out.println("FATAL - inheritage was null");
+			return;
 		}
-		this.inheritage.addAll( inheritage );
+//		this.inheritage.addAll( inheritage );
+		for( int idxinherit=0; idxinherit < inheritage.size(); ++idxinherit){
+			this.inheritage.add(new ArrayList<Integer>());
+			for( int idxid=0; idxid < inheritage.get(idxinherit).size(); ++idxid){
+				this.inheritage.get(idxinherit).add(inheritage.get(idxinherit).get(idxid));
+			}
+		}
 
-		// set dominator
 		if( 0 == this.inheritage.size() ){
 			System.out.println( "FATAL - inhertiage was empty");
+			return;
 		}
-		List<Integer> inherit = this.inheritage.get(0);
 
+		List<Integer> inherit = this.inheritage.get(0);
 		if( 0 == inherit.size()){
 			System.out.println( "FATAL - first list in inheritage was empty");
+			return;
 		}
 		Integer latestId = inherit.get( inherit.size()-1 );
+
+		// set dominator
 		this.idom = latestId;
 
 		// append own Id to all of the inheritage lists
 		for( List<Integer> list : this.inheritage ){
-			list.add(Id);
+			if( -1 == list.indexOf(Id)){
+				list.add(Id);
+			}// else: loop (issue with doubled last entries...)
 		}
 	}
 
