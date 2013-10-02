@@ -22,19 +22,13 @@ public class Node {
 		return inheritage;
 	}
 
-
-
 	public void inheritageInit( List<List<Integer>> inheritage){
-System.out.println( "FFF inheritageInit()");
-for(int jik=0; jik<inheritage.size(); jik++){
-	System.out.println("id "+this.Id +"\t: '" + inheritage.get(jik) + "'");
-}
 
 		if( null == inheritage ){
 			System.out.println("FATAL - inheritage was null");
 			return;
 		}
-//		this.inheritage.addAll( inheritage );
+		// add list as separate new initialized lists (does addAll copy thoroughly enough??)
 		for( int idxinherit=0; idxinherit < inheritage.size(); ++idxinherit){
 			this.inheritage.add(new ArrayList<Integer>());
 			for( int idxid=0; idxid < inheritage.get(idxinherit).size(); ++idxid){
@@ -65,15 +59,14 @@ for(int jik=0; jik<inheritage.size(); jik++){
 		}
 	}
 
-	public boolean inheritageMerge( List<Node> parents ){
-System.out.println("FFF inheritageMerge()");
+	public void inheritageMerge( List<Node> parents ){
 		// add all parent inheritages
 		for( Node parent : parents ){
 			inheritageInit( parent.getInheritage() );
 		}
 
 		// find dominator (reset dominator)
-		return identifyDominator( parents );
+		identifyDominator( parents );
 //System.out.println( "XXX result idom = " + this.idom); // XXX
 	}
 
@@ -86,9 +79,7 @@ System.out.println("FFF inheritageMerge()");
 	// return false, if was not mergeable (still), needs to be redone later
 	// this means basically a "false" shall provoke the remove from the
 	// "passedIds" list
-//	public void identifyDominator( List<Node> parents){
-	public boolean identifyDominator( List<Node> parents){
-System.out.println( "FFF identifyDominator()");
+	public void identifyDominator( List<Node> parents){
 
 		for( Node nd : parents){
 			boolean pending=false; // more ugly quickfixes
@@ -100,23 +91,9 @@ System.out.println( "FFF identifyDominator()");
 			}else{
 				this.idom = nd.getInheritage().get(0).get( nd.getInheritage().get(0).size()-1 );
 			}
-			if( pending ) return false;
+// TODO improve this by parse order
+			if( pending ) return;
 		}
-/*
-// TODO rm
-// debugging dump
-System.out.println( "AAA ---");
-for( int idxparent=0; idxparent < parents.size(); ++idxparent ){
-	System.out.println( "parent id: " + idxparent);
-	final List<List<Integer>> parent = parents.get(idxparent).getInheritage();
-	for( int idxinherit=0; idxinherit < parent.size(); ++idxinherit){
-		System.out.print("\tinherit idx: " + idxinherit + ": " + parent.get(idxinherit));
-		System.out.println( "" );
-	}
-	System.out.println( "" );
-}
-System.out.println( "BBB ---");
-//*/
 
 		
 		if( 2 > parents.size() ){
@@ -159,7 +136,7 @@ System.out.println( "BBB ---");
 							// list was empty - an ERROR
 							System.out.println( "FIXME: a node had just one inherit list, which was empty");
 						}
-					return true;
+					return;
 					}else{
 						parent.remove(idxinherit);
 						continue;
@@ -190,7 +167,7 @@ System.out.println( "BBB ---");
 								// list was empty - an ERROR
 								System.out.println( "FIXME: a node had just one inherit list, which was empty");
 							}
-							return true;
+							return;
 						}else{
 							parent.remove(idxinherit);
 							continue;
@@ -199,7 +176,7 @@ System.out.println( "BBB ---");
 				}
 			}
 		}
-		return true;
+		return;
 	}
 
 
