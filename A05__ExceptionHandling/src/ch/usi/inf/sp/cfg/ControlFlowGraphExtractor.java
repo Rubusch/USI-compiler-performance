@@ -69,7 +69,8 @@ public class ControlFlowGraphExtractor {
 		initInstructions();
 	}
 
-	private void branching( int targetIdx, int idx ){
+//	private void branching( int targetIdx, int idx ){
+	private void branching( int idx, int targetIdx ){
 		String dotConnection = "";
 		dotConnection += String.valueOf( idx ) + ":" + String.valueOf(targetIdx);
 		this.edgeslist.add(dotConnection);
@@ -214,7 +215,8 @@ public class ControlFlowGraphExtractor {
 
 				LabelNode target = ((JumpInsnNode) ins).label;
 				int targetIdx = instructions.indexOf(target);
-				branching( targetIdx, idx );
+//				branching( targetIdx, idx );
+				branching( idx, targetIdx );
 
 				// provoke a new basic block
 				branchNextIteration = true;
@@ -225,12 +227,14 @@ public class ControlFlowGraphExtractor {
 				for( int t=0; t<keys.size(); t++ ){
 					final LabelNode targetInstruction = (LabelNode)labels.get(t);
 					final int targetIdx = instructions.indexOf(targetInstruction);
-					branching( targetIdx, idx );
+//					branching( targetIdx, idx );
+					branching( idx, targetIdx );
 				}
 
 				final LabelNode defaultTargetInstruction = ((LookupSwitchInsnNode)ins).dflt;
 				final int targetIdx = instructions.indexOf(defaultTargetInstruction);
-				branching( targetIdx, idx );
+//				branching( targetIdx, idx );
+				branching( idx, targetIdx );
 				// create a new basic block
 				branchNextIteration = true;
 			}
@@ -247,7 +251,8 @@ public class ControlFlowGraphExtractor {
 				}
 
 				// branching
-				branching( tryblocklimit, idx );
+//				branching( tryblocklimit, idx );
+				branching( idx, tryblocklimit );
 
 				// start new block
 				branchNextIteration = true;
