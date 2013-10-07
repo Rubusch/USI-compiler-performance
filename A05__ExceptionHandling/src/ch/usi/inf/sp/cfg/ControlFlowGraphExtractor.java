@@ -190,6 +190,9 @@ public class ControlFlowGraphExtractor {
 				// create a new basic block
 				branchNextIteration = true;
 			}
+//			else if( ins.getType() == 
+//case AbstractInsnNode.INSN					
+					
 
 // APPEND
 			if( -1 < this.forwardJump.indexOf( idx ) && this.blocklist.get( this.blocklist.size() -1 ).size() > 1 ){
@@ -324,7 +327,6 @@ public class ControlFlowGraphExtractor {
 				break;
 			case AbstractInsnNode.TYPE_INSN:
 				// Opcodes: NEW, ANEWARRAY, CHECKCAST or INSTANCEOF.
-//				szBlock += "NEWorANEWARRAYorCHECKCASTorINSTANCEOF");
 				szBlock +=  Printer.OPCODES[opcode];
 				szBlock += " ";
 				szBlock += ((TypeInsnNode)ins).desc;
@@ -351,16 +353,10 @@ public class ControlFlowGraphExtractor {
 				szBlock += " ";
 				szBlock += ((MethodInsnNode)ins).owner;
 				szBlock += ".";
-//				szBlock += "METHODNAME";
-// FIXME, no '<' and '>' in output
-//*
 				String tmp = ((MethodInsnNode)ins).name;
 				tmp = tmp.replace('<', '(');
 				tmp = tmp.replace('>', ')');
 				szBlock += tmp;
-/*/
-				szBlock += ((MethodInsnNode)ins).name;
-//*/
 				szBlock += " ";
 				szBlock += ((MethodInsnNode)ins).desc;
 				break;
