@@ -24,15 +24,15 @@ import org.objectweb.asm.util.Printer;
 public class ControlFlowGraphExtractor {
 	private List< ArrayList<AbstractInsnNode>> blocklist;
 	private static InsnList instructions;
-	private ArrayList<Integer> forwardJump;
-	private ArrayList<String> edgeslist;
-	private ArrayList<Integer> omitFallthruList;
+	private List<Integer> forwardJump;
+	private List<String> edgeslist;
+	private List<Integer> omitFallthruList;
 
 	public List<ArrayList<AbstractInsnNode>> getBlocklist() {
 		return blocklist;
 	}
 
-	public ArrayList<String> getEdgeslist() {
+	public List<String> getEdgeslist() {
 		return edgeslist;
 	}
 
