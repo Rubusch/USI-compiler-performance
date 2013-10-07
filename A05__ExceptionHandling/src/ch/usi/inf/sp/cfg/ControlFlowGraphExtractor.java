@@ -190,9 +190,22 @@ public class ControlFlowGraphExtractor {
 				// create a new basic block
 				branchNextIteration = true;
 			}
-//			else if( ins.getType() == 
-//case AbstractInsnNode.INSN					
-					
+
+			if( !branchNextIteration && isPEI.get(idx).booleanValue()){
+				// we have a PEI, and the block is not branched
+				// (which actually is implicit, isn't it?)
+// TODO
+			}
+/*
+			if( ins.getType() == AbstractInsnNode.INSN
+					|| ins.getType() == AbstractInsnNode.TYPE_INSN
+					|| ins.getType() == AbstractInsnNode.FIELD_INSN
+					|| ins.getType() == AbstractInsnNode.METHOD_INSN
+					|| ins.getType() == AbstractInsnNode.MULTIANEWARRAY_INSN
+					|| ins.getType() == AbstractInsnNode.INT_INSN ){
+				// groups of PEIs
+			}
+//*/
 
 // APPEND
 			if( -1 < this.forwardJump.indexOf( idx ) && this.blocklist.get( this.blocklist.size() -1 ).size() > 1 ){
