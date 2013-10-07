@@ -2,7 +2,9 @@ package ch.usi.inf.sp.cfg;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -29,7 +31,8 @@ public class ControlFlowGraphExtractor {
 	private MethodNode method;
 	private List<Integer> forwardJump;
 	private List<String> edgeslist; // TODO rename "jumpTable"?
-	private List<String> exceptionlist;
+//	private List<String> exceptionlist;
+	private Map<Integer, Integer> exceptiontable;
 	private List<Integer> omitFallthruList;
 	private List<Boolean> isPEI;
 
@@ -61,7 +64,7 @@ public class ControlFlowGraphExtractor {
 		
 		// exception handling
 		this.isPEI = new ArrayList<Boolean>();
-		this.exceptionlist = new ArrayList<String>();
+		this.exceptiontable = new HashMap<Integer, Integer>();
 
 		initInstructions();
 	}
@@ -107,13 +110,16 @@ public class ControlFlowGraphExtractor {
 
 	private void initInstructions(){
 // TODO set up exception table - BETTER: add information of exception table to the already maintained jumplist?
-//		for( exp : this.exceptionlist )
+
+		int tryblocklimit = -1; // use a stack here, for nested try/catch
 		List<TryCatchBlockNode> trycatchlist = method.tryCatchBlocks;
 		for( TryCatchBlockNode trycatch : trycatchlist){
 			int start = method.instructions.indexOf((LabelNode) trycatch.start);
 			int end = method.instructions.indexOf((LabelNode) trycatch.end);
-			this.exceptionlist.add(String.valueOf(start) + ":" + String.valueOf(end));
+			this.exceptiontable.put(new Integer(start), new Integer(end));
 		}
+
+
 
 		boolean branchNextIteration = false;
 		for( int idx = 0; idx < this.instructions.size(); ++idx ){
@@ -127,9 +133,18 @@ public class ControlFlowGraphExtractor {
 				branchNextIteration = false;
 			}
 
+
+
+
+
 // EXCEPTIONS
 			// exception handling, default FALSE, a PEI: TRUE
 			isPEI.add(new Boolean(false));
+
+			if( null != this.exceptiontable.get(new Integer(idx)) ){
+				tryblocklimit = this.exceptiontable.get(new Integer(idx));
+			}
+
 			switch (ins.getOpcode()) {
 			case Opcodes.AALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
 			case Opcodes.AASTORE: // NullPointerException, ArrayIndexOutOfBoundsException, ArrayStoreException
@@ -213,6 +228,7 @@ public class ControlFlowGraphExtractor {
 			if( !branchNextIteration && isPEI.get(idx).booleanValue()){
 				// we have a PEI, and the block is not branched
 				// (which actually is implicit, isn't it?)
+				
 // TODO
 //				instructions.getExceptionTable() ???
 			}
