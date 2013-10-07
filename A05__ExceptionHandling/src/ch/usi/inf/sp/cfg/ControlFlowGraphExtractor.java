@@ -99,10 +99,12 @@ public class ControlFlowGraphExtractor {
 	private void initInstructions(){
 		boolean branchNextIteration = false;
 		for( int idx = 0; idx < this.instructions.size(); ++idx ){
+
+			// get next INSTRUCTION
+			AbstractInsnNode ins = this.instructions.get(idx);
+
 			// exception handling, default FALSE, a PEI: TRUE
 			isPEI.add(new Boolean(false));
-
-			AbstractInsnNode ins = this.instructions.get(idx);
 
 			// create new block
 			if(true == branchNextIteration){
@@ -137,7 +139,6 @@ public class ControlFlowGraphExtractor {
 				branching( targetIdx, idx );
 				// create a new basic block
 				branchNextIteration = true;
-
 			}
 
 /***/

@@ -9,7 +9,7 @@ public class ExceptionHandling {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-
+/*
 		public class C {
 			public void m(Exception ex) throws Exception {
 				throw ex;
@@ -67,5 +67,6 @@ public class ExceptionHandling {
 			case Opcodes.SALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
 			case Opcodes.SASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
 				isPEI[i] = true;
+//*/
 	}
 }
