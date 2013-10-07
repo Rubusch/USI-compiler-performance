@@ -42,7 +42,7 @@ public class ControlFlowGraphExtractor {
 		blocklist.add(new ArrayList<AbstractInsnNode>());
 		this.instructions = instructions;
 		this.forwardJump = new ArrayList<Integer>();
-		this.edgeslist = new ArrayList<String>();
+		this.edgeslist = new ArrayList<String>(); // TODO rename "jumpTable"?
 		this.omitFallthruList = new ArrayList<Integer>();
 		{
 			// opcodes for goto and jumps
@@ -97,6 +97,14 @@ public class ControlFlowGraphExtractor {
 	}
 
 	private void initInstructions(){
+// TODO set up exception table - BETTER: add information of exception table to the already maintained jumplist?
+
+
+
+
+
+
+
 		boolean branchNextIteration = false;
 		for( int idx = 0; idx < this.instructions.size(); ++idx ){
 

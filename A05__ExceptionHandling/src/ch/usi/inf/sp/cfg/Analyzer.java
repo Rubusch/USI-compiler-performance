@@ -73,7 +73,7 @@ public class Analyzer {
 
 
 
-
+// XXXXXXXXX
 // TODO set up exception table by the data obtained as follows
 		System.out.println( "XXX " + method.tryCatchBlocks.get(0) );
 		List<TryCatchBlockNode> trycatch = method.tryCatchBlocks;
@@ -87,9 +87,8 @@ public class Analyzer {
 		LabelNode endInstruction = trycatch.get(0).end;
 		targetId = method.instructions.indexOf(endInstruction);
 		System.out.println( "DDD end " + String.valueOf( targetId )); // LabelNode
-
 		die("STOP");
-
+// XXXXXXXXX
 
 
 
