@@ -15,8 +15,10 @@ import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.LookupSwitchInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.MultiANewArrayInsnNode;
 import org.objectweb.asm.tree.TableSwitchInsnNode;
+import org.objectweb.asm.tree.TryCatchBlockNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.util.Printer;
@@ -24,8 +26,10 @@ import org.objectweb.asm.util.Printer;
 public class ControlFlowGraphExtractor {
 	private List< List<AbstractInsnNode>> blocklist;
 	private static InsnList instructions;
+	private MethodNode method;
 	private List<Integer> forwardJump;
-	private List<String> edgeslist;
+	private List<String> edgeslist; // TODO rename "jumpTable"?
+	private List<String> exceptionlist;
 	private List<Integer> omitFallthruList;
 	private List<Boolean> isPEI;
 
@@ -37,12 +41,14 @@ public class ControlFlowGraphExtractor {
 		return edgeslist;
 	}
 
-	public ControlFlowGraphExtractor( final InsnList instructions ){
+//	public ControlFlowGraphExtractor( final InsnList instructions ){
+	public ControlFlowGraphExtractor( final MethodNode method){
 		blocklist = new ArrayList< List<AbstractInsnNode>>();
 		blocklist.add(new ArrayList<AbstractInsnNode>());
-		this.instructions = instructions;
+		this.method = method;
+		this.instructions = this.method.instructions;
 		this.forwardJump = new ArrayList<Integer>();
-		this.edgeslist = new ArrayList<String>(); // TODO rename "jumpTable"?
+		this.edgeslist = new ArrayList<String>();
 		this.omitFallthruList = new ArrayList<Integer>();
 		{
 			// opcodes for goto and jumps
@@ -52,7 +58,10 @@ public class ControlFlowGraphExtractor {
 				omitFallthruList.add(new Integer(iOpcode));
 			}
 		}
-		isPEI = new ArrayList<Boolean>();
+		
+		// exception handling
+		this.isPEI = new ArrayList<Boolean>();
+		this.exceptionlist = new ArrayList<String>();
 
 		initInstructions();
 	}
@@ -98,12 +107,13 @@ public class ControlFlowGraphExtractor {
 
 	private void initInstructions(){
 // TODO set up exception table - BETTER: add information of exception table to the already maintained jumplist?
-
-
-
-
-
-
+//		for( exp : this.exceptionlist )
+		List<TryCatchBlockNode> trycatchlist = method.tryCatchBlocks;
+		for( TryCatchBlockNode trycatch : trycatchlist){
+			int start = method.instructions.indexOf((LabelNode) trycatch.start);
+			int end = method.instructions.indexOf((LabelNode) trycatch.end);
+			this.exceptionlist.add(String.valueOf(start) + ":" + String.valueOf(end));
+		}
 
 		boolean branchNextIteration = false;
 		for( int idx = 0; idx < this.instructions.size(); ++idx ){

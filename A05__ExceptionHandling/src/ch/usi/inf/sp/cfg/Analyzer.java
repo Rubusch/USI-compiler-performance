@@ -72,7 +72,7 @@ public class Analyzer {
 		System.out.println("\n# " + method.name);
 
 
-
+/*
 // XXXXXXXXX
 // TODO set up exception table by the data obtained as follows
 		System.out.println( "XXX " + method.tryCatchBlocks.get(0) );
@@ -89,12 +89,17 @@ public class Analyzer {
 		System.out.println( "DDD end " + String.valueOf( targetId )); // LabelNode
 		die("STOP");
 // XXXXXXXXX
+//*/
 
 
-
-
+//*
+		ControlFlowGraphExtractor controlFlow = new ControlFlowGraphExtractor( method );
+/*/
 		final InsnList instructions = method.instructions;
 		ControlFlowGraphExtractor controlFlow = new ControlFlowGraphExtractor( instructions );
+//*/
+
+
 //*
 		controlFlow.dotPrintCFG();
 /*/
