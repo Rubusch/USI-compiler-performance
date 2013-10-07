@@ -10,6 +10,7 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TryCatchBlockNode;
 
 
 public class Analyzer {
@@ -68,12 +69,17 @@ public class Analyzer {
 	private void flowMethod( final MethodNode method ){
 		System.out.println("\n# " + method.name);
 
-		
 //		System.out.println( "XXX " + method.exceptions );
 //		System.out.println( "XXX " + method.tryCatchBlocks );
 //		System.out.println( "XXX " + method.tryCatchBlocks.get(0) );
 
 		System.out.println( "XXX " + method.tryCatchBlocks.get(0) );
+
+		List<TryCatchBlockNode> trycatch = method.tryCatchBlocks;
+		System.out.println( "AAA number of try-catch " + String.valueOf(trycatch.size()));
+		System.out.println( "BBB element 0 is " + String.valueOf( trycatch.get(0)));
+		System.out.println( "CCC start " + String.valueOf( trycatch.get(0).start)); // LabelNode
+		System.out.println( "DDD end " + String.valueOf( trycatch.get(0).end)); // LabelNode
 
 		die("STOP");
 
