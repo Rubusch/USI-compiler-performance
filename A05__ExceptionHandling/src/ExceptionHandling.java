@@ -67,6 +67,5 @@ public class ExceptionHandling {
 			case Opcodes.SALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
 			case Opcodes.SASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
 				isPEI[i] = true;
-	                
 	}
 }

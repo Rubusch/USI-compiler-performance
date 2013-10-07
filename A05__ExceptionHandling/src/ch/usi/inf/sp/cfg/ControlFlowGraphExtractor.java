@@ -27,6 +27,7 @@ public class ControlFlowGraphExtractor {
 	private List<Integer> forwardJump;
 	private List<String> edgeslist;
 	private List<Integer> omitFallthruList;
+	private List<Boolean> isPEI;
 
 	public List<List<AbstractInsnNode>> getBlocklist() {
 		return blocklist;
@@ -51,6 +52,7 @@ public class ControlFlowGraphExtractor {
 				omitFallthruList.add(new Integer(iOpcode));
 			}
 		}
+		isPEI = new ArrayList<Boolean>();
 
 		initInstructions();
 	}
@@ -67,12 +69,15 @@ public class ControlFlowGraphExtractor {
 				AbstractInsnNode firstIns = this.blocklist.get(listIdx).get(0);
 				int idxFirstIns = this.blocklist.indexOf( firstIns );
 				if( targetIdx < idxFirstIns ){
-					// we ultrapassed one, so the last one is it: go back
+
+					// we overran one, so the last one is it: go back
 					int start = idxLastFirstIns;
 					int diff = targetIdx - start;
+
 					// break sublist, and insert new sublist
 					List<AbstractInsnNode> sublist = this.blocklist.get(listIdx-1).subList( diff, this.blocklist.get(listIdx-1).size());
 					this.blocklist.add( listIdx, new ArrayList<AbstractInsnNode>( sublist ));
+
 					// now remove sublist from old location
 					this.blocklist.get( listIdx-1 ).removeAll( this.blocklist.get( listIdx ) );
 
@@ -84,15 +89,19 @@ public class ControlFlowGraphExtractor {
 				}
 				idxLastFirstIns = idxFirstIns;
 			}
+
 		}else if( targetIdx > idx){
 			// forward jump
 			this.forwardJump.add(new Integer(targetIdx));
-		} // no else: jump to next element
+		} // no else: continue with next element
 	}
 
 	private void initInstructions(){
 		boolean branchNextIteration = false;
 		for( int idx = 0; idx < this.instructions.size(); ++idx ){
+			// exception handling, default FALSE, a PEI: TRUE
+			isPEI.add(new Boolean(false));
+
 			AbstractInsnNode ins = this.instructions.get(idx);
 
 			// create new block
@@ -129,7 +138,63 @@ public class ControlFlowGraphExtractor {
 				// create a new basic block
 				branchNextIteration = true;
 
-			}//else if( ins)
+			}
+
+/***/
+
+			// exception handling
+			switch (ins.getOpcode()) {
+			case Opcodes.AALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
+			case Opcodes.AASTORE: // NullPointerException, ArrayIndexOutOfBoundsException, ArrayStoreException
+			case Opcodes.ANEWARRAY: // NegativeArraySizeException, (linking)
+			case Opcodes.ARETURN: // IllegalMonitorStateException (if synchronized)
+			case Opcodes.ARRAYLENGTH: // NullPointerException
+			case Opcodes.ATHROW: // NullPointerException, IllegalMonitorStateException (if synchronized), 
+			case Opcodes.BALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
+			case Opcodes.BASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
+			case Opcodes.CALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
+			case Opcodes.CASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
+			case Opcodes.CHECKCAST: // ClassCastException, (linking)
+			case Opcodes.DALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
+			case Opcodes.DASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
+			case Opcodes.DRETURN: // IllegalMonitorStateException (if synchronized)
+			case Opcodes.FALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
+			case Opcodes.FASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
+			case Opcodes.FRETURN: // IllegalMonitorStateException (if synchronized)
+			case Opcodes.GETFIELD: // NullPointerException, (linking)
+			case Opcodes.GETSTATIC: // Error*, (linking)
+			case Opcodes.IALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
+			case Opcodes.IASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
+			case Opcodes.IDIV: // ArithmeticException
+			case Opcodes.INSTANCEOF: // (linking)
+			case Opcodes.INVOKEDYNAMIC: // what's this??
+			case Opcodes.INVOKEINTERFACE: // NullPointerException, IncompatibleClassChangeError, AbstractMethodError, IllegalAccessError, AbstractMethodError, UnsatisfiedLinkError, (linking)
+			case Opcodes.INVOKESPECIAL: // NullPointerException, UnsatisfiedLinkError, (linking)
+			case Opcodes.INVOKESTATIC: // UnsatisfiedLinkError, Error*, (linking)
+			case Opcodes.INVOKEVIRTUAL: // NullPointerException, AbstractMethodError, UnsatisfiedLinkError, (linking)
+			case Opcodes.IREM: // ArithmeticException
+			case Opcodes.IRETURN: // IllegalMonitorStateException (if synchronized)
+			case Opcodes.LALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
+			case Opcodes.LASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
+			case Opcodes.LDIV: // ArithmeticException
+			case Opcodes.LREM: // ArithmeticException
+			case Opcodes.LRETURN: // IllegalMonitorStateException (if synchronized)
+			case Opcodes.MONITORENTER: // NullPointerException
+			case Opcodes.MONITOREXIT: // NullPointerException, IllegalMonitorStateException
+			case Opcodes.MULTIANEWARRAY: // NegativeArraySizeException, (linking)
+			case Opcodes.NEW: // Error*, (linking)
+			case Opcodes.NEWARRAY: // NegativeArraySizeException
+			case Opcodes.PUTFIELD: // NullPointerException, (linking)
+			case Opcodes.PUTSTATIC: // Error*, (linking)
+			case Opcodes.RETURN: // IllegalMonitorStateException (if synchronized)
+			case Opcodes.SALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
+			case Opcodes.SASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
+				isPEI.set(idx, new Boolean( true ));
+			}
+
+
+/***/
+
 
 			// append
 			if( -1 < this.forwardJump.indexOf( idx ) && this.blocklist.get( this.blocklist.size() -1 ).size() > 1 ){
