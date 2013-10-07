@@ -22,13 +22,13 @@ import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.util.Printer;
 
 public class ControlFlowGraphExtractor {
-	private List< ArrayList<AbstractInsnNode>> blocklist;
+	private List< List<AbstractInsnNode>> blocklist;
 	private static InsnList instructions;
 	private List<Integer> forwardJump;
 	private List<String> edgeslist;
 	private List<Integer> omitFallthruList;
 
-	public List<ArrayList<AbstractInsnNode>> getBlocklist() {
+	public List<List<AbstractInsnNode>> getBlocklist() {
 		return blocklist;
 	}
 
@@ -37,7 +37,7 @@ public class ControlFlowGraphExtractor {
 	}
 
 	public ControlFlowGraphExtractor( final InsnList instructions ){
-		blocklist = new ArrayList< ArrayList<AbstractInsnNode>>();
+		blocklist = new ArrayList< List<AbstractInsnNode>>();
 		blocklist.add(new ArrayList<AbstractInsnNode>());
 		this.instructions = instructions;
 		this.forwardJump = new ArrayList<Integer>();
@@ -185,7 +185,7 @@ public class ControlFlowGraphExtractor {
 		System.out.println("}");
 	}
 
-	public static String dotPrintBlock( int blockId, ArrayList<AbstractInsnNode> blockinstructions ){
+	public static String dotPrintBlock( int blockId, List<AbstractInsnNode> blockinstructions ){
 		String szBlock = "";
 		szBlock += "  node" + blockId;
 		szBlock += " [label = \"block" + blockId + " | { <";
@@ -290,9 +290,11 @@ public class ControlFlowGraphExtractor {
 				szBlock += " ";
 				szBlock += ((MethodInsnNode)ins).owner;
 				szBlock += ".";
-				szBlock += ((MethodInsnNode)ins).name;
-				szBlock += " ";
-				szBlock += ((MethodInsnNode)ins).desc;
+				szBlock += "METHODNAME";
+// TODO fixme, no '<' and '>' in output
+//				szBlock += ((MethodInsnNode)ins).name;
+//				szBlock += " ";
+//				szBlock += ((MethodInsnNode)ins).desc;
 				break;
 			case AbstractInsnNode.MULTIANEWARRAY_INSN:
 				// Opcodes: MULTIANEWARRAY.

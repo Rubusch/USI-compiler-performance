@@ -7,9 +7,9 @@ import java.util.Stack;
 import org.objectweb.asm.tree.AbstractInsnNode;
 
 public class DiGraph {
-	private final ArrayList<Node> nodelist;
-	private final ArrayList<Edge> CFGedgelist;
-	private final ArrayList<Edge> DAedgelist;
+	private final List<Node> nodelist;
+	private final List<Edge> CFGedgelist;
+	private final List<Edge> DAedgelist;
 
 	public final static int START = -1;
 	public final static int END = -2;
