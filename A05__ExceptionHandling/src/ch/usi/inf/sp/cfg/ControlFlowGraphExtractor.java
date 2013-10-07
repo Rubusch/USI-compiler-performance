@@ -123,7 +123,6 @@ public class ControlFlowGraphExtractor {
 
 		boolean branchNextIteration = false;
 		for( int idx = 0; idx < this.instructions.size(); ++idx ){
-
 			// get next INSTRUCTION
 			AbstractInsnNode ins = this.instructions.get(idx);
 
@@ -141,57 +140,68 @@ public class ControlFlowGraphExtractor {
 			// exception handling, default FALSE, a PEI: TRUE
 			isPEI.add(new Boolean(false));
 
+
 			if( null != this.exceptiontable.get(new Integer(idx)) ){
 				tryblocklimit = this.exceptiontable.get(new Integer(idx));
+				// start try block
+// TODO
 			}
 
-			switch (ins.getOpcode()) {
-			case Opcodes.AALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
-			case Opcodes.AASTORE: // NullPointerException, ArrayIndexOutOfBoundsException, ArrayStoreException
-			case Opcodes.ANEWARRAY: // NegativeArraySizeException, (linking)
-			case Opcodes.ARETURN: // IllegalMonitorStateException (if synchronized)
-			case Opcodes.ARRAYLENGTH: // NullPointerException
-			case Opcodes.ATHROW: // NullPointerException, IllegalMonitorStateException (if synchronized), 
-			case Opcodes.BALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
-			case Opcodes.BASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
-			case Opcodes.CALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
-			case Opcodes.CASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
-			case Opcodes.CHECKCAST: // ClassCastException, (linking)
-			case Opcodes.DALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
-			case Opcodes.DASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
-			case Opcodes.DRETURN: // IllegalMonitorStateException (if synchronized)
-			case Opcodes.FALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
-			case Opcodes.FASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
-			case Opcodes.FRETURN: // IllegalMonitorStateException (if synchronized)
-			case Opcodes.GETFIELD: // NullPointerException, (linking)
-			case Opcodes.GETSTATIC: // Error*, (linking)
-			case Opcodes.IALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
-			case Opcodes.IASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
-			case Opcodes.IDIV: // ArithmeticException
-			case Opcodes.INSTANCEOF: // (linking)
-			case Opcodes.INVOKEDYNAMIC: // what's this??
-			case Opcodes.INVOKEINTERFACE: // NullPointerException, IncompatibleClassChangeError, AbstractMethodError, IllegalAccessError, AbstractMethodError, UnsatisfiedLinkError, (linking)
-			case Opcodes.INVOKESPECIAL: // NullPointerException, UnsatisfiedLinkError, (linking)
-			case Opcodes.INVOKESTATIC: // UnsatisfiedLinkError, Error*, (linking)
-			case Opcodes.INVOKEVIRTUAL: // NullPointerException, AbstractMethodError, UnsatisfiedLinkError, (linking)
-			case Opcodes.IREM: // ArithmeticException
-			case Opcodes.IRETURN: // IllegalMonitorStateException (if synchronized)
-			case Opcodes.LALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
-			case Opcodes.LASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
-			case Opcodes.LDIV: // ArithmeticException
-			case Opcodes.LREM: // ArithmeticException
-			case Opcodes.LRETURN: // IllegalMonitorStateException (if synchronized)
-			case Opcodes.MONITORENTER: // NullPointerException
-			case Opcodes.MONITOREXIT: // NullPointerException, IllegalMonitorStateException
-			case Opcodes.MULTIANEWARRAY: // NegativeArraySizeException, (linking)
-			case Opcodes.NEW: // Error*, (linking)
-			case Opcodes.NEWARRAY: // NegativeArraySizeException
-			case Opcodes.PUTFIELD: // NullPointerException, (linking)
-			case Opcodes.PUTSTATIC: // Error*, (linking)
-			case Opcodes.RETURN: // IllegalMonitorStateException (if synchronized)
-			case Opcodes.SALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
-			case Opcodes.SASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
-				isPEI.set(idx, new Boolean( true ));
+			if( idx == tryblocklimit ){
+				// stop
+// TODO
+				tryblocklimit = -1;
+			}
+
+			if(-1 < tryblocklimit ){
+				switch (ins.getOpcode()) {
+				case Opcodes.AALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
+				case Opcodes.AASTORE: // NullPointerException, ArrayIndexOutOfBoundsException, ArrayStoreException
+				case Opcodes.ANEWARRAY: // NegativeArraySizeException, (linking)
+				case Opcodes.ARETURN: // IllegalMonitorStateException (if synchronized)
+				case Opcodes.ARRAYLENGTH: // NullPointerException
+				case Opcodes.ATHROW: // NullPointerException, IllegalMonitorStateException (if synchronized), 
+				case Opcodes.BALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
+				case Opcodes.BASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
+				case Opcodes.CALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
+				case Opcodes.CASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
+				case Opcodes.CHECKCAST: // ClassCastException, (linking)
+				case Opcodes.DALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
+				case Opcodes.DASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
+				case Opcodes.DRETURN: // IllegalMonitorStateException (if synchronized)
+				case Opcodes.FALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
+				case Opcodes.FASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
+				case Opcodes.FRETURN: // IllegalMonitorStateException (if synchronized)
+				case Opcodes.GETFIELD: // NullPointerException, (linking)
+				case Opcodes.GETSTATIC: // Error*, (linking)
+				case Opcodes.IALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
+				case Opcodes.IASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
+				case Opcodes.IDIV: // ArithmeticException
+				case Opcodes.INSTANCEOF: // (linking)
+				case Opcodes.INVOKEDYNAMIC: // what's this??
+				case Opcodes.INVOKEINTERFACE: // NullPointerException, IncompatibleClassChangeError, AbstractMethodError, IllegalAccessError, AbstractMethodError, UnsatisfiedLinkError, (linking)
+				case Opcodes.INVOKESPECIAL: // NullPointerException, UnsatisfiedLinkError, (linking)
+				case Opcodes.INVOKESTATIC: // UnsatisfiedLinkError, Error*, (linking)
+				case Opcodes.INVOKEVIRTUAL: // NullPointerException, AbstractMethodError, UnsatisfiedLinkError, (linking)
+				case Opcodes.IREM: // ArithmeticException
+				case Opcodes.IRETURN: // IllegalMonitorStateException (if synchronized)
+				case Opcodes.LALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
+				case Opcodes.LASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
+				case Opcodes.LDIV: // ArithmeticException
+				case Opcodes.LREM: // ArithmeticException
+				case Opcodes.LRETURN: // IllegalMonitorStateException (if synchronized)
+				case Opcodes.MONITORENTER: // NullPointerException
+				case Opcodes.MONITOREXIT: // NullPointerException, IllegalMonitorStateException
+				case Opcodes.MULTIANEWARRAY: // NegativeArraySizeException, (linking)
+				case Opcodes.NEW: // Error*, (linking)
+				case Opcodes.NEWARRAY: // NegativeArraySizeException
+				case Opcodes.PUTFIELD: // NullPointerException, (linking)
+				case Opcodes.PUTSTATIC: // Error*, (linking)
+				case Opcodes.RETURN: // IllegalMonitorStateException (if synchronized)
+				case Opcodes.SALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
+				case Opcodes.SASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
+					isPEI.set(idx, new Boolean( true ));
+				}
 			}
 
 // BRANCHING
@@ -228,7 +238,19 @@ public class ControlFlowGraphExtractor {
 			if( !branchNextIteration && isPEI.get(idx).booleanValue()){
 				// we have a PEI, and the block is not branched
 				// (which actually is implicit, isn't it?)
-				
+
+				// fallthrough
+				String dotConnection = "";
+				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
+					dotConnection += String.valueOf( idx ) + ":" + String.valueOf( idx+1 );
+					this.edgeslist.add(dotConnection);
+				}
+
+				// branching
+				branching( tryblocklimit, idx );
+
+				// start new block
+				branchNextIteration = true;
 // TODO
 //				instructions.getExceptionTable() ???
 			}

@@ -70,28 +70,6 @@ public class Analyzer {
 	 */
 	private void flowMethod( final MethodNode method ){
 		System.out.println("\n# " + method.name);
-
-
-/*
-// XXXXXXXXX
-// TODO set up exception table by the data obtained as follows
-		System.out.println( "XXX " + method.tryCatchBlocks.get(0) );
-		List<TryCatchBlockNode> trycatch = method.tryCatchBlocks;
-		System.out.println( "AAA number of try-catch " + String.valueOf(trycatch.size()));
-		System.out.println( "BBB element 0 is " + String.valueOf( trycatch.get(0)));
-
-		LabelNode startInstruction = trycatch.get(0).start;
-		int targetId = method.instructions.indexOf(startInstruction);
-		System.out.println( "CCC start " + String.valueOf( targetId )); // LabelNode
-
-		LabelNode endInstruction = trycatch.get(0).end;
-		targetId = method.instructions.indexOf(endInstruction);
-		System.out.println( "DDD end " + String.valueOf( targetId )); // LabelNode
-		die("STOP");
-// XXXXXXXXX
-//*/
-
-
 //*
 		ControlFlowGraphExtractor controlFlow = new ControlFlowGraphExtractor( method );
 /*/
