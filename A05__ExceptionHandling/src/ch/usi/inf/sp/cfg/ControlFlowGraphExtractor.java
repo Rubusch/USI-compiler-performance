@@ -318,8 +318,8 @@ public class ControlFlowGraphExtractor {
 				break;
 			case AbstractInsnNode.JUMP_INSN:
 				// Opcodes: IFEQ, IFNE, IFLT, IFGE, IFGT, IFLE, IF_ICMPEQ,
-			    // IF_ICMPNE, IF_ICMPLT, IF_ICMPGE, IF_ICMPGT, IF_ICMPLE, IF_ACMPEQ,
-			    // IF_ACMPNE, GOTO, JSR, IFNULL or IFNONNULL.
+				// IF_ICMPNE, IF_ICMPLT, IF_ICMPGE, IF_ICMPGT, IF_ICMPLE, IF_ACMPEQ,
+				// IF_ACMPNE, GOTO, JSR, IFNULL or IFNONNULL.
 				szBlock += Printer.OPCODES[ins.getOpcode()];
 				szBlock += " ";
 			{
