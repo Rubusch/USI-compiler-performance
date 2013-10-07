@@ -168,6 +168,7 @@ public class ControlFlowGraphExtractor {
 					dotConnection += String.valueOf( idx ) + ":" + String.valueOf( idx+1 );
 					this.edgeslist.add(dotConnection);
 				}
+
 				LabelNode target = ((JumpInsnNode) ins).label;
 				int targetIdx = instructions.indexOf(target);
 				branching( targetIdx, idx );
@@ -195,6 +196,7 @@ public class ControlFlowGraphExtractor {
 				// we have a PEI, and the block is not branched
 				// (which actually is implicit, isn't it?)
 // TODO
+//				instructions.getExceptionTable() ???
 			}
 /*
 			if( ins.getType() == AbstractInsnNode.INSN

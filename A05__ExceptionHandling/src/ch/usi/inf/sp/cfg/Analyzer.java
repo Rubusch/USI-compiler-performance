@@ -67,6 +67,16 @@ public class Analyzer {
 	 */
 	private void flowMethod( final MethodNode method ){
 		System.out.println("\n# " + method.name);
+
+		
+//		System.out.println( "XXX " + method.exceptions );
+//		System.out.println( "XXX " + method.tryCatchBlocks );
+//		System.out.println( "XXX " + method.tryCatchBlocks.get(0) );
+
+		System.out.println( "XXX " + method.tryCatchBlocks.get(0) );
+
+		die("STOP");
+
 		final InsnList instructions = method.instructions;
 		ControlFlowGraphExtractor controlFlow = new ControlFlowGraphExtractor( instructions );
 //*
