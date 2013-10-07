@@ -128,7 +128,8 @@ public class ControlFlowGraphExtractor {
 				branching( targetIdx, idx );
 				// create a new basic block
 				branchNextIteration = true;
-			}
+
+			}//else if( ins)
 
 			// append
 			if( -1 < this.forwardJump.indexOf( idx ) && this.blocklist.get( this.blocklist.size() -1 ).size() > 1 ){
@@ -290,11 +291,18 @@ public class ControlFlowGraphExtractor {
 				szBlock += " ";
 				szBlock += ((MethodInsnNode)ins).owner;
 				szBlock += ".";
-				szBlock += "METHODNAME";
-// TODO fixme, no '<' and '>' in output
-//				szBlock += ((MethodInsnNode)ins).name;
-//				szBlock += " ";
-//				szBlock += ((MethodInsnNode)ins).desc;
+//				szBlock += "METHODNAME";
+// FIXME, no '<' and '>' in output
+//*
+				String tmp = ((MethodInsnNode)ins).name;
+				tmp = tmp.replace('<', '(');
+				tmp = tmp.replace('>', ')');
+				szBlock += tmp;
+/*/
+				szBlock += ((MethodInsnNode)ins).name;
+//*/
+				szBlock += " ";
+				szBlock += ((MethodInsnNode)ins).desc;
 				break;
 			case AbstractInsnNode.MULTIANEWARRAY_INSN:
 				// Opcodes: MULTIANEWARRAY.

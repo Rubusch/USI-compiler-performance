@@ -5,22 +5,49 @@ import java.util.ArrayList;
 
 public class Example {
 
- private List<Integer> list;
- private static final int SIZE = 10;
+	private List<Integer> list;
+	private static final int SIZE = 10;
 
- public Example() {
-     list = new ArrayList<Integer>(SIZE);
-     for (int i = 0; i < SIZE; i++) {
-         list.add(new Integer(i));
-     }
- }
+	public static void main( String[] args ){
+		Example ex = new Example();
 
- public void writeList() throws IOException {
-     PrintWriter out = new PrintWriter(new FileWriter("OutFile.txt"));
+		ex.exp();
 
-     for (int i = 0; i < SIZE; i++) {
-         out.println("Value at: " + i + " = " + list.get(i));
-     }
-     out.close();
- }
+		System.out.println( "READY.\n");
+	}
+
+
+/******************************************************************************/
+
+	public void exp(){
+		System.out.println("some heading instructions");
+/*
+		tryitout();
+/*/
+		try{
+			tryitout();
+		}catch(Exception e){
+			System.out.println("my catch");
+		}
+/*/
+		try{
+			tryitout();
+		}finally{
+			System.out.println("my finally");
+		}
+/* /
+		try{
+			tryitout();
+		}catch(Exception e){
+			System.out.println( "my catch" );
+		}finally{
+			System.out.println("my finally");
+		}
+//*/
+		System.out.println("some trailing instructions");
+	}
+
+	public void tryitout(){
+		System.out.println("try it out function");
+	}
 }

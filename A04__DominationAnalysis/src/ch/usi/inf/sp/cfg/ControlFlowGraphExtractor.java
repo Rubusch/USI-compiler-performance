@@ -290,7 +290,11 @@ public class ControlFlowGraphExtractor {
 				szBlock += " ";
 				szBlock += ((MethodInsnNode)ins).owner;
 				szBlock += ".";
-				szBlock += ((MethodInsnNode)ins).name;
+				String tmp = ((MethodInsnNode)ins).name;
+				tmp = tmp.replace('<', '(');
+				tmp = tmp.replace('>', ')');
+				szBlock += tmp;
+//				szBlock += ((MethodInsnNode)ins).name;
 				szBlock += " ";
 				szBlock += ((MethodInsnNode)ins).desc;
 				break;

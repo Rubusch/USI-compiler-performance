@@ -249,7 +249,11 @@ public class ControlFlowGraphExtractor {
 					System.out.print(" ");
 					System.out.print(((MethodInsnNode)ins).owner);
 					System.out.print(".");
-					System.out.print(((MethodInsnNode)ins).name);
+					String tmp = ((MethodInsnNode)ins).name;
+					tmp = tmp.replace('<', '(');
+					tmp = tmp.replace('>', ')');
+					System.out.print( tmp);
+//					System.out.print(((MethodInsnNode)ins).name);
 					System.out.print(" ");
 					System.out.print(((MethodInsnNode)ins).desc);
 					break;
