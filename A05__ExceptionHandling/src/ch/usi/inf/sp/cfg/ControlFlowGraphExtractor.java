@@ -103,47 +103,15 @@ public class ControlFlowGraphExtractor {
 			// get next INSTRUCTION
 			AbstractInsnNode ins = this.instructions.get(idx);
 
-			// exception handling, default FALSE, a PEI: TRUE
-			isPEI.add(new Boolean(false));
-
 			// create new block
 			if(true == branchNextIteration){
 				blocklist.add(new ArrayList<AbstractInsnNode>());
 				branchNextIteration = false;
 			}
 
-			if( ins.getType() == AbstractInsnNode.JUMP_INSN ){
-				String dotConnection = "";
-				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
-					dotConnection += String.valueOf( idx ) + ":" + String.valueOf( idx+1 );
-					this.edgeslist.add(dotConnection);
-				}
-				LabelNode target = ((JumpInsnNode) ins).label;
-				int targetIdx = instructions.indexOf(target);
-				branching( targetIdx, idx );
-
-				// provoke a new basic block
-				branchNextIteration = true;
-
-			}else if( ins.getType() == AbstractInsnNode.LOOKUPSWITCH_INSN){
-				final List<?> keys = ((LookupSwitchInsnNode)ins).keys;
-				final List<?> labels = ((LookupSwitchInsnNode)ins).labels;
-				for( int t=0; t<keys.size(); t++ ){
-					final LabelNode targetInstruction = (LabelNode)labels.get(t);
-					final int targetIdx = instructions.indexOf(targetInstruction);
-					branching( targetIdx, idx );
-				}
-
-				final LabelNode defaultTargetInstruction = ((LookupSwitchInsnNode)ins).dflt;
-				final int targetIdx = instructions.indexOf(defaultTargetInstruction);
-				branching( targetIdx, idx );
-				// create a new basic block
-				branchNextIteration = true;
-			}
-
-/***/
-
-			// exception handling
+// EXCEPTIONS
+			// exception handling, default FALSE, a PEI: TRUE
+			isPEI.add(new Boolean(false));
 			switch (ins.getOpcode()) {
 			case Opcodes.AALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
 			case Opcodes.AASTORE: // NullPointerException, ArrayIndexOutOfBoundsException, ArrayStoreException
@@ -193,11 +161,37 @@ public class ControlFlowGraphExtractor {
 				isPEI.set(idx, new Boolean( true ));
 			}
 
+// BRANCHING
+			if( ins.getType() == AbstractInsnNode.JUMP_INSN ){
+				String dotConnection = "";
+				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
+					dotConnection += String.valueOf( idx ) + ":" + String.valueOf( idx+1 );
+					this.edgeslist.add(dotConnection);
+				}
+				LabelNode target = ((JumpInsnNode) ins).label;
+				int targetIdx = instructions.indexOf(target);
+				branching( targetIdx, idx );
 
-/***/
+				// provoke a new basic block
+				branchNextIteration = true;
 
+			}else if( ins.getType() == AbstractInsnNode.LOOKUPSWITCH_INSN){
+				final List<?> keys = ((LookupSwitchInsnNode)ins).keys;
+				final List<?> labels = ((LookupSwitchInsnNode)ins).labels;
+				for( int t=0; t<keys.size(); t++ ){
+					final LabelNode targetInstruction = (LabelNode)labels.get(t);
+					final int targetIdx = instructions.indexOf(targetInstruction);
+					branching( targetIdx, idx );
+				}
 
-			// append
+				final LabelNode defaultTargetInstruction = ((LookupSwitchInsnNode)ins).dflt;
+				final int targetIdx = instructions.indexOf(defaultTargetInstruction);
+				branching( targetIdx, idx );
+				// create a new basic block
+				branchNextIteration = true;
+			}
+
+// APPEND
 			if( -1 < this.forwardJump.indexOf( idx ) && this.blocklist.get( this.blocklist.size() -1 ).size() > 1 ){
 				// there was a forward jump to this address
 				this.blocklist.add( new ArrayList<AbstractInsnNode>() );
