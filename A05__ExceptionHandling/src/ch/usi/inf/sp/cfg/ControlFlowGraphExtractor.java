@@ -43,7 +43,17 @@ public class ControlFlowGraphExtractor {
 		return edgeslist;
 	}
 
-//	public ControlFlowGraphExtractor( final InsnList instructions ){
+	private void edgeslistAdd(int srcidx, int dstidx){
+		edgeslistAdd( srcidx, dstidx, "");
+	}
+
+	private void edgeslistAdd(int srcidx, int dstidx, String opt){
+		String str = String.valueOf( srcidx );
+		str += ":" + String.valueOf( dstidx );
+		if( 0 < opt.length() ){ str += ":" + opt; }
+		this.edgeslist.add(str);
+	}
+
 	public ControlFlowGraphExtractor( final MethodNode method){
 		blocklist = new ArrayList< List<AbstractInsnNode>>();
 		blocklist.add(new ArrayList<AbstractInsnNode>());
@@ -96,9 +106,10 @@ public class ControlFlowGraphExtractor {
 					// now remove sublist from old location
 					this.blocklist.get( listIdx-1 ).removeAll( this.blocklist.get( listIdx ) );
 
-// TODO is this necessary?
 					// fallthrough edge
-					this.edgeslist.add(String.valueOf( targetidx-1 ) + ":" + String.valueOf(targetidx) + ":" + "???" );
+// TODO is this necessary?
+//					this.edgeslist.add(String.valueOf( targetidx-1 ) + ":" + String.valueOf(targetidx) + ":" + "???" );
+					edgeslistAdd( targetidx-1, targetidx, "???");
 
 					break;
 				}
@@ -231,10 +242,11 @@ public class ControlFlowGraphExtractor {
 // BRANCHING
 			if( ins.getType() == AbstractInsnNode.JUMP_INSN ){
 				// conditional jumps
-				String dotConnection = "";
+//				String dotConnection = "";
 				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
-					dotConnection += String.valueOf( idx ) + ":" + String.valueOf( idx+1 ) + ":" + "label=\"TRUE\"";
-					this.edgeslist.add(dotConnection);
+//					dotConnection += String.valueOf( idx ) + ":" + String.valueOf( idx+1 ) + ":" + "label=\"TRUE\"";
+//					this.edgeslist.add(dotConnection);
+					edgeslistAdd( idx, idx+1, "label=\"TRUE\"");
 				}
 
 				LabelNode target = ((JumpInsnNode) ins).label;
@@ -289,19 +301,21 @@ public class ControlFlowGraphExtractor {
 				// fallthrou, but not into catch handler
 				if( -1 != tryblockCatch){ // TODO
 					// in case there is a CATCH
-					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( tryblockCatch ) + ":" + "label=\"catch\",style=dotted");
+//					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( tryblockCatch ) + ":" + "label=\"catch\",style=dotted");
+					edgeslistAdd( idx, tryblockCatch, "label=\"catch\",style=dotted");
 // TODO make catch fallthrou to the finally case - IF THERE IS ONE
 				}
 
 				if( -1 != tryblockFinally ){
-					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( tryblockFinally ) + ":" + "label=\"finally\",style=dotted");
+//					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( tryblockFinally ) + ":" + "label=\"finally\",style=dotted");
+					edgeslistAdd(idx, tryblockFinally, "label=\"finally\",style=dotted");
 				}
-// XXX
 
 				
 //				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
 				if( !this.omitFallthruList.contains( ins.getOpcode() ) && -1 == tryblockFinally ){
-					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( idx+1 ) + ":" + "label=\"fallthrou PEI\"");
+//					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( idx+1 ) + ":" + "label=\"fallthrou PEI\"");
+					edgeslistAdd(idx, idx+1, "label=\"fallthrou PEI\"");
 				}
 
 // FIXME deconnected nodes for try-catch-finally
@@ -321,7 +335,8 @@ public class ControlFlowGraphExtractor {
 
 				// fallthrough edge
 // TODO are there instructions that cannot fall through here? check!
-				this.edgeslist.add(String.valueOf( idx-1 ) + ":" + String.valueOf(idx) + ":" + "label=\"fallthrou\"");
+//				this.edgeslist.add(String.valueOf( idx-1 ) + ":" + String.valueOf(idx) + ":" + "label=\"fallthrou\"");
+				edgeslistAdd( idx-1, idx, "label=\"fallthrou\"");
 			}
 
 			// append instruction at last position
@@ -348,19 +363,8 @@ public class ControlFlowGraphExtractor {
 
 		// connections
 		Analyzer.echo("  nodeS:S -> node0:0");
-
 		for( int idx = 0; idx < this.edgeslist.size(); ++idx ){
-			String[] szbuf = this.edgeslist.get(idx).split(":");
-			int idxSrc = Integer.valueOf( szbuf[0] ).intValue();
-			int idxNodeSrc = insId2NodeId( idxSrc );
-			int idxDst = Integer.valueOf( szbuf[1] ).intValue();
-			int idxNodeDst = insId2NodeId( idxDst );
-			String str = "  node" +  idxNodeSrc +":" + idxSrc + " -> node" + idxNodeDst + ":" + idxDst;
-			if( 2 < szbuf.length ){
-				str += "[ " + szbuf[2] + " ]";
-			}
-
-			Analyzer.echo(str);
+			Analyzer.echo(dotEdges( idx ));
 		}
 
 		// trailer
@@ -370,6 +374,20 @@ public class ControlFlowGraphExtractor {
 				+ " -> nodeE:E");
 		Analyzer.echo("}");
 	}
+
+	private String dotEdges( int idx ){
+		String[] szbuf = this.edgeslist.get(idx).split(":");
+		int idxSrc = Integer.valueOf( szbuf[0] ).intValue();
+		int idxNodeSrc = insId2NodeId( idxSrc );
+		int idxDst = Integer.valueOf( szbuf[1] ).intValue();
+		int idxNodeDst = insId2NodeId( idxDst );
+		String str = "  node" +  idxNodeSrc +":" + idxSrc + " -> node" + idxNodeDst + ":" + idxDst;
+		if( 2 < szbuf.length ){
+			str += "[ " + szbuf[2] + " ]";
+		}
+		return str;
+	}
+
 
 	public static String dotPrintBlock( int blockId, List<AbstractInsnNode> blockinstructions ){
 		String szBlock = "";
