@@ -23,19 +23,19 @@ public class Example {
 		System.out.println("some heading instructions");
 /*
 		tryitout();
-/*/
+/* /
 		try{
 			tryitout();
 		}catch(Exception e){
 			System.out.println("my catch");
 		}
-/*/
+/* /
 		try{
 			tryitout();
 		}finally{
 			System.out.println("my finally");
 		}
-/* /
+/*/
 		try{
 			tryitout();
 		}catch(Exception e){

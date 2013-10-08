@@ -262,6 +262,9 @@ public class ControlFlowGraphExtractor {
 					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( idx+1 ));
 				}
 
+// FIXME deconnected nodes for try-catch-finally
+// FIXME dotted line for exception handling
+// FIXME labels for if branchings, and for try-catch-finally
 
 				// branching
 				branching( idx, tryblockEnd );
