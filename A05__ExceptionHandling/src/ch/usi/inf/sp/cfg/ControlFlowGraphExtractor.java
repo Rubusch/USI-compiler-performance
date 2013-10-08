@@ -124,6 +124,44 @@ public class ControlFlowGraphExtractor {
 		} // no else: continue with next element
 	}
 
+	private ExceptionState fetchState( final int idx, ExceptionState current, List<ExceptionState> statestack ){
+		if( null == current){
+			// check stack
+			if( 0 < this.statestack.size() ){
+				current = this.statestack.get(0);
+				this.statestack.remove(0);
+
+			// else check list
+			}else if( null != this.exceptiontable.get(new Integer(idx)) ){
+				// state TRYING
+				current = this.exceptiontable.get(new Integer(idx));
+			}else{
+				// no state change, nothing
+				return null;
+			}
+
+		}else if( checkExceptionState( EState.TRYING, current )){
+			// we're in TRYING, and there is a nested trying
+			if( null != this.exceptiontable.get(new Integer(idx)) ){
+				statestack.add(0, current);
+
+				// state TRYING
+				current = this.exceptiontable.get(new Integer(idx));
+			}
+		}
+
+		if(idx == current.getHandlerAddr()){
+			if( idx != current.getEndAddr()){
+				current.setState(EState.CATCHING);
+
+			}else if( idx == current.getEndAddr()){
+				current.setState(EState.FINALIZING);
+			}
+		}
+
+		return current;
+	}
+
 	private boolean checkExceptionState( final EState which, final ExceptionState state){
 		if( null == state ){
 			return false;
@@ -175,8 +213,8 @@ public class ControlFlowGraphExtractor {
 
 ///////////////////////////////////////////////////
 // TODO
-// fetchState( idx, current, statestack )
-
+			current = fetchState( idx, current, this.statestack );
+/*
 			// exception handling, default FALSE, a PEI: TRUE
 // TODO check statestack first, then fetch new object
 
@@ -214,7 +252,9 @@ public class ControlFlowGraphExtractor {
 				isFinallyBlock = true;
 			}
 
-//////////////////////// we have a state here
+//*/ /////////////////////// we have a state here
+
+
 // BRANCHING
 			if( ins.getType() == AbstractInsnNode.JUMP_INSN ){
 				// conditional jumps
@@ -263,12 +303,7 @@ public class ControlFlowGraphExtractor {
 				// ins.getType() == AbstractInsnNode.MULTIANEWARRAY_INSN
 				// ins.getType() == AbstractInsnNode.INT_INSN
 				// check current instruction being escaped
-				isPEI = false;
-				if(checkExceptionState( EState.TRYING, current)){
-					isPEI = checkPEI(ins);
-				}
-
-				if( isPEI ){
+				if( checkPEI(ins) ){
 //					Analyzer.db("PEI: " + Printer.OPCODES[idx]);
 
 					// fallthrou
@@ -293,11 +328,15 @@ public class ControlFlowGraphExtractor {
 
 			}else if( checkExceptionState( EState.CATCHING, current )){
 				if( idx == current.getEndAddr() && current.getEndAddr() == current.getHandlerAddr()){
+					// case try-catch-finally
 					branching( idx, current.getHandlerAddr(), "label=\"catching to finally\",style=dotted" );
 					current.setState(EState.FINALIZING);
-				}
+
+					// start new block
+					branchNextIteration = true;
+				} // else try-catch, normal ending
 			}
-//*/
+
 // APPEND
 			if( -1 < forwardJump.indexOf( idx ) && blocklist.get( blocklist.size() -1 ).size() > 1 ){
 				// there was a forward jump to this address
@@ -320,6 +359,7 @@ public class ControlFlowGraphExtractor {
 			blocklist.get( blocklist.size()-1 ).add( ins );
 		}
 	}
+
 
 	private boolean checkPEI(final AbstractInsnNode ins){
 		switch (ins.getOpcode()) {
