@@ -271,8 +271,12 @@ public class ControlFlowGraphExtractor {
 				branchNextIteration = true;
 			}
 
+
+
+
+
 			if( isPEI.get(idx).booleanValue()){
-				Analyzer.db(Printer.OPCODES[idx]);
+				Analyzer.db("PEI: " + Printer.OPCODES[idx]);
 /*
 				// types of instructions of PEIs are:
 				ins.getType() == AbstractInsnNode.INSN
@@ -291,9 +295,9 @@ public class ControlFlowGraphExtractor {
 // TODO make catch fallthrou to the finally case - IF THERE IS ONE
 				}
 
-				if( -1 != tryblockFinally ){
-					edgeslistAdd(idx, tryblockFinally, "label=\"finally\",style=dotted");
-				}
+//				if( -1 != tryblockFinally ){
+//					edgeslistAdd(idx, tryblockFinally, "label=\"finally\",style=dotted");
+//				}
 
 				
 				if( !this.omitFallthruList.contains( ins.getOpcode() ) && -1 == tryblockFinally ){
@@ -307,8 +311,14 @@ public class ControlFlowGraphExtractor {
 // FIXME split duplicate finally
 // FIXME ATHROWS
 
-				// branching
-//				branching( idx, tryblockEnd );
+				// PEI branching
+				if(-1 < tryblockCatch){
+					branching( idx, tryblockCatch, "label=\"PEI to catch\",style=dotted" );
+				}else if(-1 < tryblockFinally && -1 == tryblockCatch){
+					branching( idx, tryblockFinally, "label=\"PEI to finally\",style=dotted" );
+				}else{
+					Analyzer.die("PEI found, but neither catch, nor finally block");
+				}
 
 				// start new block
 				branchNextIteration = true;
