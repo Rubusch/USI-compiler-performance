@@ -16,16 +16,18 @@ public class Example {
 
 	public void test(){
 		System.out.println("some heading instructions");
-	
+
+/*
 		if( itzok ){
 			System.out.println( "true" );
 		}else{
 			System.out.println( "else" );
 		}
+//*/
 		
-//*
+/*
 		tryitout();
-/* /
+/*/
 		try{
 			tryitout();
 		}catch(Exception e){
