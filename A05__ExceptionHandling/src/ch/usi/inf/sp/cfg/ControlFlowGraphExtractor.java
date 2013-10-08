@@ -176,8 +176,9 @@ public class ControlFlowGraphExtractor {
 				isTryBlock = true;
 
 //				tryblockEnd = this.exceptiontable.get(new Integer(idx));
-				tryblockEnd = this.exceptiontable.get(new Integer(idx));
-				
+				current = this.exceptiontable.get(new Integer(idx));
+				tryblockEnd = current.getEndAddr();
+
 				if( tryblockEnd == tryblockCatch){
 					// this block is handled by a finally block
 //					isFinallyBlock = true;
