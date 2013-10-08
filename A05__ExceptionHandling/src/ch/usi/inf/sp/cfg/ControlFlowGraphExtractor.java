@@ -69,23 +69,22 @@ public class ControlFlowGraphExtractor {
 		initInstructions();
 	}
 
-//	private void branching( int targetIdx, int idx ){
-	private void branching( int idx, int targetIdx ){
+	private void branching( int fromidx, int targetidx ){
 		String dotConnection = "";
-		dotConnection += String.valueOf( idx ) + ":" + String.valueOf(targetIdx);
+		dotConnection += String.valueOf( fromidx ) + ":" + String.valueOf(targetidx);
 		this.edgeslist.add(dotConnection);
 
-		if( targetIdx < idx ){
+		if( targetidx < fromidx ){
 			// backward jump
 			int idxLastFirstIns = 0;
 			for( int listIdx = 1; listIdx < this.blocklist.size()-1; ++listIdx ){
 				AbstractInsnNode firstIns = this.blocklist.get(listIdx).get(0);
 				int idxFirstIns = this.blocklist.indexOf( firstIns );
-				if( targetIdx < idxFirstIns ){
+				if( targetidx < idxFirstIns ){
 
 					// we overran one, so the last one is it: go back
 					int start = idxLastFirstIns;
-					int diff = targetIdx - start;
+					int diff = targetidx - start;
 
 					// break sublist, and insert new sublist
 					List<AbstractInsnNode> sublist = this.blocklist.get(listIdx-1).subList( diff, this.blocklist.get(listIdx-1).size());
@@ -96,31 +95,38 @@ public class ControlFlowGraphExtractor {
 
 // TODO is this necessary?
 					// fallthrough edge
-					this.edgeslist.add(String.valueOf( targetIdx-1 ) + ":" + String.valueOf(targetIdx));
+					this.edgeslist.add(String.valueOf( targetidx-1 ) + ":" + String.valueOf(targetidx));
 
 					break;
 				}
 				idxLastFirstIns = idxFirstIns;
 			}
 
-		}else if( targetIdx > idx){
+		}else if( targetidx > fromidx){
 			// forward jump
-			this.forwardJump.add(new Integer(targetIdx));
+			this.forwardJump.add(new Integer(targetidx));
 		} // no else: continue with next element
 	}
+
+
+
+
+
 
 	private void initInstructions(){
 // TODO set up exception table - BETTER: add information of exception table to the already maintained jumplist?
 
 		int tryblocklimit = -1; // use a stack here, for nested try/catch
+		int handler = -1;
 		List<TryCatchBlockNode> trycatchlist = method.tryCatchBlocks;
 		for( TryCatchBlockNode trycatch : trycatchlist){
 			int start = method.instructions.indexOf((LabelNode) trycatch.start);
 			int end = method.instructions.indexOf((LabelNode) trycatch.end);
+			
+			handler = method.instructions.indexOf((LabelNode) trycatch.handler);
+			
 			this.exceptiontable.put(new Integer(start), new Integer(end));
 		}
-
-
 
 		boolean branchNextIteration = false;
 		for( int idx = 0; idx < this.instructions.size(); ++idx ){
@@ -152,6 +158,7 @@ public class ControlFlowGraphExtractor {
 				// stop
 // TODO
 				tryblocklimit = -1;
+				handler = -1;
 			}
 
 			if(-1 < tryblocklimit ){
@@ -244,11 +251,14 @@ public class ControlFlowGraphExtractor {
 				// (which actually is implicit, isn't it?)
 
 				// fallthrough
+/*
 				String dotConnection = "";
 				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
 					dotConnection += String.valueOf( idx ) + ":" + String.valueOf( idx+1 );
 					this.edgeslist.add(dotConnection);
 				}
+//*/
+				this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( handler ));
 
 				// branching
 //				branching( tryblocklimit, idx );
