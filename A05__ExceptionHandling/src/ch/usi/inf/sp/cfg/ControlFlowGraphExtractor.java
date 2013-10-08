@@ -173,6 +173,9 @@ public class ControlFlowGraphExtractor {
 // TODO test
 				tryblockFinally = -1;
 			}
+
+// TODO if idx at end of tryblockCatch and IF there is a tryblockFinally, go directly to tryblockFinally, and NOT fallthrou!
+
 			if(-1 < tryblockEnd ){
 				switch (ins.getOpcode()) {
 				case Opcodes.AALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
@@ -289,11 +292,12 @@ public class ControlFlowGraphExtractor {
 				if( -1 != tryblockFinally ){
 					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( tryblockFinally ) + ":" + "label=\"finally\",style=dotted");
 				}
+// XXX				
 				
 				
 				
-				
-				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
+//				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
+				if( !this.omitFallthruList.contains( ins.getOpcode() ) && -1 == tryblockFinally ){
 					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( idx+1 ) + ":" + "label=\"fallthrou PEI\"");
 				}
 
