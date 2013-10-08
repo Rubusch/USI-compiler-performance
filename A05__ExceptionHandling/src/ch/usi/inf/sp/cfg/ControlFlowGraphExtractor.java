@@ -222,7 +222,7 @@ public class ControlFlowGraphExtractor {
 			if( ins.getType() == AbstractInsnNode.JUMP_INSN ){
 				String dotConnection = "";
 				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
-					dotConnection += String.valueOf( idx ) + ":" + String.valueOf( idx+1 );
+					dotConnection += String.valueOf( idx ) + ":" + String.valueOf( idx+1 ) + ":" + "label=\"fallthrou FALSE\"";
 					this.edgeslist.add(dotConnection);
 				}
 
@@ -257,10 +257,10 @@ public class ControlFlowGraphExtractor {
 
 				// fallthrou, but not into catch handler
 //				if( -1 != tryblockHandler){
-					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( tryblockHandler ));
+					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( tryblockHandler ) + ":" + "label=\"handler\"");
 //				}else
 				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
-					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( idx+1 ) + ":" + " label=fallthrou");
+					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( idx+1 ) + ":" + "label=\"fallthrou PEI\"");
 				}
 
 // FIXME deconnected nodes for try-catch-finally
@@ -292,7 +292,7 @@ public class ControlFlowGraphExtractor {
 				this.blocklist.add( new ArrayList<AbstractInsnNode>() );
 				// fallthrough edge
 // TODO are there instructions that cannot fall through here? check!
-				this.edgeslist.add(String.valueOf( idx-1 ) + ":" + String.valueOf(idx));
+				this.edgeslist.add(String.valueOf( idx-1 ) + ":" + String.valueOf(idx) + ":" + "label=\"fallthrou\"");
 			}
 
 			// append instruction at last position
@@ -308,12 +308,12 @@ public class ControlFlowGraphExtractor {
 		System.out.println( "digraph G {" );
 		System.out.println( "  nodesep=.5" );
 		System.out.println( "  node [shape=record,width=.1,height=.1]" );
-		System.out.println( "" );
+//		System.out.println( "" );
 
 		// start node
 		System.out.println( "  nodeS [label = \"{ <S> start }\"];" );
 		System.out.println( "  nodeE [label = \"{ <E> end }\"];" );
-		System.out.println( "" );
+//		System.out.println( "" );
 
 		for( int idx=0; idx < this.blocklist.size(); ++idx){
 			System.out.print( dotPrintBlock( idx, blocklist.get(idx)) );
@@ -342,7 +342,7 @@ public class ControlFlowGraphExtractor {
 			}
 
 			System.out.println( str );
-			System.out.println(  );
+//			System.out.println(  );
 		}
 
 		// trailer
