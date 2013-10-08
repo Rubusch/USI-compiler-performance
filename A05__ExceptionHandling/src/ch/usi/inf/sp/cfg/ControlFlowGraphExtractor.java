@@ -178,6 +178,7 @@ public class ControlFlowGraphExtractor {
 //				tryblockEnd = this.exceptiontable.get(new Integer(idx));
 				current = this.exceptiontable.get(new Integer(idx));
 				tryblockEnd = current.getEndAddr();
+				tryblockCatch = current.getHandlerAddr();
 
 				if( tryblockEnd == tryblockCatch){
 					// this block is handled by a finally block
@@ -342,7 +343,6 @@ public class ControlFlowGraphExtractor {
 // FIXME labels for if branchings, and for try-catch-finally
 // FIXME block0 links to GOTO (block1)
 // FIXME split duplicate finally
-// FIXME ATHROWS
 // FIXME nested try-catch-finally (stack?)
 				
 
@@ -371,9 +371,10 @@ public class ControlFlowGraphExtractor {
 //				edgeslistAdd( idx-1, idx, "label=\"fallthrou\"");
 //				branching( idx-1, idx, "label=\"tryblock fallthrou\"");
 				if( isFinallyBlock ){
-					branching( idx-1, idx+6, "label=\"tryblock fallthrou\""); // ATHROWS callback to label
+					branching( idx-1, idx+6, "label=\"finally fallthrou\""); // ATHROWS callback to label
 					isFinallyBlock = false;
 				}else{
+					// tryBlock fallthrou
 					branching( idx-1, idx, "label=\"tryblock fallthrou\"");
 				}
 			}

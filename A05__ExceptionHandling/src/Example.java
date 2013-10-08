@@ -27,7 +27,7 @@ public class Example {
 		
 /*
 		tryitout();
-/* /
+/*/
 		try{
 			tryitout();
 		}catch(Exception e){
