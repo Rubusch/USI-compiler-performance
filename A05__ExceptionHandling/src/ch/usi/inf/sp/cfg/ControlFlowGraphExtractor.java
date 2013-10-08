@@ -163,14 +163,15 @@ public class ControlFlowGraphExtractor {
 					tryblockFinally = tryblockEnd;
 				}
 			}
+
+
 			if( idx == tryblockEnd ){
-				// stop
+				// end of try block, or end of catch block, or end of finally block ??? 
 // TODO check this again
 				tryblockEnd = -1;
 				tryblockCatch = -1;
 			}
 			if( idx == tryblockFinally ){
-// TODO test
 				tryblockFinally = -1;
 			}
 
@@ -262,15 +263,18 @@ public class ControlFlowGraphExtractor {
 				final int targetIdx = instructions.indexOf(defaultTargetInstruction);
 
 				branching( idx, targetIdx );
-				// create a new basic block
+
+				// provoke a new basic block
 				branchNextIteration = true;
 			}
 
-
-
-			if( !branchNextIteration && isPEI.get(idx).booleanValue()){
+// TODO rm
+//			if( !branchNextIteration && isPEI.get(idx).booleanValue()){
 				// we have a PEI, and the block is not branched
 				// (which actually is implicit, isn't it?)
+
+			if( isPEI.get(idx).booleanValue()){
+				Analyzer.db(Printer.OPCODES[idx]);
 /*
 				// types of instructions of PEIs are:
 				ins.getType() == AbstractInsnNode.INSN
@@ -292,9 +296,8 @@ public class ControlFlowGraphExtractor {
 				if( -1 != tryblockFinally ){
 					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( tryblockFinally ) + ":" + "label=\"finally\",style=dotted");
 				}
-// XXX				
-				
-				
+// XXX
+
 				
 //				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
 				if( !this.omitFallthruList.contains( ins.getOpcode() ) && -1 == tryblockFinally ){
@@ -302,11 +305,10 @@ public class ControlFlowGraphExtractor {
 				}
 
 // FIXME deconnected nodes for try-catch-finally
-// FIXME dotted line for exception handling
 // FIXME labels for if branchings, and for try-catch-finally
 
 				// branching
-				branching( idx, tryblockEnd );
+//				branching( idx, tryblockEnd );
 
 				// start new block
 				branchNextIteration = true;
