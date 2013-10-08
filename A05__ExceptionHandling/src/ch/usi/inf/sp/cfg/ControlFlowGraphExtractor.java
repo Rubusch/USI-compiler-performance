@@ -125,59 +125,6 @@ public class ControlFlowGraphExtractor {
 	}
 
 
-	private boolean checkPEI(final AbstractInsnNode ins){
-		switch (ins.getOpcode()) {
-		case Opcodes.AALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
-		case Opcodes.AASTORE: // NullPointerException, ArrayIndexOutOfBoundsException, ArrayStoreException
-		case Opcodes.ANEWARRAY: // NegativeArraySizeException, (linking)
-		case Opcodes.ARETURN: // IllegalMonitorStateException (if synchronized)
-		case Opcodes.ARRAYLENGTH: // NullPointerException
-		case Opcodes.ATHROW: // NullPointerException, IllegalMonitorStateException (if synchronized), 
-		case Opcodes.BALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
-		case Opcodes.BASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
-		case Opcodes.CALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
-		case Opcodes.CASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
-		case Opcodes.CHECKCAST: // ClassCastException, (linking)
-		case Opcodes.DALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
-		case Opcodes.DASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
-		case Opcodes.DRETURN: // IllegalMonitorStateException (if synchronized)
-		case Opcodes.FALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
-		case Opcodes.FASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
-		case Opcodes.FRETURN: // IllegalMonitorStateException (if synchronized)
-		case Opcodes.GETFIELD: // NullPointerException, (linking)
-		case Opcodes.GETSTATIC: // Error*, (linking)
-		case Opcodes.IALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
-		case Opcodes.IASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
-		case Opcodes.IDIV: // ArithmeticException
-		case Opcodes.INSTANCEOF: // (linking)
-		case Opcodes.INVOKEDYNAMIC: // what's this??
-		case Opcodes.INVOKEINTERFACE: // NullPointerException, IncompatibleClassChangeError, AbstractMethodError, IllegalAccessError, AbstractMethodError, UnsatisfiedLinkError, (linking)
-		case Opcodes.INVOKESPECIAL: // NullPointerException, UnsatisfiedLinkError, (linking)
-		case Opcodes.INVOKESTATIC: // UnsatisfiedLinkError, Error*, (linking)
-		case Opcodes.INVOKEVIRTUAL: // NullPointerException, AbstractMethodError, UnsatisfiedLinkError, (linking)
-		case Opcodes.IREM: // ArithmeticException
-		case Opcodes.IRETURN: // IllegalMonitorStateException (if synchronized)
-		case Opcodes.LALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
-		case Opcodes.LASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
-		case Opcodes.LDIV: // ArithmeticException
-		case Opcodes.LREM: // ArithmeticException
-		case Opcodes.LRETURN: // IllegalMonitorStateException (if synchronized)
-		case Opcodes.MONITORENTER: // NullPointerException
-		case Opcodes.MONITOREXIT: // NullPointerException, IllegalMonitorStateException
-		case Opcodes.MULTIANEWARRAY: // NegativeArraySizeException, (linking)
-		case Opcodes.NEW: // Error*, (linking)
-		case Opcodes.NEWARRAY: // NegativeArraySizeException
-		case Opcodes.PUTFIELD: // NullPointerException, (linking)
-		case Opcodes.PUTSTATIC: // Error*, (linking)
-		case Opcodes.RETURN: // IllegalMonitorStateException (if synchronized)
-		case Opcodes.SALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
-		case Opcodes.SASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
-//			isPEI.set(idx, new Boolean( true ));
-			return true;
-		}
-		return false;
-	}
-
 	private void initInstructions(){
 // TODO set up exception table - BETTER: add information of exception table to the already maintained jumplist?
 
@@ -196,8 +143,6 @@ public class ControlFlowGraphExtractor {
 		for( TryCatchBlockNode trycatch : trycatchlist){
 			int start = method.instructions.indexOf((LabelNode) trycatch.start);
 			int end = method.instructions.indexOf((LabelNode) trycatch.end);
-//			tryblockCatch = method.instructions.indexOf((LabelNode) trycatch.handler);
-//			this.exceptiontable.put(new Integer(start), new Integer(end));
 			int handler = method.instructions.indexOf((LabelNode) trycatch.handler);
 			tryblockCatch = handler;
 // TODO tryblockCatch to handler?
@@ -244,12 +189,10 @@ public class ControlFlowGraphExtractor {
 				}else{
 					// this block is handled by a a catch block
 //					isTryBlock = true;
-					tryblockCatch = tryblockEnd;
 					tryblockFinally = -1;
 					// tryblockEnd is already set
 				}
 			}
-
 
 			if( idx == tryblockCatch){
 				isTryBlock = false;
@@ -261,9 +204,6 @@ public class ControlFlowGraphExtractor {
 				isFinallyBlock = true;
 			}
 
-
-
-// TODO if idx at end of tryblockCatch and IF there is a tryblockFinally, go directly to tryblockFinally, and NOT fallthrou!
 			isPEI = false;
 			if(isTryBlock){
 				isPEI = checkPEI(ins);
@@ -306,8 +246,6 @@ public class ControlFlowGraphExtractor {
 				// provoke a new basic block
 				branchNextIteration = true;
 			}
-
-
 
 
 
@@ -384,6 +322,60 @@ public class ControlFlowGraphExtractor {
 		}
 	}
 
+	private boolean checkPEI(final AbstractInsnNode ins){
+		switch (ins.getOpcode()) {
+		case Opcodes.AALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
+		case Opcodes.AASTORE: // NullPointerException, ArrayIndexOutOfBoundsException, ArrayStoreException
+		case Opcodes.ANEWARRAY: // NegativeArraySizeException, (linking)
+		case Opcodes.ARETURN: // IllegalMonitorStateException (if synchronized)
+		case Opcodes.ARRAYLENGTH: // NullPointerException
+		case Opcodes.ATHROW: // NullPointerException, IllegalMonitorStateException (if synchronized), 
+		case Opcodes.BALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
+		case Opcodes.BASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
+		case Opcodes.CALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
+		case Opcodes.CASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
+		case Opcodes.CHECKCAST: // ClassCastException, (linking)
+		case Opcodes.DALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
+		case Opcodes.DASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
+		case Opcodes.DRETURN: // IllegalMonitorStateException (if synchronized)
+		case Opcodes.FALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
+		case Opcodes.FASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
+		case Opcodes.FRETURN: // IllegalMonitorStateException (if synchronized)
+		case Opcodes.GETFIELD: // NullPointerException, (linking)
+		case Opcodes.GETSTATIC: // Error*, (linking)
+		case Opcodes.IALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
+		case Opcodes.IASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
+		case Opcodes.IDIV: // ArithmeticException
+		case Opcodes.INSTANCEOF: // (linking)
+		case Opcodes.INVOKEDYNAMIC: // what's this??
+		case Opcodes.INVOKEINTERFACE: // NullPointerException, IncompatibleClassChangeError, AbstractMethodError, IllegalAccessError, AbstractMethodError, UnsatisfiedLinkError, (linking)
+		case Opcodes.INVOKESPECIAL: // NullPointerException, UnsatisfiedLinkError, (linking)
+		case Opcodes.INVOKESTATIC: // UnsatisfiedLinkError, Error*, (linking)
+		case Opcodes.INVOKEVIRTUAL: // NullPointerException, AbstractMethodError, UnsatisfiedLinkError, (linking)
+		case Opcodes.IREM: // ArithmeticException
+		case Opcodes.IRETURN: // IllegalMonitorStateException (if synchronized)
+		case Opcodes.LALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
+		case Opcodes.LASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
+		case Opcodes.LDIV: // ArithmeticException
+		case Opcodes.LREM: // ArithmeticException
+		case Opcodes.LRETURN: // IllegalMonitorStateException (if synchronized)
+		case Opcodes.MONITORENTER: // NullPointerException
+		case Opcodes.MONITOREXIT: // NullPointerException, IllegalMonitorStateException
+		case Opcodes.MULTIANEWARRAY: // NegativeArraySizeException, (linking)
+		case Opcodes.NEW: // Error*, (linking)
+		case Opcodes.NEWARRAY: // NegativeArraySizeException
+		case Opcodes.PUTFIELD: // NullPointerException, (linking)
+		case Opcodes.PUTSTATIC: // Error*, (linking)
+		case Opcodes.RETURN: // IllegalMonitorStateException (if synchronized)
+		case Opcodes.SALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
+		case Opcodes.SASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
+//			isPEI.set(idx, new Boolean( true ));
+			return true;
+		}
+		return false;
+	}
+	
+	
 	public void dotPrintCFG(){
 		Analyzer.echo("# ---");
 		if( 0 == this.blocklist.size() ) return;
