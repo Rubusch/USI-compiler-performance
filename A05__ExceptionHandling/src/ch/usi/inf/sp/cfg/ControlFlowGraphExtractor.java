@@ -31,9 +31,11 @@ public class ControlFlowGraphExtractor {
 	private MethodNode method;
 	private List<Integer> forwardJump;
 	private List<String> edgeslist; // TODO rename "jumpTable"?
-	private Map<Integer, Integer> exceptiontable;
+//	private Map<Integer, Integer> exceptiontable;
+	private Map<Integer, ExceptionState> exceptiontable;
 	private List<Integer> omitFallthruList;
 	private List<Boolean> isPEI;
+	private List<ExceptionState> statestack;
 
 	public List<List<AbstractInsnNode>> getBlocklist() {
 		return blocklist;
@@ -73,8 +75,10 @@ public class ControlFlowGraphExtractor {
 		
 		// exception handling
 		this.isPEI = new ArrayList<Boolean>();
-		this.exceptiontable = new HashMap<Integer, Integer>();
+//		this.exceptiontable = new HashMap<Integer, Integer>();
+		this.exceptiontable = new HashMap<Integer, ExceptionState>();
 
+		this.statestack = new ArrayList<ExceptionState>(); // TODO LinkedList?
 		initInstructions();
 	}
 
@@ -124,6 +128,8 @@ public class ControlFlowGraphExtractor {
 	private void initInstructions(){
 // TODO set up exception table - BETTER: add information of exception table to the already maintained jumplist?
 
+		ExceptionState current;
+
 		int tryblockEnd = -1; // use a stack here, for nested try/catch
 		int tryblockCatch = -1;
 		int tryblockFinally = -1;
@@ -137,8 +143,12 @@ public class ControlFlowGraphExtractor {
 		for( TryCatchBlockNode trycatch : trycatchlist){
 			int start = method.instructions.indexOf((LabelNode) trycatch.start);
 			int end = method.instructions.indexOf((LabelNode) trycatch.end);
-			tryblockCatch = method.instructions.indexOf((LabelNode) trycatch.handler);
-			this.exceptiontable.put(new Integer(start), new Integer(end));
+//			tryblockCatch = method.instructions.indexOf((LabelNode) trycatch.handler);
+//			this.exceptiontable.put(new Integer(start), new Integer(end));
+			int handler = method.instructions.indexOf((LabelNode) trycatch.handler);
+			tryblockCatch = handler;
+// TODO tryblockCatch to handler?
+			this.exceptiontable.put(new Integer(start), new ExceptionState(start, end, handler));
 
 			// debug
 			Analyzer.db("start " + String.valueOf(start));
@@ -160,12 +170,14 @@ public class ControlFlowGraphExtractor {
 
 // EXCEPTIONS
 			// exception handling, default FALSE, a PEI: TRUE
-//			isPEI.add(new Boolean(false));
+// TODO check statestack first, then fetch new object
 			if( null != this.exceptiontable.get(new Integer(idx)) ){
 				// start a block
 				isTryBlock = true;
 
+//				tryblockEnd = this.exceptiontable.get(new Integer(idx));
 				tryblockEnd = this.exceptiontable.get(new Integer(idx));
+				
 				if( tryblockEnd == tryblockCatch){
 					// this block is handled by a finally block
 //					isFinallyBlock = true;
