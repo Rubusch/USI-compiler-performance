@@ -121,6 +121,7 @@ public class ControlFlowGraphExtractor {
 
 		int tryblockEnd = -1; // use a stack here, for nested try/catch
 		int tryblockCatch = -1;
+		int tryblockFinally = -1;
 		List<TryCatchBlockNode> trycatchlist = method.tryCatchBlocks;
 		for( TryCatchBlockNode trycatch : trycatchlist){
 			int start = method.instructions.indexOf((LabelNode) trycatch.start);
@@ -157,13 +158,20 @@ public class ControlFlowGraphExtractor {
 				// start try block
 				tryblockEnd = this.exceptiontable.get(new Integer(idx));
 				if( tryblockEnd == tryblockCatch){
+					// this is finally
 					tryblockCatch = -1;
+					tryblockFinally = tryblockEnd;
 				}
 			}
 			if( idx == tryblockEnd ){
 				// stop
+// TODO check this again
 				tryblockEnd = -1;
 				tryblockCatch = -1;
+			}
+			if( idx == tryblockFinally ){
+// TODO test
+				tryblockFinally = -1;
 			}
 			if(-1 < tryblockEnd ){
 				switch (ins.getOpcode()) {
@@ -277,13 +285,14 @@ public class ControlFlowGraphExtractor {
 					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( tryblockCatch ) + ":" + "label=\"catch\",style=dotted");
 // TODO make catch fallthrou to the finally case - IF THERE IS ONE
 				}
+
+				if( -1 != tryblockFinally ){
+					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( tryblockFinally ) + ":" + "label=\"finally\",style=dotted");
+				}
 				
 				
 				
 				
-				
-				
-//				}else
 				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
 					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( idx+1 ) + ":" + "label=\"fallthrou PEI\"");
 				}
