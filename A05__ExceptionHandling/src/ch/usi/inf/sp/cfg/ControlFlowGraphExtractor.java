@@ -150,8 +150,6 @@ public class ControlFlowGraphExtractor {
 // EXCEPTIONS
 			// exception handling, default FALSE, a PEI: TRUE
 			isPEI.add(new Boolean(false));
-
-
 			if( null != this.exceptiontable.get(new Integer(idx)) ){
 				// start try block
 				tryblockEnd = this.exceptiontable.get(new Integer(idx));
@@ -159,14 +157,11 @@ public class ControlFlowGraphExtractor {
 					tryblockHandler = -1;
 				}
 			}
-
 			if( idx == tryblockEnd ){
 				// stop
-// TODO
 				tryblockEnd = -1;
 				tryblockHandler = -1;
 			}
-
 			if(-1 < tryblockEnd ){
 				switch (ins.getOpcode()) {
 				case Opcodes.AALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
@@ -228,7 +223,6 @@ public class ControlFlowGraphExtractor {
 
 				LabelNode target = ((JumpInsnNode) ins).label;
 				int targetIdx = instructions.indexOf(target);
-//				branching( targetIdx, idx );
 				branching( idx, targetIdx );
 
 				// provoke a new basic block
@@ -256,8 +250,8 @@ public class ControlFlowGraphExtractor {
 				// (which actually is implicit, isn't it?)
 
 				// fallthrou, but not into catch handler
-//				if( -1 != tryblockHandler){
-					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( tryblockHandler ) + ":" + "label=\"handler\"");
+//				if( -1 != tryblockHandler){ // TODO
+				this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( tryblockHandler ) + ":" + "label=\"handler\",style=dotted");
 //				}else
 				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
 					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( idx+1 ) + ":" + "label=\"fallthrou PEI\"");
@@ -308,12 +302,10 @@ public class ControlFlowGraphExtractor {
 		System.out.println( "digraph G {" );
 		System.out.println( "  nodesep=.5" );
 		System.out.println( "  node [shape=record,width=.1,height=.1]" );
-//		System.out.println( "" );
 
 		// start node
 		System.out.println( "  nodeS [label = \"{ <S> start }\"];" );
 		System.out.println( "  nodeE [label = \"{ <E> end }\"];" );
-//		System.out.println( "" );
 
 		for( int idx=0; idx < this.blocklist.size(); ++idx){
 			System.out.print( dotPrintBlock( idx, blocklist.get(idx)) );
@@ -323,14 +315,6 @@ public class ControlFlowGraphExtractor {
 		System.out.println( "  nodeS:S -> node0:0" );
 
 		for( int idx = 0; idx < this.edgeslist.size(); ++idx ){
-/*
-			String str = this.edgeslist.get(idx);
-			int idxSrc = Integer.valueOf( str.split(":")[0] ).intValue();
-			int idxNodeSrc = insId2NodeId( idxSrc );
-			int idxDst = Integer.valueOf( str.split(":")[1] ).intValue();
-			int idxNodeDst = insId2NodeId( idxDst );
-			System.out.println( "  node" +  idxNodeSrc +":" + idxSrc + " -> node" + idxNodeDst + ":" + idxDst );
-/*/
 			String[] szbuf = this.edgeslist.get(idx).split(":");
 			int idxSrc = Integer.valueOf( szbuf[0] ).intValue();
 			int idxNodeSrc = insId2NodeId( idxSrc );
@@ -342,7 +326,6 @@ public class ControlFlowGraphExtractor {
 			}
 
 			System.out.println( str );
-//			System.out.println(  );
 		}
 
 		// trailer

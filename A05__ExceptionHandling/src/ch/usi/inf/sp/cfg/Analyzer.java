@@ -8,17 +8,21 @@ import java.util.List;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.JumpInsnNode;
-import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.TryCatchBlockNode;
 
 
 public class Analyzer {
 	public static void die( String msg ){
 		System.out.println( msg );
 		System.exit(-1);
+	}
+
+	public static void echo( String msg ){
+		System.out.println( msg );
+	}
+
+	public static void db( String msg){
+		echo( "# DEBUG: '" + msg + "'");
 	}
 
 	public static void main(String[] args) throws FileNotFoundException, IOException {
@@ -34,7 +38,6 @@ public class Analyzer {
 		cr.accept(cnode, 0);
 		Analyzer control = new Analyzer();
 
-
 		String methodNameAndDescriptor = "";
 		try{
 			methodNameAndDescriptor = args[1];
@@ -43,7 +46,8 @@ public class Analyzer {
 			// no specific method provided, do all methods
 			control.flow( cnode );			
 		}
-		System.out.println( "\n# READY.");
+//		System.out.println( "\n# READY.");
+		echo( "# READY." );
 	}
 
 	private void flow( ClassNode cnode, String methodNameAndDescriptor ){
@@ -70,13 +74,7 @@ public class Analyzer {
 	 */
 	private void flowMethod( final MethodNode method ){
 		System.out.println("\n# " + method.name);
-//*
 		ControlFlowGraphExtractor controlFlow = new ControlFlowGraphExtractor( method );
-/*/
-		final InsnList instructions = method.instructions;
-		ControlFlowGraphExtractor controlFlow = new ControlFlowGraphExtractor( instructions );
-//*/
-
 
 //*
 		controlFlow.dotPrintCFG();
