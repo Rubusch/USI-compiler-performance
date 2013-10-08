@@ -116,15 +116,19 @@ public class ControlFlowGraphExtractor {
 	private void initInstructions(){
 // TODO set up exception table - BETTER: add information of exception table to the already maintained jumplist?
 
-		int tryblocklimit = -1; // use a stack here, for nested try/catch
-		int handler = -1;
+		int tryblockEnd = -1; // use a stack here, for nested try/catch
+		int tryblockHandler = -1;
 		List<TryCatchBlockNode> trycatchlist = method.tryCatchBlocks;
 		for( TryCatchBlockNode trycatch : trycatchlist){
 			int start = method.instructions.indexOf((LabelNode) trycatch.start);
+			System.out.println("# XXX start " + String.valueOf(start)); // TODO rm
+
 			int end = method.instructions.indexOf((LabelNode) trycatch.end);
-			
-			handler = method.instructions.indexOf((LabelNode) trycatch.handler);
-			
+			System.out.println("# XXX end " + String.valueOf(end)); // TODO rm
+
+			tryblockHandler = method.instructions.indexOf((LabelNode) trycatch.handler);
+			System.out.println("# XXX handler " + String.valueOf(tryblockHandler)); // TODO rm
+
 			this.exceptiontable.put(new Integer(start), new Integer(end));
 		}
 
@@ -149,19 +153,21 @@ public class ControlFlowGraphExtractor {
 
 
 			if( null != this.exceptiontable.get(new Integer(idx)) ){
-				tryblocklimit = this.exceptiontable.get(new Integer(idx));
 				// start try block
-// TODO
+				tryblockEnd = this.exceptiontable.get(new Integer(idx));
+				if( tryblockEnd == tryblockHandler){
+					tryblockHandler = -1;
+				}
 			}
 
-			if( idx == tryblocklimit ){
+			if( idx == tryblockEnd ){
 				// stop
 // TODO
-				tryblocklimit = -1;
-				handler = -1;
+				tryblockEnd = -1;
+				tryblockHandler = -1;
 			}
 
-			if(-1 < tryblocklimit ){
+			if(-1 < tryblockEnd ){
 				switch (ins.getOpcode()) {
 				case Opcodes.AALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
 				case Opcodes.AASTORE: // NullPointerException, ArrayIndexOutOfBoundsException, ArrayStoreException
@@ -234,13 +240,12 @@ public class ControlFlowGraphExtractor {
 				for( int t=0; t<keys.size(); t++ ){
 					final LabelNode targetInstruction = (LabelNode)labels.get(t);
 					final int targetIdx = instructions.indexOf(targetInstruction);
-//					branching( targetIdx, idx );
 					branching( idx, targetIdx );
 				}
 
 				final LabelNode defaultTargetInstruction = ((LookupSwitchInsnNode)ins).dflt;
 				final int targetIdx = instructions.indexOf(defaultTargetInstruction);
-//				branching( targetIdx, idx );
+
 				branching( idx, targetIdx );
 				// create a new basic block
 				branchNextIteration = true;
@@ -250,35 +255,32 @@ public class ControlFlowGraphExtractor {
 				// we have a PEI, and the block is not branched
 				// (which actually is implicit, isn't it?)
 
-				// fallthrough
-/*
-				String dotConnection = "";
-				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
-					dotConnection += String.valueOf( idx ) + ":" + String.valueOf( idx+1 );
-					this.edgeslist.add(dotConnection);
+				// fallthrou, but not into catch handler
+				if( -1 != tryblockHandler){
+					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( tryblockHandler ));
+				}else if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
+					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( idx+1 ));
 				}
-//*/
-				this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( handler ));
+
 
 				// branching
-//				branching( tryblocklimit, idx );
-				branching( idx, tryblocklimit );
+				branching( idx, tryblockEnd );
 
 				// start new block
 				branchNextIteration = true;
-// TODO
-//				instructions.getExceptionTable() ???
-			}
 /*
-			if( ins.getType() == AbstractInsnNode.INSN
+				// the type of instructions of PEIs
+
+				if( ins.getType() == AbstractInsnNode.INSN
 					|| ins.getType() == AbstractInsnNode.TYPE_INSN
 					|| ins.getType() == AbstractInsnNode.FIELD_INSN
 					|| ins.getType() == AbstractInsnNode.METHOD_INSN
 					|| ins.getType() == AbstractInsnNode.MULTIANEWARRAY_INSN
 					|| ins.getType() == AbstractInsnNode.INT_INSN ){
 				// groups of PEIs
-			}
 //*/
+			}
+
 
 // APPEND
 			if( -1 < this.forwardJump.indexOf( idx ) && this.blocklist.get( this.blocklist.size() -1 ).size() > 1 ){
