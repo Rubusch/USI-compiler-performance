@@ -1,17 +1,12 @@
 //Note: This class won't compile by design!
-import java.io.*;
 import java.util.List;
-import java.util.ArrayList;
 
 public class Example {
-
-	private List<Integer> list;
-	private static final int SIZE = 10;
-
+	public static boolean itzok = true;
 	public static void main( String[] args ){
 		Example ex = new Example();
 
-		ex.exp();
+		ex.test();
 
 		System.out.println( "READY.\n");
 	}
@@ -19,9 +14,16 @@ public class Example {
 
 /******************************************************************************/
 
-	public void exp(){
+	public void test(){
 		System.out.println("some heading instructions");
-/*
+	
+		if( itzok ){
+			System.out.println( "true" );
+		}else{
+			System.out.println( "false" );
+		}
+		
+//*
 		tryitout();
 /* /
 		try{
@@ -35,7 +37,7 @@ public class Example {
 		}finally{
 			System.out.println("my finally");
 		}
-/*/
+/* /
 		try{
 			tryitout();
 		}catch(Exception e){

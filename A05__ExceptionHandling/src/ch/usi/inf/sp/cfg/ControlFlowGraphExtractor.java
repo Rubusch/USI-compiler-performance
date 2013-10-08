@@ -214,6 +214,7 @@ public class ControlFlowGraphExtractor {
 
 // BRANCHING
 			if( ins.getType() == AbstractInsnNode.JUMP_INSN ){
+				// conditional jumps
 				String dotConnection = "";
 				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
 					dotConnection += String.valueOf( idx ) + ":" + String.valueOf( idx+1 ) + ":" + "label=\"fallthrou FALSE\"";
@@ -228,6 +229,7 @@ public class ControlFlowGraphExtractor {
 				branchNextIteration = true;
 
 			}else if( ins.getType() == AbstractInsnNode.LOOKUPSWITCH_INSN){
+				// switch / case
 				final List<?> keys = ((LookupSwitchInsnNode)ins).keys;
 				final List<?> labels = ((LookupSwitchInsnNode)ins).labels;
 				for( int t=0; t<keys.size(); t++ ){
@@ -244,9 +246,21 @@ public class ControlFlowGraphExtractor {
 				branchNextIteration = true;
 			}
 
+
+
 			if( !branchNextIteration && isPEI.get(idx).booleanValue()){
 				// we have a PEI, and the block is not branched
 				// (which actually is implicit, isn't it?)
+/*
+				// types of instructions of PEIs are:
+				ins.getType() == AbstractInsnNode.INSN
+				ins.getType() == AbstractInsnNode.TYPE_INSN
+				ins.getType() == AbstractInsnNode.FIELD_INSN
+				ins.getType() == AbstractInsnNode.METHOD_INSN
+				ins.getType() == AbstractInsnNode.MULTIANEWARRAY_INSN
+				ins.getType() == AbstractInsnNode.INT_INSN
+				// groups of PEIs
+//*/
 
 				// fallthrou, but not into catch handler
 //				if( -1 != tryblockHandler){ // TODO
@@ -265,24 +279,13 @@ public class ControlFlowGraphExtractor {
 
 				// start new block
 				branchNextIteration = true;
-/*
-				// the type of instructions of PEIs
-
-				if( ins.getType() == AbstractInsnNode.INSN
-					|| ins.getType() == AbstractInsnNode.TYPE_INSN
-					|| ins.getType() == AbstractInsnNode.FIELD_INSN
-					|| ins.getType() == AbstractInsnNode.METHOD_INSN
-					|| ins.getType() == AbstractInsnNode.MULTIANEWARRAY_INSN
-					|| ins.getType() == AbstractInsnNode.INT_INSN ){
-				// groups of PEIs
-//*/
 			}
-
 
 // APPEND
 			if( -1 < this.forwardJump.indexOf( idx ) && this.blocklist.get( this.blocklist.size() -1 ).size() > 1 ){
 				// there was a forward jump to this address
 				this.blocklist.add( new ArrayList<AbstractInsnNode>() );
+
 				// fallthrough edge
 // TODO are there instructions that cannot fall through here? check!
 				this.edgeslist.add(String.valueOf( idx-1 ) + ":" + String.valueOf(idx) + ":" + "label=\"fallthrou\"");
