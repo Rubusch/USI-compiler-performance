@@ -27,17 +27,17 @@ public class Example {
 		
 /*
 		tryitout();
-/*/
+/* /
 		try{
 			tryitout();
 		}catch(Exception e){
 			System.out.println("my catch");
 		}
-/* /
+/*/
 		try{
 			tryitout();
 		}finally{
-			System.out.println("my finally");
+			System.out.println("finally");
 		}
 /* /
 		try{

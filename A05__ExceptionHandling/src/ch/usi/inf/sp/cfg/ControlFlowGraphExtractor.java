@@ -120,7 +120,7 @@ public class ControlFlowGraphExtractor {
 // TODO set up exception table - BETTER: add information of exception table to the already maintained jumplist?
 
 		int tryblockEnd = -1; // use a stack here, for nested try/catch
-		int tryblockHandler = -1;
+		int tryblockCatch = -1;
 		List<TryCatchBlockNode> trycatchlist = method.tryCatchBlocks;
 		for( TryCatchBlockNode trycatch : trycatchlist){
 			int start = method.instructions.indexOf((LabelNode) trycatch.start);
@@ -129,8 +129,8 @@ public class ControlFlowGraphExtractor {
 			int end = method.instructions.indexOf((LabelNode) trycatch.end);
 			Analyzer.db("end " + String.valueOf(end));
 
-			tryblockHandler = method.instructions.indexOf((LabelNode) trycatch.handler);
-			Analyzer.db("handler " + String.valueOf(tryblockHandler));
+			tryblockCatch = method.instructions.indexOf((LabelNode) trycatch.handler);
+			Analyzer.db("handler " + String.valueOf(tryblockCatch));
 
 			this.exceptiontable.put(new Integer(start), new Integer(end));
 		}
@@ -156,14 +156,14 @@ public class ControlFlowGraphExtractor {
 			if( null != this.exceptiontable.get(new Integer(idx)) ){
 				// start try block
 				tryblockEnd = this.exceptiontable.get(new Integer(idx));
-				if( tryblockEnd == tryblockHandler){
-					tryblockHandler = -1;
+				if( tryblockEnd == tryblockCatch){
+					tryblockCatch = -1;
 				}
 			}
 			if( idx == tryblockEnd ){
 				// stop
 				tryblockEnd = -1;
-				tryblockHandler = -1;
+				tryblockCatch = -1;
 			}
 			if(-1 < tryblockEnd ){
 				switch (ins.getOpcode()) {
@@ -272,8 +272,17 @@ public class ControlFlowGraphExtractor {
 //*/
 
 				// fallthrou, but not into catch handler
-//				if( -1 != tryblockHandler){ // TODO
-				this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( tryblockHandler ) + ":" + "label=\"handler\",style=dotted");
+				if( -1 != tryblockCatch){ // TODO
+					// in case there is a CATCH
+					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( tryblockCatch ) + ":" + "label=\"catch\",style=dotted");
+// TODO make catch fallthrou to the finally case - IF THERE IS ONE
+				}
+				
+				
+				
+				
+				
+				
 //				}else
 				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
 					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( idx+1 ) + ":" + "label=\"fallthrou PEI\"");
