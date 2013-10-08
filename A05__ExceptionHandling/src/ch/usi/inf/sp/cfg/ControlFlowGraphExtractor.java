@@ -78,26 +78,27 @@ public class ControlFlowGraphExtractor {
 		initInstructions();
 	}
 
-	private void branching( int fromidx, int targetidx ){
-		branching( fromidx, targetidx, "");
+	private void branching( int srcidx, int dstidx ){
+		branching( srcidx, dstidx, "");
 	}
 
-	private void branching( int fromidx, int targetidx, String opt){
-		String dotConnection = "";
-		dotConnection += String.valueOf( fromidx ) + ":" + String.valueOf(targetidx) + ":" + opt ;
-		this.edgeslist.add(dotConnection);
+	private void branching( int srcidx, int dstidx, String opt){
+//		String dotConnection = "";
+//		dotConnection += String.valueOf( fromidx ) + ":" + String.valueOf(targetidx) + ":" + opt ;
+//		this.edgeslist.add(dotConnection);
+		edgeslistAdd( srcidx, dstidx, opt);
 
-		if( targetidx < fromidx ){
+		if( dstidx < srcidx ){
 			// backward jump
 			int idxLastFirstIns = 0;
 			for( int listIdx = 1; listIdx < this.blocklist.size()-1; ++listIdx ){
 				AbstractInsnNode firstIns = this.blocklist.get(listIdx).get(0);
 				int idxFirstIns = this.blocklist.indexOf( firstIns );
-				if( targetidx < idxFirstIns ){
+				if( dstidx < idxFirstIns ){
 
 					// we overran one, so the last one is it: go back
 					int start = idxLastFirstIns;
-					int diff = targetidx - start;
+					int diff = dstidx - start;
 
 					// break sublist, and insert new sublist
 					List<AbstractInsnNode> sublist = this.blocklist.get(listIdx-1).subList( diff, this.blocklist.get(listIdx-1).size());
@@ -109,16 +110,16 @@ public class ControlFlowGraphExtractor {
 					// fallthrough edge
 // TODO is this necessary?
 //					this.edgeslist.add(String.valueOf( targetidx-1 ) + ":" + String.valueOf(targetidx) + ":" + "???" );
-					edgeslistAdd( targetidx-1, targetidx, "???");
+					edgeslistAdd( dstidx-1, dstidx, "???");
 
 					break;
 				}
 				idxLastFirstIns = idxFirstIns;
 			}
 
-		}else if( targetidx > fromidx){
+		}else if( dstidx > srcidx){
 			// forward jump
-			this.forwardJump.add(new Integer(targetidx));
+			this.forwardJump.add(new Integer(dstidx));
 		} // no else: continue with next element
 	}
 
