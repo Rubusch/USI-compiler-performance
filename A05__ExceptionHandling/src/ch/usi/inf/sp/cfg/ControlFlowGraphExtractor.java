@@ -69,8 +69,12 @@ public class ControlFlowGraphExtractor {
 	}
 
 	private void branching( int fromidx, int targetidx ){
+		branching( fromidx, targetidx, "");
+	}
+
+	private void branching( int fromidx, int targetidx, String opt){
 		String dotConnection = "";
-		dotConnection += String.valueOf( fromidx ) + ":" + String.valueOf(targetidx);
+		dotConnection += String.valueOf( fromidx ) + ":" + String.valueOf(targetidx) + ":" + opt ;
 		this.edgeslist.add(dotConnection);
 
 		if( targetidx < fromidx ){
@@ -94,7 +98,7 @@ public class ControlFlowGraphExtractor {
 
 // TODO is this necessary?
 					// fallthrough edge
-					this.edgeslist.add(String.valueOf( targetidx-1 ) + ":" + String.valueOf(targetidx));
+					this.edgeslist.add(String.valueOf( targetidx-1 ) + ":" + String.valueOf(targetidx) + ":" + "???" );
 
 					break;
 				}
@@ -217,13 +221,13 @@ public class ControlFlowGraphExtractor {
 				// conditional jumps
 				String dotConnection = "";
 				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
-					dotConnection += String.valueOf( idx ) + ":" + String.valueOf( idx+1 ) + ":" + "label=\"fallthrou FALSE\"";
+					dotConnection += String.valueOf( idx ) + ":" + String.valueOf( idx+1 ) + ":" + "label=\"TRUE\"";
 					this.edgeslist.add(dotConnection);
 				}
 
 				LabelNode target = ((JumpInsnNode) ins).label;
 				int targetIdx = instructions.indexOf(target);
-				branching( idx, targetIdx );
+				branching( idx, targetIdx, "label=\"FALSE\"" );
 
 				// provoke a new basic block
 				branchNextIteration = true;
@@ -499,7 +503,7 @@ public class ControlFlowGraphExtractor {
 				szBlock += " | <";
 			}
 		}
-		szBlock += " }\"];\n";
+		szBlock += " }\"];";
 
 		return szBlock;
 	}
