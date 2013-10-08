@@ -46,12 +46,10 @@ public class ControlFlowGraphExtractor {
 		initInstructions();
 	}
 
-//	private void branching( int targetIdx, int idx ){
 	private void branching( int sourceidx, int targetidx ){
 		branching( sourceidx, targetidx, "");
 	}
 
-//	private void branching( int targetIdx, int idx, String opt ){
 	private void branching( int sourceidx, int targetidx, String opt ){
 		String dotConnection = "";
 		dotConnection += String.valueOf( sourceidx ) + ":" + String.valueOf(targetidx);
@@ -100,13 +98,12 @@ public class ControlFlowGraphExtractor {
 				}
 				LabelNode target = ((JumpInsnNode) ins).label;
 				int targetIdx = instructions.indexOf(target);
-				
+
 				if( Opcodes.GOTO == ins.getOpcode()){
 					branching( idx, targetIdx, "label=\"GOTO\"" );
 				}else{
 					branching( idx, targetIdx, "label=\"FALSE\"" );
 				}
-//				branching( targetIdx, idx );
 
 				// provoke a new basic block
 				branchNextIteration = true;
@@ -117,13 +114,11 @@ public class ControlFlowGraphExtractor {
 				for( int t=0; t<keys.size(); t++ ){
 					final LabelNode targetInstruction = (LabelNode)labels.get(t);
 					final int targetIdx = instructions.indexOf(targetInstruction);
-//					branching( targetIdx, idx );
 					branching( idx, targetIdx );
 				}
 
 				final LabelNode defaultTargetInstruction = ((LookupSwitchInsnNode)ins).dflt;
 				final int targetIdx = instructions.indexOf(defaultTargetInstruction);
-//				branching( targetIdx, idx );
 				branching( idx, targetIdx );
 				// create a new basic block
 				branchNextIteration = true;
@@ -141,247 +136,7 @@ public class ControlFlowGraphExtractor {
 			blockList.get( blockList.size()-1 ).add( ins );
 		}
 	}
-/*
-	public void dottyPrint(){
-		System.out.println("\n# ---");
-		if( 0 == this.blockList.size() ) return;
 
-		// header
-		System.out.println( "digraph G {" );
-		System.out.println( "  nodesep=.5" );
-		System.out.println( "  rankdir=LR" );
-		System.out.println( "  node [shape=record,width=.1,height=.1]" );
-		System.out.println( "" );
-
-		// start node
-		System.out.println( "  nodeS [label = \"{ <S> S }\"];" );
-		System.out.println( "  nodeE [label = \"{ <E> E }\"];" );
-		System.out.println( "" );
-
-//*
-		for( int idx=0; idx < this.blockList.size(); ++idx){
-			System.out.print("  node" + idx + " [label = \"{ <");
-			for( int jdx=0; jdx < this.blockList.get(idx).size(); ++jdx){
-//				int opcode = this.listlist.get(idx).get(jdx).getOpcode();
-				AbstractInsnNode ins = this.blockList.get(idx).get(jdx);
-				int opcode = ins.getOpcode();
-
-//				System.out.print( this.instructions.indexOf( this.listlist.get(idx).get(jdx)) + "> " );
-				System.out.print( this.instructions.indexOf( ins ) + "> " );
-				switch(ins.getType()){
-//				if( -1 < opcode){
-				case AbstractInsnNode.LABEL: 
-					// pseudo-instruction (branch or exception target)
-					System.out.print("label");
-					break;
-				case AbstractInsnNode.FRAME:
-					// pseudo-instruction (stack frame map)
-					System.out.print("stackframemap");
-					break;
-				case AbstractInsnNode.LINE:
-					// pseudo-instruction (line number information)
-					System.out.print("linenumber");
-					break;
-				case AbstractInsnNode.INSN:
-					// Opcodes: NOP, ACONST_NULL, ICONST_M1, ICONST_0, ICONST_1, ICONST_2,
-				    // ICONST_3, ICONST_4, ICONST_5, LCONST_0, LCONST_1, FCONST_0,
-					// FCONST_1, FCONST_2, DCONST_0, DCONST_1, IALOAD, LALOAD, FALOAD,
-					// DALOAD, AALOAD, BALOAD, CALOAD, SALOAD, IASTORE, LASTORE, FASTORE,
-					// DASTORE, AASTORE, BASTORE, CASTORE, SASTORE, POP, POP2, DUP,
-					// DUP_X1, DUP_X2, DUP2, DUP2_X1, DUP2_X2, SWAP, IADD, LADD, FADD,
-					// DADD, ISUB, LSUB, FSUB, DSUB, IMUL, LMUL, FMUL, DMUL, IDIV, LDIV,
-					// FDIV, DDIV, IREM, LREM, FREM, DREM, INEG, LNEG, FNEG, DNEG, ISHL,
-					// LSHL, ISHR, LSHR, IUSHR, LUSHR, IAND, LAND, IOR, LOR, IXOR, LXOR,
-					// I2L, I2F, I2D, L2I, L2F, L2D, F2I, F2L, F2D, D2I, D2L, D2F, I2B,
-					// I2C, I2S, LCMP, FCMPL, FCMPG, DCMPL, DCMPG, IRETURN, LRETURN,
-					// FRETURN, DRETURN, ARETURN, RETURN, ARRAYLENGTH, ATHROW,
-					// MONITORENTER, or MONITOREXIT.
-					// zero operands, nothing to print
-					System.out.print(Printer.OPCODES[ins.getOpcode()]);
-					break;
-				case AbstractInsnNode.INT_INSN:
-					// Opcodes: NEWARRAY, BIPUSH, SIPUSH.
-					if( ins.getOpcode()==Opcodes.NEWARRAY) {
-						// NEWARRAY
-						System.out.print("NEWARRAY");
-						System.out.print(" ");
-						System.out.print(Printer.TYPES[((IntInsnNode)ins).operand]);
-					} else {
-						// BIPUSH or SIPUSH
-						System.out.print("BIPUSH SIPUSH");
-						System.out.print(" ");
-						System.out.print(((IntInsnNode)ins).operand);
-					}
-					break;
-				case AbstractInsnNode.JUMP_INSN:
-					// Opcodes: IFEQ, IFNE, IFLT, IFGE, IFGT, IFLE, IF_ICMPEQ,
-				    // IF_ICMPNE, IF_ICMPLT, IF_ICMPGE, IF_ICMPGT, IF_ICMPLE, IF_ACMPEQ,
-				    // IF_ACMPNE, GOTO, JSR, IFNULL or IFNONNULL.
-					System.out.print(Printer.OPCODES[ins.getOpcode()]);
-					System.out.print(" ");
-				{
-					final LabelNode targetInstruction = ((JumpInsnNode)ins).label;
-					final int targetId = instructions.indexOf(targetInstruction);
-					System.out.print(targetId);
-					break;
-				}
-				case AbstractInsnNode.LDC_INSN:
-					// Opcodes: LDC.
-					System.out.print(((LdcInsnNode)ins).cst);
-					break;
-				case AbstractInsnNode.IINC_INSN:
-					// Opcodes: IINC.
-					System.out.print("IINC");
-					System.out.print(" ");
-					System.out.print(((IincInsnNode)ins).var);
-					System.out.print(" ");
-					System.out.print(((IincInsnNode)ins).incr);
-					break;
-				case AbstractInsnNode.TYPE_INSN:
-					// Opcodes: NEW, ANEWARRAY, CHECKCAST or INSTANCEOF.
-//					System.out.print("NEWorANEWARRAYorCHECKCASTorINSTANCEOF");
-					System.out.print( Printer.OPCODES[opcode]);
-					System.out.print(" ");
-					System.out.print(((TypeInsnNode)ins).desc);
-					break;
-				case AbstractInsnNode.VAR_INSN:
-					System.out.print( Printer.OPCODES[opcode] );
-					System.out.print(" ");
-					System.out.print(((VarInsnNode) ins).var );
-					break;
-				case AbstractInsnNode.FIELD_INSN:
-					// Opcodes: GETSTATIC, PUTSTATIC, GETFIELD or PUTFIELD.
-					System.out.print(Printer.OPCODES[ins.getOpcode()]);
-					System.out.print(" ");
-					System.out.print(((FieldInsnNode)ins).owner);
-					System.out.print(".");
-					System.out.print(((FieldInsnNode)ins).name);
-					System.out.print(" ");
-					System.out.print(((FieldInsnNode)ins).desc);
-					break;
-				case AbstractInsnNode.METHOD_INSN:
-					// Opcodes: INVOKEVIRTUAL, INVOKESPECIAL, INVOKESTATIC,
-				    // INVOKEINTERFACE or INVOKEDYNAMIC.
-					System.out.print(Printer.OPCODES[ins.getOpcode()]);
-					System.out.print(" ");
-					System.out.print(((MethodInsnNode)ins).owner);
-					System.out.print(".");
-					String tmp = ((MethodInsnNode)ins).name;
-					tmp = tmp.replace('<', '(');
-					tmp = tmp.replace('>', ')');
-					System.out.print( tmp);
-//					System.out.print(((MethodInsnNode)ins).name);
-					System.out.print(" ");
-					System.out.print(((MethodInsnNode)ins).desc);
-					break;
-				case AbstractInsnNode.MULTIANEWARRAY_INSN:
-					// Opcodes: MULTIANEWARRAY.
-					System.out.print(Printer.OPCODES[ins.getOpcode()]);
-					System.out.print(" ");
-					System.out.print(((MultiANewArrayInsnNode)ins).desc);
-					System.out.print(" ");
-					System.out.print(((MultiANewArrayInsnNode)ins).dims);
-					break;
-				case AbstractInsnNode.LOOKUPSWITCH_INSN:
-					// Opcodes: LOOKUPSWITCH.
-				{
-					final List<?> keys = ((LookupSwitchInsnNode)ins).keys;
-					final List<?> labels = ((LookupSwitchInsnNode)ins).labels;
-					System.out.print(Printer.OPCODES[ins.getOpcode()]);
-					System.out.print(" ");
-					for (int t=0; t<keys.size(); t++) {
-						final int key = (Integer)keys.get(t);
-						final LabelNode targetInstruction = (LabelNode)labels.get(t);
-						final int targetId = instructions.indexOf(targetInstruction);
-						System.out.print(key+": "+targetId+", ");
-					}
-					final LabelNode defaultTargetInstruction = ((LookupSwitchInsnNode)ins).dflt;
-					final int defaultTargetId = instructions.indexOf(defaultTargetInstruction);
-					System.out.print("default: "+defaultTargetId);
-					break;
-				}
-				case AbstractInsnNode.TABLESWITCH_INSN:
-					// Opcodes: TABLESWITCH.
-					System.out.print(Printer.OPCODES[ins.getOpcode()]);
-					System.out.print(" ");
-				{
-					final int minKey = ((TableSwitchInsnNode)ins).min;
-					final List<?> labels = ((TableSwitchInsnNode)ins).labels;
-					for (int t=0; t<labels.size(); t++) {
-						final int key = minKey+t;
-						final LabelNode targetInstruction = (LabelNode)labels.get(t);
-						final int targetId = instructions.indexOf(targetInstruction);
-						System.out.print(key+": "+targetId+", ");
-					}
-					final LabelNode defaultTargetInstruction = ((TableSwitchInsnNode)ins).dflt;
-					final int defaultTargetId = instructions.indexOf(defaultTargetInstruction);
-					System.out.print("default: "+defaultTargetId);
-					break;
-				}
-				}// end
-
-				if(jdx < this.blockList.get(idx).size() -1 ){
-					System.out.print(" | <");
-				}
-			}
-			System.out.print(" }\"];\n");
-		}
-		System.out.println( "" );
-
-		// connections
-		System.out.println( "  nodeS:S -> node0:0" );
-
-/*
-		for( int idx = 0; idx < this.edgesList.size(); ++idx ){
-			String str = this.edgesList.get(idx);
-
-			int idxSrc = Integer.valueOf( str.split(":")[0] ).intValue();
-			
-			int idxNodeSrc = 1;
-			for( ; idxNodeSrc < this.blockList.size(); ++idxNodeSrc ){
-				if( this.instructions.indexOf( this.blockList.get( idxNodeSrc ).get(0) ) > idxSrc){
-					break;
-				}
-			}
-			--idxNodeSrc;
-
-			int idxDst = Integer.valueOf( str.split(":")[1] ).intValue();
-
-			int idxNodeDst = 1;
-			for( ; idxNodeDst < blockList.size(); ++idxNodeDst ){
-				if( instructions.indexOf( blockList.get( idxNodeDst ).get(0) ) > idxDst){
-					break;
-				}
-			}
-			--idxNodeDst;
-
-			System.out.println( "  node" +  idxNodeSrc +":" + idxSrc + " -> node" + idxNodeDst + ":" + idxDst );
-/* /
-		for( int idx = 0; idx < this.edgesList.size(); ++idx ){
-			String[] szbuf = this.edgesList.get(idx).split(":");
-			int idxSrc = Integer.valueOf( szbuf[0] ).intValue();
-			int idxNodeSrc = insId2NodeId( idxSrc );
-			int idxDst = Integer.valueOf( szbuf[1] ).intValue();
-			int idxNodeDst = insId2NodeId( idxDst );
-			String str = "  node" +  idxNodeSrc +":" + idxSrc + " -> node" + idxNodeDst + ":" + idxDst;
-			if( 2 < szbuf.length ){
-				str += "[ " + szbuf[2] + " ]";
-			}
-			System.out.println(str);
-//* /
-		}
-
-		System.out.println( "" );
-
-		// trailer
-// TODO back from RETURN, here just the forelast instruction
-		System.out.println("  node" + String.valueOf(blockList.size()-1)
-				+ ":" + String.valueOf(instructions.size()-2)
-				+ " -> nodeE:E" );
-
-		System.out.println("}");
-	}
-//*/	
 	public void dotPrintCFG(){
 		System.out.println("# ---");
 		if( 0 == this.blockList.size() ) return;
