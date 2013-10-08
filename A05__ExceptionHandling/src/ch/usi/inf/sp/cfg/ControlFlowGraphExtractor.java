@@ -83,9 +83,6 @@ public class ControlFlowGraphExtractor {
 	}
 
 	private void branching( int srcidx, int dstidx, String opt){
-//		String dotConnection = "";
-//		dotConnection += String.valueOf( fromidx ) + ":" + String.valueOf(targetidx) + ":" + opt ;
-//		this.edgeslist.add(dotConnection);
 		edgeslistAdd( srcidx, dstidx, opt);
 
 		if( dstidx < srcidx ){
@@ -122,10 +119,6 @@ public class ControlFlowGraphExtractor {
 			this.forwardJump.add(new Integer(dstidx));
 		} // no else: continue with next element
 	}
-
-
-
-
 
 
 	private void initInstructions(){
@@ -243,10 +236,7 @@ public class ControlFlowGraphExtractor {
 // BRANCHING
 			if( ins.getType() == AbstractInsnNode.JUMP_INSN ){
 				// conditional jumps
-//				String dotConnection = "";
 				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
-//					dotConnection += String.valueOf( idx ) + ":" + String.valueOf( idx+1 ) + ":" + "label=\"TRUE\"";
-//					this.edgeslist.add(dotConnection);
 					edgeslistAdd( idx, idx+1, "label=\"TRUE\"");
 				}
 
@@ -281,11 +271,6 @@ public class ControlFlowGraphExtractor {
 				branchNextIteration = true;
 			}
 
-// TODO rm
-//			if( !branchNextIteration && isPEI.get(idx).booleanValue()){
-				// we have a PEI, and the block is not branched
-				// (which actually is implicit, isn't it?)
-
 			if( isPEI.get(idx).booleanValue()){
 				Analyzer.db(Printer.OPCODES[idx]);
 /*
@@ -302,25 +287,25 @@ public class ControlFlowGraphExtractor {
 				// fallthrou, but not into catch handler
 				if( -1 != tryblockCatch){ // TODO
 					// in case there is a CATCH
-//					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( tryblockCatch ) + ":" + "label=\"catch\",style=dotted");
 					edgeslistAdd( idx, tryblockCatch, "label=\"catch\",style=dotted");
 // TODO make catch fallthrou to the finally case - IF THERE IS ONE
 				}
 
 				if( -1 != tryblockFinally ){
-//					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( tryblockFinally ) + ":" + "label=\"finally\",style=dotted");
 					edgeslistAdd(idx, tryblockFinally, "label=\"finally\",style=dotted");
 				}
 
 				
-//				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
 				if( !this.omitFallthruList.contains( ins.getOpcode() ) && -1 == tryblockFinally ){
-//					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( idx+1 ) + ":" + "label=\"fallthrou PEI\"");
 					edgeslistAdd(idx, idx+1, "label=\"fallthrou PEI\"");
 				}
 
 // FIXME deconnected nodes for try-catch-finally
 // FIXME labels for if branchings, and for try-catch-finally
+// FIXME ALOAD -> branch && fallthrou
+// FIXME block0 links to GOTO (block1)
+// FIXME split duplicate finally
+// FIXME ATHROWS
 
 				// branching
 //				branching( idx, tryblockEnd );
@@ -336,7 +321,6 @@ public class ControlFlowGraphExtractor {
 
 				// fallthrough edge
 // TODO are there instructions that cannot fall through here? check!
-//				this.edgeslist.add(String.valueOf( idx-1 ) + ":" + String.valueOf(idx) + ":" + "label=\"fallthrou\"");
 				edgeslistAdd( idx-1, idx, "label=\"fallthrou\"");
 			}
 
