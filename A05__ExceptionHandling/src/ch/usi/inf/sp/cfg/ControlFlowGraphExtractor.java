@@ -291,7 +291,8 @@ public class ControlFlowGraphExtractor {
 				// fallthrou, but not into catch handler
 				if( -1 != tryblockCatch){ // TODO
 					// in case there is a CATCH
-					edgeslistAdd( idx, tryblockCatch, "label=\"catch\",style=dotted");
+//					edgeslistAdd( idx, tryblockCatch, "label=\"catch\",style=dotted");
+					branching( idx, tryblockCatch, "label=\"catch\",style=dotted");
 // TODO make catch fallthrou to the finally case - IF THERE IS ONE
 				}
 
@@ -300,13 +301,14 @@ public class ControlFlowGraphExtractor {
 //				}
 
 				
-				if( !this.omitFallthruList.contains( ins.getOpcode() ) && -1 == tryblockFinally ){
-					edgeslistAdd(idx, idx+1, "label=\"fallthrou PEI\"");
+//				if( !this.omitFallthruList.contains( ins.getOpcode() ) && -1 == tryblockFinally ){
+//					edgeslistAdd(idx, idx+1, "label=\"fallthrou PEI\"");
+				if( !this.omitFallthruList.contains( ins.getOpcode() )){
+					branching( idx, idx+1, "label=\"fallthrou PEI\"");
 				}
 
 // FIXME deconnected nodes for try-catch-finally
 // FIXME labels for if branchings, and for try-catch-finally
-// FIXME ALOAD -> branch && fallthrou
 // FIXME block0 links to GOTO (block1)
 // FIXME split duplicate finally
 // FIXME ATHROWS
@@ -331,7 +333,8 @@ public class ControlFlowGraphExtractor {
 
 				// fallthrough edge
 // TODO are there instructions that cannot fall through here? check!
-				edgeslistAdd( idx-1, idx, "label=\"fallthrou\"");
+//				edgeslistAdd( idx-1, idx, "label=\"fallthrou\"");
+				branching( idx-1, idx, "label=\"tryblock fallthrou\"");
 			}
 
 			// append instruction at last position
