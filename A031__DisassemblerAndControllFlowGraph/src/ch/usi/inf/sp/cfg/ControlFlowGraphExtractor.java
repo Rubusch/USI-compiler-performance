@@ -285,7 +285,7 @@ public class ControlFlowGraphExtractor {
 				}
 				case AbstractInsnNode.TABLESWITCH_INSN:
 					// Opcodes: TABLESWITCH.
-					System.out.println(Printer.OPCODES[ins.getOpcode()]);
+					System.out.print(Printer.OPCODES[ins.getOpcode()]);
 					System.out.print(" ");
 				{
 					final int minKey = ((TableSwitchInsnNode)ins).min;

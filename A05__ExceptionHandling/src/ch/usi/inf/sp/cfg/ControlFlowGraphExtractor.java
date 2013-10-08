@@ -31,7 +31,6 @@ public class ControlFlowGraphExtractor {
 	private MethodNode method;
 	private List<Integer> forwardJump;
 	private List<String> edgeslist; // TODO rename "jumpTable"?
-//	private List<String> exceptionlist;
 	private Map<Integer, Integer> exceptiontable;
 	private List<Integer> omitFallthruList;
 	private List<Boolean> isPEI;
@@ -121,13 +120,16 @@ public class ControlFlowGraphExtractor {
 		List<TryCatchBlockNode> trycatchlist = method.tryCatchBlocks;
 		for( TryCatchBlockNode trycatch : trycatchlist){
 			int start = method.instructions.indexOf((LabelNode) trycatch.start);
-			System.out.println("# XXX start " + String.valueOf(start)); // TODO rm
+//			System.out.println("# XXX start " + String.valueOf(start)); // TODO rm
+			Analyzer.db("start " + String.valueOf(start));
 
 			int end = method.instructions.indexOf((LabelNode) trycatch.end);
-			System.out.println("# XXX end " + String.valueOf(end)); // TODO rm
+//			System.out.println("# XXX end " + String.valueOf(end)); // TODO rm
+			Analyzer.db("end " + String.valueOf(end));
 
 			tryblockHandler = method.instructions.indexOf((LabelNode) trycatch.handler);
-			System.out.println("# XXX handler " + String.valueOf(tryblockHandler)); // TODO rm
+//			System.out.println("# XXX handler " + String.valueOf(tryblockHandler)); // TODO rm
+			Analyzer.db("handler " + String.valueOf(tryblockHandler));
 
 			this.exceptiontable.put(new Integer(start), new Integer(end));
 		}
@@ -295,24 +297,32 @@ public class ControlFlowGraphExtractor {
 	}
 
 	public void dotPrintCFG(){
-		System.out.println("# ---");
+//		System.out.println("# ---");
+		Analyzer.echo("# ---");
 		if( 0 == this.blocklist.size() ) return;
 
 		// header
-		System.out.println( "digraph G {" );
-		System.out.println( "  nodesep=.5" );
-		System.out.println( "  node [shape=record,width=.1,height=.1]" );
+//		System.out.println( "digraph G {" );
+		Analyzer.echo("digraph G {");
+//		System.out.println( "  nodesep=.5" );
+		Analyzer.echo("  nodesep=.5");
+//		System.out.println( "  node [shape=record,width=.1,height=.1]" );
+		Analyzer.echo("  node [shape=record,width=.1,height=.1]");
 
 		// start node
-		System.out.println( "  nodeS [label = \"{ <S> start }\"];" );
-		System.out.println( "  nodeE [label = \"{ <E> end }\"];" );
+//		System.out.println( "  nodeS [label = \"{ <S> start }\"];" );
+		Analyzer.echo("  nodeS [label = \"{ <S> start }\"];");
+//		System.out.println( "  nodeE [label = \"{ <E> end }\"];" );
+		Analyzer.echo("  nodeE [label = \"{ <E> end }\"];");
 
 		for( int idx=0; idx < this.blocklist.size(); ++idx){
-			System.out.print( dotPrintBlock( idx, blocklist.get(idx)) );
+//			System.out.print( dotPrintBlock( idx, blocklist.get(idx)) );
+			Analyzer.echo(dotPrintBlock( idx, blocklist.get(idx)));
 		}
 
 		// connections
-		System.out.println( "  nodeS:S -> node0:0" );
+//		System.out.println( "  nodeS:S -> node0:0" );
+		Analyzer.echo("  nodeS:S -> node0:0");
 
 		for( int idx = 0; idx < this.edgeslist.size(); ++idx ){
 			String[] szbuf = this.edgeslist.get(idx).split(":");
@@ -325,16 +335,21 @@ public class ControlFlowGraphExtractor {
 				str += "[ " + szbuf[2] + " ]";
 			}
 
-			System.out.println( str );
+//			System.out.println( str );
+			Analyzer.echo(str);
 		}
 
 		// trailer
 // TODO back from RETURN, here just the forelast instruction
-		System.out.println("  node" + String.valueOf(blocklist.size()-1)
+//		System.out.println("  node" + String.valueOf(blocklist.size()-1)
+//				+ ":" + String.valueOf(instructions.size()-2)
+//				+ " -> nodeE:E" );
+		Analyzer.echo("  node" + String.valueOf(blocklist.size()-1)
 				+ ":" + String.valueOf(instructions.size()-2)
-				+ " -> nodeE:E" );
+				+ " -> nodeE:E");
 
-		System.out.println("}");
+//		System.out.println("}");
+		Analyzer.echo("}");
 	}
 
 	public static String dotPrintBlock( int blockId, List<AbstractInsnNode> blockinstructions ){
@@ -476,7 +491,8 @@ public class ControlFlowGraphExtractor {
 			}
 			case AbstractInsnNode.TABLESWITCH_INSN:
 				// Opcodes: TABLESWITCH.
-				System.out.println(Printer.OPCODES[ins.getOpcode()]);
+//				System.out.println(Printer.OPCODES[ins.getOpcode()]);
+				szBlock += Printer.OPCODES[ins.getOpcode()];
 				szBlock += " ";
 			{
 				final int minKey = ((TableSwitchInsnNode)ins).min;
