@@ -256,10 +256,11 @@ public class ControlFlowGraphExtractor {
 				// (which actually is implicit, isn't it?)
 
 				// fallthrou, but not into catch handler
-				if( -1 != tryblockHandler){
+//				if( -1 != tryblockHandler){
 					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( tryblockHandler ));
-				}else if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
-					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( idx+1 ));
+//				}else
+				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
+					this.edgeslist.add(String.valueOf( idx ) + ":" + String.valueOf( idx+1 ) + ":" + " label=fallthrou");
 				}
 
 // FIXME deconnected nodes for try-catch-finally
@@ -322,13 +323,26 @@ public class ControlFlowGraphExtractor {
 		System.out.println( "  nodeS:S -> node0:0" );
 
 		for( int idx = 0; idx < this.edgeslist.size(); ++idx ){
+/*
 			String str = this.edgeslist.get(idx);
 			int idxSrc = Integer.valueOf( str.split(":")[0] ).intValue();
 			int idxNodeSrc = insId2NodeId( idxSrc );
 			int idxDst = Integer.valueOf( str.split(":")[1] ).intValue();
 			int idxNodeDst = insId2NodeId( idxDst );
-
 			System.out.println( "  node" +  idxNodeSrc +":" + idxSrc + " -> node" + idxNodeDst + ":" + idxDst );
+/*/
+			String[] szbuf = this.edgeslist.get(idx).split(":");
+			int idxSrc = Integer.valueOf( szbuf[0] ).intValue();
+			int idxNodeSrc = insId2NodeId( idxSrc );
+			int idxDst = Integer.valueOf( szbuf[1] ).intValue();
+			int idxNodeDst = insId2NodeId( idxDst );
+			String str = "  node" +  idxNodeSrc +":" + idxSrc + " -> node" + idxNodeDst + ":" + idxDst;
+			if( 2 < szbuf.length ){
+				str += "[ " + szbuf[2] + " ]";
+			}
+
+			System.out.println( str );
+			System.out.println(  );
 		}
 
 		// trailer
