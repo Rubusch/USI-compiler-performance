@@ -33,7 +33,7 @@ public class Example {
 		}catch(Exception e){
 			System.out.println("my catch");
 		}
-/*/
+/* /
 		try{
 			tryitout();
 		}finally{

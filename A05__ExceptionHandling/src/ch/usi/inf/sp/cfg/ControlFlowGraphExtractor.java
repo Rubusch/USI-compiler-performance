@@ -124,11 +124,17 @@ public class ControlFlowGraphExtractor {
 		} // no else: continue with next element
 	}
 
+	private boolean checkExceptionState( final EState which, final ExceptionState state){
+		if( null == state ){
+			return false;
+		}
+		return (which == state.getState());
+	}
 
 	private void initInstructions(){
 // TODO set up exception table - BETTER: add information of exception table to the already maintained jumplist?
 
-		ExceptionState current;
+		ExceptionState current = null;
 
 		int tryblockEnd = -1; // use a stack here, for nested try/catch
 		int tryblockCatch = -1;
@@ -166,9 +172,14 @@ public class ControlFlowGraphExtractor {
 				branchNextIteration = false;
 			}
 
-// EXCEPTIONS
+
+///////////////////////////////////////////////////
+// TODO
+// fetchState( idx, current, statestack )
+
 			// exception handling, default FALSE, a PEI: TRUE
 // TODO check statestack first, then fetch new object
+
 			if( null != this.exceptiontable.get(new Integer(idx)) ){
 				// start a block
 				isTryBlock = true;
@@ -181,10 +192,9 @@ public class ControlFlowGraphExtractor {
 				if( tryblockEnd == tryblockCatch){
 					// this block is handled by a finally block
 //					isFinallyBlock = true;
-// TODO check this
 					tryblockFinally = tryblockEnd;
 					tryblockCatch = -1;
-//					isCatchBlock = false; // XXX?
+//					isCatchBlock = false;
 
 				}else{
 					// this block is handled by a a catch block
@@ -204,11 +214,7 @@ public class ControlFlowGraphExtractor {
 				isFinallyBlock = true;
 			}
 
-			isPEI = false;
-			if(isTryBlock){
-				isPEI = checkPEI(ins);
-			}
-
+//////////////////////// we have a state here
 // BRANCHING
 			if( ins.getType() == AbstractInsnNode.JUMP_INSN ){
 				// conditional jumps
@@ -248,72 +254,65 @@ public class ControlFlowGraphExtractor {
 			}
 
 
-
-//			if( isPEI.get(idx).booleanValue()){
-			if( isPEI ){
-				Analyzer.db("PEI: " + Printer.OPCODES[idx]);
-/*
+			if( checkExceptionState( EState.TRYING, current )){
 				// types of instructions of PEIs are:
-				ins.getType() == AbstractInsnNode.INSN
-				ins.getType() == AbstractInsnNode.TYPE_INSN
-				ins.getType() == AbstractInsnNode.FIELD_INSN
-				ins.getType() == AbstractInsnNode.METHOD_INSN
-				ins.getType() == AbstractInsnNode.MULTIANEWARRAY_INSN
-				ins.getType() == AbstractInsnNode.INT_INSN
-				// groups of PEIs
-//*/
-
-				// fallthrou, but not into catch handler
-//				if( -1 < tryblockCatch){ // TODO
-					// handled by a catch block
-//					branching( idx, tryblockCatch, "label=\"catch\",style=dotted");
-// TODO make catch fallthrou to the finally case - IF THERE IS ONE
-//				}
-
-//				if( -1 != tryblockFinally ){
-//					edgeslistAdd(idx, tryblockFinally, "label=\"finally\",style=dotted");
-//				}
-
-				
-//				if( !this.omitFallthruList.contains( ins.getOpcode() ) && -1 == tryblockFinally ){
-//					edgeslistAdd(idx, idx+1, "label=\"fallthrou PEI\"");
-				if( !this.omitFallthruList.contains( ins.getOpcode() )){
-					branching( idx, idx+1, "label=\"fallthrou PEI\"");
+				// ins.getType() == AbstractInsnNode.INSN
+				// ins.getType() == AbstractInsnNode.TYPE_INSN
+				// ins.getType() == AbstractInsnNode.FIELD_INSN
+				// ins.getType() == AbstractInsnNode.METHOD_INSN
+				// ins.getType() == AbstractInsnNode.MULTIANEWARRAY_INSN
+				// ins.getType() == AbstractInsnNode.INT_INSN
+				// check current instruction being escaped
+				isPEI = false;
+				if(checkExceptionState( EState.TRYING, current)){
+					isPEI = checkPEI(ins);
 				}
 
-// FIXME nested try-catch-finally (stack?)
+				if( isPEI ){
+//					Analyzer.db("PEI: " + Printer.OPCODES[idx]);
 
+					// fallthrou
+					if( !this.omitFallthruList.contains( ins.getOpcode() )){
+						branching( idx, idx+1, "label=\"fallthrou PEI\"");
+					}
 
-				// PEI branching
-				if(-1 < tryblockCatch){
-					// handeled by a CATCH
-					branching( idx, tryblockCatch, "label=\"PEI to catch\",style=dotted" );
-				}else if(-1 < tryblockFinally && -1 == tryblockCatch){
-					// handeled by a FINALLY
-					branching( idx, tryblockFinally, "label=\"PEI to finally\",style=dotted" );
-				}else{
-					Analyzer.die("PEI found, but neither catch, nor finally block");
+					// PEI branching
+					if(-1 < tryblockCatch){
+						// handeled by a CATCH
+						branching( idx, tryblockCatch, "label=\"PEI to catch\",style=dotted" );
+					}else if(-1 < tryblockFinally && -1 == tryblockCatch){
+						// handeled by a FINALLY
+						branching( idx, tryblockFinally, "label=\"PEI to finally\",style=dotted" );
+					}else{
+						Analyzer.die("PEI found, but neither catch, nor finally block");
+					}
+
+					// start new block
+					branchNextIteration = true;
 				}
 
-				// start new block
-				branchNextIteration = true;
+			}else if( checkExceptionState( EState.CATCHING, current )){
+				if( idx == current.getEndAddr() && current.getEndAddr() == current.getHandlerAddr()){
+					branching( idx, current.getHandlerAddr(), "label=\"catching to finally\",style=dotted" );
+					current.setState(EState.FINALIZING);
+				}
 			}
-
+//*/
 // APPEND
-			if( -1 < this.forwardJump.indexOf( idx ) && this.blocklist.get( this.blocklist.size() -1 ).size() > 1 ){
+			if( -1 < forwardJump.indexOf( idx ) && blocklist.get( blocklist.size() -1 ).size() > 1 ){
 				// there was a forward jump to this address
 				this.blocklist.add( new ArrayList<AbstractInsnNode>() );
 
 				// fallthrough edge
-// TODO are there instructions that cannot fall through here? check!
-//				edgeslistAdd( idx-1, idx, "label=\"fallthrou\"");
-//				branching( idx-1, idx, "label=\"tryblock fallthrou\"");
-				if( isFinallyBlock ){
+// TODO recheck this
+//				if( isFinallyBlock ){
+				if( checkExceptionState( EState.FINALIZING, current )){
 					branching( idx-1, idx+6, "label=\"finally fallthrou\""); // ATHROWS callback to label
-					isFinallyBlock = false;
+//					isFinallyBlock = false;
+					current = null;
 				}else{
-					// tryBlock fallthrou
-					branching( idx-1, idx, "label=\"tryblock fallthrou\"");
+					// forward pointing block fallthrough
+					branching( idx-1, idx, "label=\"forward fallthrou\"");
 				}
 			}
 
