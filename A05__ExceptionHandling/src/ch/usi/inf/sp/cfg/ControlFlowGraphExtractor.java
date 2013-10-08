@@ -127,20 +127,26 @@ public class ControlFlowGraphExtractor {
 		int tryblockEnd = -1; // use a stack here, for nested try/catch
 		int tryblockCatch = -1;
 		int tryblockFinally = -1;
+
+		boolean isPEI = false;
+		boolean isTryBlock = false;
+		boolean isCatchBlock = false;
+		boolean isFinallyBlock = false;
+
 		List<TryCatchBlockNode> trycatchlist = method.tryCatchBlocks;
 		for( TryCatchBlockNode trycatch : trycatchlist){
 			int start = method.instructions.indexOf((LabelNode) trycatch.start);
-			Analyzer.db("start " + String.valueOf(start));
-
 			int end = method.instructions.indexOf((LabelNode) trycatch.end);
-			Analyzer.db("end " + String.valueOf(end));
-
 			tryblockCatch = method.instructions.indexOf((LabelNode) trycatch.handler);
-			Analyzer.db("handler " + String.valueOf(tryblockCatch));
-
 			this.exceptiontable.put(new Integer(start), new Integer(end));
+
+			// debug
+			Analyzer.db("start " + String.valueOf(start));
+			Analyzer.db("end " + String.valueOf(end));
+			Analyzer.db("handler " + String.valueOf(tryblockCatch));
 		}
 
+// FOR
 		boolean branchNextIteration = false;
 		for( int idx = 0; idx < this.instructions.size(); ++idx ){
 			// get next INSTRUCTION
@@ -152,37 +158,48 @@ public class ControlFlowGraphExtractor {
 				branchNextIteration = false;
 			}
 
-
-
-
-
 // EXCEPTIONS
 			// exception handling, default FALSE, a PEI: TRUE
-			isPEI.add(new Boolean(false));
+//			isPEI.add(new Boolean(false));
 			if( null != this.exceptiontable.get(new Integer(idx)) ){
-				// start try block
+				// start a block
+				isTryBlock = true;
+
 				tryblockEnd = this.exceptiontable.get(new Integer(idx));
 				if( tryblockEnd == tryblockCatch){
-					// this is finally
-					tryblockCatch = -1;
+					// this block is handled by a finally block
+//					isFinallyBlock = true;
+// TODO check this
 					tryblockFinally = tryblockEnd;
+					tryblockCatch = -1;
+//					isCatchBlock = false; // XXX?
+
+				}else{
+					// this block is handled by a a catch block
+//					isTryBlock = true;
+					tryblockCatch = tryblockEnd;
+					tryblockFinally = -1;
+					// tryblockEnd is already set
 				}
 			}
 
 
-			if( idx == tryblockEnd ){
-				// end of try block, or end of catch block, or end of finally block ??? 
-// TODO check this again
-				tryblockEnd = -1;
-				tryblockCatch = -1;
+			if( idx == tryblockCatch){
+				isTryBlock = false;
+				isCatchBlock = true;
 			}
-			if( idx == tryblockFinally ){
-				tryblockFinally = -1;
+
+			if( idx == tryblockFinally){
+				isTryBlock = false;
+				isFinallyBlock = true;
 			}
+
+
 
 // TODO if idx at end of tryblockCatch and IF there is a tryblockFinally, go directly to tryblockFinally, and NOT fallthrou!
-
-			if(-1 < tryblockEnd ){
+			isPEI = false;
+			if(isTryBlock){
+//			if(-1 < tryblockEnd ){
 				switch (ins.getOpcode()) {
 				case Opcodes.AALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
 				case Opcodes.AASTORE: // NullPointerException, ArrayIndexOutOfBoundsException, ArrayStoreException
@@ -229,7 +246,8 @@ public class ControlFlowGraphExtractor {
 				case Opcodes.RETURN: // IllegalMonitorStateException (if synchronized)
 				case Opcodes.SALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
 				case Opcodes.SASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
-					isPEI.set(idx, new Boolean( true ));
+//					isPEI.set(idx, new Boolean( true ));
+					isPEI = true;
 				}
 			}
 
@@ -275,7 +293,8 @@ public class ControlFlowGraphExtractor {
 
 
 
-			if( isPEI.get(idx).booleanValue()){
+//			if( isPEI.get(idx).booleanValue()){
+			if( isPEI ){
 				Analyzer.db("PEI: " + Printer.OPCODES[idx]);
 /*
 				// types of instructions of PEIs are:
@@ -289,12 +308,11 @@ public class ControlFlowGraphExtractor {
 //*/
 
 				// fallthrou, but not into catch handler
-				if( -1 != tryblockCatch){ // TODO
-					// in case there is a CATCH
-//					edgeslistAdd( idx, tryblockCatch, "label=\"catch\",style=dotted");
-					branching( idx, tryblockCatch, "label=\"catch\",style=dotted");
+//				if( -1 < tryblockCatch){ // TODO
+					// handled by a catch block
+//					branching( idx, tryblockCatch, "label=\"catch\",style=dotted");
 // TODO make catch fallthrou to the finally case - IF THERE IS ONE
-				}
+//				}
 
 //				if( -1 != tryblockFinally ){
 //					edgeslistAdd(idx, tryblockFinally, "label=\"finally\",style=dotted");
@@ -312,11 +330,15 @@ public class ControlFlowGraphExtractor {
 // FIXME block0 links to GOTO (block1)
 // FIXME split duplicate finally
 // FIXME ATHROWS
+// FIXME nested try-catch-finally (stack?)
+				
 
 				// PEI branching
 				if(-1 < tryblockCatch){
+					// handeled by a CATCH
 					branching( idx, tryblockCatch, "label=\"PEI to catch\",style=dotted" );
 				}else if(-1 < tryblockFinally && -1 == tryblockCatch){
+					// handeled by a FINALLY
 					branching( idx, tryblockFinally, "label=\"PEI to finally\",style=dotted" );
 				}else{
 					Analyzer.die("PEI found, but neither catch, nor finally block");
@@ -334,7 +356,13 @@ public class ControlFlowGraphExtractor {
 				// fallthrough edge
 // TODO are there instructions that cannot fall through here? check!
 //				edgeslistAdd( idx-1, idx, "label=\"fallthrou\"");
-				branching( idx-1, idx, "label=\"tryblock fallthrou\"");
+//				branching( idx-1, idx, "label=\"tryblock fallthrou\"");
+				if( isFinallyBlock ){
+					branching( idx-1, idx+6, "label=\"tryblock fallthrou\""); // ATHROWS callback to label
+					isFinallyBlock = false;
+				}else{
+					branching( idx-1, idx, "label=\"tryblock fallthrou\"");
+				}
 			}
 
 			// append instruction at last position
