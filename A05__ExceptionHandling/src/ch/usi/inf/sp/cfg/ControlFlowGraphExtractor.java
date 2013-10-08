@@ -227,7 +227,12 @@ public class ControlFlowGraphExtractor {
 
 				LabelNode target = ((JumpInsnNode) ins).label;
 				int targetIdx = instructions.indexOf(target);
-				branching( idx, targetIdx, "label=\"FALSE\"" );
+
+				if( Opcodes.GOTO == ins.getOpcode()){
+					branching( idx, targetIdx, "label=\"GOTO\"" );
+				}else{
+					branching( idx, targetIdx, "label=\"FALSE\"" );
+				}
 
 				// provoke a new basic block
 				branchNextIteration = true;
