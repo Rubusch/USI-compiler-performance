@@ -47,7 +47,7 @@ public class Example {
 		}finally{
 			System.out.println("my finally");
 		}
-/*/
+/* /
 		try{
 			try{
 				tryitout();
@@ -58,6 +58,21 @@ public class Example {
 			System.out.println( "my catch" );
 		}finally{
 			System.out.println("my finally");
+		}
+/*/
+		try{
+			tryitout();
+			try{
+				tryitout();
+			}catch(Exception ee){
+				System.out.println("inner catch");
+			}finally{
+				System.out.println("intern finally");
+			}
+		}catch(Exception e){
+			System.out.println( "outer catch" );
+		}finally{
+			System.out.println("outer finally");
 		}
 //*/
 		System.out.println("some trailing instructions");

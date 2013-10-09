@@ -131,9 +131,9 @@ public class ControlFlowGraphExtractor {
 			this.exceptionStateList.add(new ExceptionState(start, end, handler));
 
 			// debug
-//			Analyzer.db("start " + String.valueOf(start));
-//			Analyzer.db("end " + String.valueOf(end));
-//			Analyzer.db("handler " + String.valueOf(handler));
+			Analyzer.db("start " + String.valueOf(start));
+			Analyzer.db("end " + String.valueOf(end));
+			Analyzer.db("handler " + String.valueOf(handler));
 		}
 	}
 
@@ -178,13 +178,21 @@ public class ControlFlowGraphExtractor {
 			for( int idxexp=0; idxexp < this.exceptionStateList.size(); ++idxexp ){
 				ExceptionState exp = this.exceptionStateList.get(idxexp);
 				if( idx == exp.getStartAddr() ){
-	
+Analyzer.db("XXX idx " + idx);	
 					// e.g. a catch and a finally both start at the same addr
 					// but the finally's scope will be bigger (higher end)
 					if(current.getEndAddr() > exp.getEndAddr()){
 						this.stateStack.add(0, current);
+Analyzer.db("AAA stack: " + current.getEndAddr() + ", kept " + exp.getEndAddr());
 						current = exp;
 					}else{
+Analyzer.db("BBB stack: " + exp.getEndAddr() + ", kept "+ current.getEndAddr());
+
+
+
+
+
+// FIXME: order on "stack" is by order of push; still they should be ordered by lowest endAddr
 						this.stateStack.add(0, exp);
 					}
 //					this.stateStack.add(0, current);
@@ -214,7 +222,6 @@ public class ControlFlowGraphExtractor {
 
 	private void initInstructions(){
 		ExceptionState current = null;
-
 		stateInit();
 
 // FOR
@@ -377,8 +384,11 @@ public class ControlFlowGraphExtractor {
 		}
 		return false;
 	}
-	
-	
+
+
+
+
+
 	public void dotPrintCFG(){
 		if( 0 == this.blocklist.size() ) return;
 
