@@ -135,7 +135,7 @@ public class ControlFlowGraphExtractor {
 			Analyzer.db("handler " + String.valueOf(handler));
 		}
 	}
-	
+
 	private ExceptionState fetchState( final int idx, ExceptionState current, List<ExceptionState> statestack ){
 		if( null == current){
 			// check stack
@@ -155,14 +155,16 @@ public class ControlFlowGraphExtractor {
 							// but the finally's scope will be bigger (higher end)
 							if(current.getEndAddr() > exp.getEndAddr()){
 								this.stateStack.add(0, current);
+								current = exp;
 							}else{
 								this.stateStack.add(0, exp);
 							}
+						}else{
+							current = exp;
 						}
-						current = exp;
 					}
 				}
-				// state TRYING
+				// state TRYING, or NULL
 			}
 
 			if(null == current){
@@ -180,12 +182,12 @@ public class ControlFlowGraphExtractor {
 					// but the finally's scope will be bigger (higher end)
 					if(current.getEndAddr() > exp.getEndAddr()){
 						this.stateStack.add(0, current);
+						current = exp;
 					}else{
 						this.stateStack.add(0, exp);
 					}
 //					this.stateStack.add(0, current);
 				}
-				current = exp;
 			}
 			// state TRYING
 		}
@@ -294,7 +296,6 @@ public class ControlFlowGraphExtractor {
 				branchNextIteration = true;
 			}
 
-
 			if( checkExceptionState( EState.TRYING, current )){
 				// types of instructions of PEIs are:
 				// ins.getType() == AbstractInsnNode.INSN
@@ -305,7 +306,7 @@ public class ControlFlowGraphExtractor {
 				// ins.getType() == AbstractInsnNode.INT_INSN
 				// check current instruction being escaped
 				if( checkPEI(ins) ){
-//					Analyzer.db("PEI: " + Printer.OPCODES[idx]);
+					Analyzer.db("PEI: " + Printer.OPCODES[idx]);
 
 					// fallthrou
 					if( !this.omitFallthruList.contains( ins.getOpcode() )){
