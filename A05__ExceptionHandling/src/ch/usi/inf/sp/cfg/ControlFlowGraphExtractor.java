@@ -108,7 +108,6 @@ public class ControlFlowGraphExtractor {
 
 					// fallthrough edge
 // TODO is this necessary?
-//					this.edgeslist.add(String.valueOf( targetidx-1 ) + ":" + String.valueOf(targetidx) + ":" + "???" );
 					edgeslistAdd( dstidx-1, dstidx, "???");
 
 					break;
@@ -122,6 +121,21 @@ public class ControlFlowGraphExtractor {
 		} // no else: continue with next element
 	}
 
+	private void stateInit(){
+		List<TryCatchBlockNode> trycatchlist = method.tryCatchBlocks;
+		for( TryCatchBlockNode trycatch : trycatchlist){
+			int start = method.instructions.indexOf((LabelNode) trycatch.start);
+			int end = method.instructions.indexOf((LabelNode) trycatch.end);
+			int handler = method.instructions.indexOf((LabelNode) trycatch.handler);
+			this.exceptionStateList.add(new ExceptionState(start, end, handler));
+
+			// debug
+			Analyzer.db("start " + String.valueOf(start));
+			Analyzer.db("end " + String.valueOf(end));
+			Analyzer.db("handler " + String.valueOf(handler));
+		}
+	}
+	
 	private ExceptionState fetchState( final int idx, ExceptionState current, List<ExceptionState> statestack ){
 		if( null == current){
 			// check stack
@@ -136,7 +150,14 @@ public class ControlFlowGraphExtractor {
 					if( idx == exp.getStartAddr() ){
 						if(null != current){
 							// we have a tryblock for a finally, so put it on the stack
-							this.stateStack.add(0, current);
+
+							// e.g. a catch and a finally both start at the same addr
+							// but the finally's scope will be bigger (higher end)
+							if(current.getEndAddr() > exp.getEndAddr()){
+								this.stateStack.add(0, current);
+							}else{
+								this.stateStack.add(0, exp);
+							}
 						}
 						current = exp;
 					}
@@ -154,7 +175,15 @@ public class ControlFlowGraphExtractor {
 			for( int idxexp=0; idxexp < this.exceptionStateList.size(); ++idxexp ){
 				ExceptionState exp = this.exceptionStateList.get(idxexp);
 				if( idx == exp.getStartAddr() ){
-					this.stateStack.add(0, current);
+	
+					// e.g. a catch and a finally both start at the same addr
+					// but the finally's scope will be bigger (higher end)
+					if(current.getEndAddr() > exp.getEndAddr()){
+						this.stateStack.add(0, current);
+					}else{
+						this.stateStack.add(0, exp);
+					}
+//					this.stateStack.add(0, current);
 				}
 				current = exp;
 			}
@@ -185,6 +214,8 @@ public class ControlFlowGraphExtractor {
 
 		ExceptionState current = null;
 
+		stateInit();
+/*
 		int tryblockEnd = -1; // use a stack here, for nested try/catch
 		int tryblockCatch = -1;
 		int tryblockFinally = -1;
@@ -209,6 +240,7 @@ public class ControlFlowGraphExtractor {
 			Analyzer.db("end " + String.valueOf(end));
 			Analyzer.db("handler " + String.valueOf(tryblockCatch));
 		}
+//*/
 
 // FOR
 		boolean branchNextIteration = false;
@@ -281,6 +313,9 @@ public class ControlFlowGraphExtractor {
 					}
 
 					// PEI branching
+Analyzer.db("XXX handler " + current.getHandlerAddr());
+					branching( idx, current.getHandlerAddr(), "label=\"PEI\",style=dotted" );
+/*					
 					if(-1 < tryblockCatch){
 						// handeled by a CATCH
 						branching( idx, tryblockCatch, "label=\"PEI to catch\",style=dotted" );
@@ -290,7 +325,7 @@ public class ControlFlowGraphExtractor {
 					}else{
 						Analyzer.die("PEI found, but neither catch, nor finally block");
 					}
-
+//*/
 					// start new block
 					branchNextIteration = true;
 				}
