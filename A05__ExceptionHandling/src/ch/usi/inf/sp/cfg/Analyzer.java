@@ -10,7 +10,6 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
-
 public class Analyzer {
 	public static void die( String msg ){
 		System.out.println( msg );

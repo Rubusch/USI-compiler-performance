@@ -32,7 +32,8 @@ public class ControlFlowGraphExtractor {
 	private List<Integer> forwardJump;
 	private List<String> edgeslist; // TODO rename "jumpTable"?
 //	private Map<Integer, Integer> exceptiontable;
-	private Map<Integer, ExceptionState> exceptiontable;
+//	private Map<Integer, ExceptionState> exceptiontable;
+	private List<ExceptionState> ExceptionStateList;
 	private List<Integer> omitFallthruList;
 	private List<Boolean> isPEI;
 	private List<ExceptionState> statestack;
@@ -76,7 +77,8 @@ public class ControlFlowGraphExtractor {
 		// exception handling
 		this.isPEI = new ArrayList<Boolean>();
 //		this.exceptiontable = new HashMap<Integer, Integer>();
-		this.exceptiontable = new HashMap<Integer, ExceptionState>();
+//		this.exceptiontable = new HashMap<Integer, ExceptionState>();
+		ExceptionStateList = new ArrayList<ExceptionState>();
 
 		this.statestack = new ArrayList<ExceptionState>(); // TODO LinkedList?
 		initInstructions();
@@ -132,22 +134,35 @@ public class ControlFlowGraphExtractor {
 				this.statestack.remove(0);
 
 			// else check list
-			}else if( null != this.exceptiontable.get(new Integer(idx)) ){
-				// state TRYING
-				current = this.exceptiontable.get(new Integer(idx));
 			}else{
+				for( int idxexp=0; idxexp < this.ExceptionStateList.size(); ++idxexp ){
+					ExceptionState exp = this.ExceptionStateList.get(idxexp);
+					if( idx == exp.getStartAddr() ){
+						if(null != current){
+							// we have a tryblock for a finally, so put it on the stack
+							this.statestack.add(0, current);
+						}
+						current = exp;
+					}
+				}
+				// state TRYING
+			}
+
+			if(null == current){
 				// no state change, nothing
 				return null;
 			}
 
 		}else if( checkExceptionState( EState.TRYING, current )){
 			// we're in TRYING, and there is a nested trying
-			if( null != this.exceptiontable.get(new Integer(idx)) ){
-				statestack.add(0, current);
-
-				// state TRYING
-				current = this.exceptiontable.get(new Integer(idx));
+			for( int idxexp=0; idxexp < this.ExceptionStateList.size(); ++idxexp ){
+				ExceptionState exp = this.ExceptionStateList.get(idxexp);
+				if( idx == exp.getStartAddr() ){
+					this.statestack.add(0, current);
+				}
+				current = exp;
 			}
+			// state TRYING
 		}
 
 		if(idx == current.getHandlerAddr()){
@@ -190,7 +205,8 @@ public class ControlFlowGraphExtractor {
 			int handler = method.instructions.indexOf((LabelNode) trycatch.handler);
 			tryblockCatch = handler;
 // TODO tryblockCatch to handler?
-			this.exceptiontable.put(new Integer(start), new ExceptionState(start, end, handler));
+//			this.exceptiontable.put(new Integer(start), new ExceptionState(start, end, handler));
+			this.ExceptionStateList.add(new ExceptionState(start, end, handler));
 
 			// debug
 			Analyzer.db("start " + String.valueOf(start));
@@ -210,50 +226,7 @@ public class ControlFlowGraphExtractor {
 				branchNextIteration = false;
 			}
 
-
-///////////////////////////////////////////////////
-// TODO
 			current = fetchState( idx, current, this.statestack );
-/*
-			// exception handling, default FALSE, a PEI: TRUE
-// TODO check statestack first, then fetch new object
-
-			if( null != this.exceptiontable.get(new Integer(idx)) ){
-				// start a block
-				isTryBlock = true;
-
-//				tryblockEnd = this.exceptiontable.get(new Integer(idx));
-				current = this.exceptiontable.get(new Integer(idx));
-				tryblockEnd = current.getEndAddr();
-				tryblockCatch = current.getHandlerAddr();
-
-				if( tryblockEnd == tryblockCatch){
-					// this block is handled by a finally block
-//					isFinallyBlock = true;
-					tryblockFinally = tryblockEnd;
-					tryblockCatch = -1;
-//					isCatchBlock = false;
-
-				}else{
-					// this block is handled by a a catch block
-//					isTryBlock = true;
-					tryblockFinally = -1;
-					// tryblockEnd is already set
-				}
-			}
-
-			if( idx == tryblockCatch){
-				isTryBlock = false;
-				isCatchBlock = true;
-			}
-
-			if( idx == tryblockFinally){
-				isTryBlock = false;
-				isFinallyBlock = true;
-			}
-
-//*/ /////////////////////// we have a state here
-
 
 // BRANCHING
 			if( ins.getType() == AbstractInsnNode.JUMP_INSN ){
