@@ -30,20 +30,18 @@ public class ControlFlowGraphExtractor {
 	private static InsnList instructions;
 	private MethodNode method;
 	private List<Integer> forwardJump;
-	private List<String> edgeslist; // TODO rename "jumpTable"?
-//	private Map<Integer, Integer> exceptiontable;
-//	private Map<Integer, ExceptionState> exceptiontable;
-	private List<ExceptionState> ExceptionStateList;
+	private List<String> edgesList; // TODO rename "jumpTable"?
+	private List<ExceptionState> exceptionStateList;
 	private List<Integer> omitFallthruList;
 	private List<Boolean> isPEI;
-	private List<ExceptionState> statestack;
+	private List<ExceptionState> stateStack;
 
 	public List<List<AbstractInsnNode>> getBlocklist() {
 		return blocklist;
 	}
 
 	public List<String> getEdgeslist() {
-		return edgeslist;
+		return edgesList;
 	}
 
 	private void edgeslistAdd(int srcidx, int dstidx){
@@ -54,7 +52,7 @@ public class ControlFlowGraphExtractor {
 		String str = String.valueOf( srcidx );
 		str += ":" + String.valueOf( dstidx );
 		if( 0 < opt.length() ){ str += ":" + opt; }
-		this.edgeslist.add(str);
+		this.edgesList.add(str);
 	}
 
 	public ControlFlowGraphExtractor( final MethodNode method){
@@ -63,7 +61,7 @@ public class ControlFlowGraphExtractor {
 		this.method = method;
 		this.instructions = this.method.instructions;
 		this.forwardJump = new ArrayList<Integer>();
-		this.edgeslist = new ArrayList<String>();
+		this.edgesList = new ArrayList<String>();
 		this.omitFallthruList = new ArrayList<Integer>();
 		{
 			// opcodes for goto and jumps
@@ -76,11 +74,9 @@ public class ControlFlowGraphExtractor {
 		
 		// exception handling
 		this.isPEI = new ArrayList<Boolean>();
-//		this.exceptiontable = new HashMap<Integer, Integer>();
-//		this.exceptiontable = new HashMap<Integer, ExceptionState>();
-		ExceptionStateList = new ArrayList<ExceptionState>();
+		exceptionStateList = new ArrayList<ExceptionState>();
 
-		this.statestack = new ArrayList<ExceptionState>(); // TODO LinkedList?
+		this.stateStack = new ArrayList<ExceptionState>(); // TODO LinkedList?
 		initInstructions();
 	}
 
@@ -129,18 +125,18 @@ public class ControlFlowGraphExtractor {
 	private ExceptionState fetchState( final int idx, ExceptionState current, List<ExceptionState> statestack ){
 		if( null == current){
 			// check stack
-			if( 0 < this.statestack.size() ){
-				current = this.statestack.get(0);
-				this.statestack.remove(0);
+			if( 0 < this.stateStack.size() ){
+				current = this.stateStack.get(0);
+				this.stateStack.remove(0);
 
 			// else check list
 			}else{
-				for( int idxexp=0; idxexp < this.ExceptionStateList.size(); ++idxexp ){
-					ExceptionState exp = this.ExceptionStateList.get(idxexp);
+				for( int idxexp=0; idxexp < this.exceptionStateList.size(); ++idxexp ){
+					ExceptionState exp = this.exceptionStateList.get(idxexp);
 					if( idx == exp.getStartAddr() ){
 						if(null != current){
 							// we have a tryblock for a finally, so put it on the stack
-							this.statestack.add(0, current);
+							this.stateStack.add(0, current);
 						}
 						current = exp;
 					}
@@ -155,10 +151,10 @@ public class ControlFlowGraphExtractor {
 
 		}else if( checkExceptionState( EState.TRYING, current )){
 			// we're in TRYING, and there is a nested trying
-			for( int idxexp=0; idxexp < this.ExceptionStateList.size(); ++idxexp ){
-				ExceptionState exp = this.ExceptionStateList.get(idxexp);
+			for( int idxexp=0; idxexp < this.exceptionStateList.size(); ++idxexp ){
+				ExceptionState exp = this.exceptionStateList.get(idxexp);
 				if( idx == exp.getStartAddr() ){
-					this.statestack.add(0, current);
+					this.stateStack.add(0, current);
 				}
 				current = exp;
 			}
@@ -206,7 +202,7 @@ public class ControlFlowGraphExtractor {
 			tryblockCatch = handler;
 // TODO tryblockCatch to handler?
 //			this.exceptiontable.put(new Integer(start), new ExceptionState(start, end, handler));
-			this.ExceptionStateList.add(new ExceptionState(start, end, handler));
+			this.exceptionStateList.add(new ExceptionState(start, end, handler));
 
 			// debug
 			Analyzer.db("start " + String.valueOf(start));
@@ -226,7 +222,7 @@ public class ControlFlowGraphExtractor {
 				branchNextIteration = false;
 			}
 
-			current = fetchState( idx, current, this.statestack );
+			current = fetchState( idx, current, this.stateStack );
 
 // BRANCHING
 			if( ins.getType() == AbstractInsnNode.JUMP_INSN ){
@@ -407,7 +403,7 @@ public class ControlFlowGraphExtractor {
 
 		// connections
 		Analyzer.echo("  nodeS:S -> node0:0");
-		for( int idx = 0; idx < this.edgeslist.size(); ++idx ){
+		for( int idx = 0; idx < this.edgesList.size(); ++idx ){
 			Analyzer.echo(dotEdges( idx ));
 		}
 
@@ -420,7 +416,7 @@ public class ControlFlowGraphExtractor {
 	}
 
 	private String dotEdges( int idx ){
-		String[] szbuf = this.edgeslist.get(idx).split(":");
+		String[] szbuf = this.edgesList.get(idx).split(":");
 		int idxSrc = Integer.valueOf( szbuf[0] ).intValue();
 		int idxNodeSrc = insId2NodeId( idxSrc );
 		int idxDst = Integer.valueOf( szbuf[1] ).intValue();
