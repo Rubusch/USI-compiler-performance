@@ -39,9 +39,21 @@ public class Example {
 		}finally{
 			System.out.println("finally");
 		}
-/*/
+/* /
 		try{
 			tryitout();
+		}catch(Exception e){
+			System.out.println( "my catch" );
+		}finally{
+			System.out.println("my finally");
+		}
+/*/
+		try{
+			try{
+				tryitout();
+			}catch(Exception ee){
+				ee.printStackTrace();
+			}
 		}catch(Exception e){
 			System.out.println( "my catch" );
 		}finally{
