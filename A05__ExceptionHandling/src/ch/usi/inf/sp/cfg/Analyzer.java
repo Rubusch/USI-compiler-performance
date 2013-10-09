@@ -72,8 +72,7 @@ public class Analyzer {
 	 * @param method
 	 */
 	private void flowMethod( final MethodNode method ){
-//		System.out.println("\n# " + method.name);
-		echo("\n# " + method.name);
+		echo("#\n# " + method.name + "()");
 		ControlFlowGraphExtractor controlFlow = new ControlFlowGraphExtractor( method );
 
 //*
@@ -82,5 +81,6 @@ public class Analyzer {
 		DiGraph dominator = new DiGraph(controlFlow);
 		dominator.dotPrintDA();
 //*/
+		echo("# ---");
 	}
 }

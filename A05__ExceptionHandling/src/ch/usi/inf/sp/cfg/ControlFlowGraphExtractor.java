@@ -76,7 +76,8 @@ public class ControlFlowGraphExtractor {
 		this.isPEI = new ArrayList<Boolean>();
 		exceptionStateList = new ArrayList<ExceptionState>();
 
-		this.stateStack = new ArrayList<ExceptionState>(); // TODO LinkedList?
+// TODO LinkedList?
+		this.stateStack = new ArrayList<ExceptionState>(); 
 		initInstructions();
 	}
 
@@ -130,9 +131,9 @@ public class ControlFlowGraphExtractor {
 			this.exceptionStateList.add(new ExceptionState(start, end, handler));
 
 			// debug
-			Analyzer.db("start " + String.valueOf(start));
-			Analyzer.db("end " + String.valueOf(end));
-			Analyzer.db("handler " + String.valueOf(handler));
+//			Analyzer.db("start " + String.valueOf(start));
+//			Analyzer.db("end " + String.valueOf(end));
+//			Analyzer.db("handler " + String.valueOf(handler));
 		}
 	}
 
@@ -212,37 +213,9 @@ public class ControlFlowGraphExtractor {
 	}
 
 	private void initInstructions(){
-// TODO set up exception table - BETTER: add information of exception table to the already maintained jumplist?
-
 		ExceptionState current = null;
 
 		stateInit();
-/*
-		int tryblockEnd = -1; // use a stack here, for nested try/catch
-		int tryblockCatch = -1;
-		int tryblockFinally = -1;
-
-		boolean isPEI = false;
-		boolean isTryBlock = false;
-		boolean isCatchBlock = false;
-		boolean isFinallyBlock = false;
-
-		List<TryCatchBlockNode> trycatchlist = method.tryCatchBlocks;
-		for( TryCatchBlockNode trycatch : trycatchlist){
-			int start = method.instructions.indexOf((LabelNode) trycatch.start);
-			int end = method.instructions.indexOf((LabelNode) trycatch.end);
-			int handler = method.instructions.indexOf((LabelNode) trycatch.handler);
-			tryblockCatch = handler;
-// TODO tryblockCatch to handler?
-//			this.exceptiontable.put(new Integer(start), new ExceptionState(start, end, handler));
-			this.exceptionStateList.add(new ExceptionState(start, end, handler));
-
-			// debug
-			Analyzer.db("start " + String.valueOf(start));
-			Analyzer.db("end " + String.valueOf(end));
-			Analyzer.db("handler " + String.valueOf(tryblockCatch));
-		}
-//*/
 
 // FOR
 		boolean branchNextIteration = false;
@@ -306,7 +279,7 @@ public class ControlFlowGraphExtractor {
 				// ins.getType() == AbstractInsnNode.INT_INSN
 				// check current instruction being escaped
 				if( checkPEI(ins) ){
-					Analyzer.db("PEI: " + Printer.OPCODES[idx]);
+//					Analyzer.db("PEI: " + Printer.OPCODES[idx]);
 
 					// fallthrou
 					if( !this.omitFallthruList.contains( ins.getOpcode() )){
@@ -314,19 +287,8 @@ public class ControlFlowGraphExtractor {
 					}
 
 					// PEI branching
-Analyzer.db("XXX handler " + current.getHandlerAddr());
 					branching( idx, current.getHandlerAddr(), "label=\"PEI\",style=dotted" );
-/*					
-					if(-1 < tryblockCatch){
-						// handeled by a CATCH
-						branching( idx, tryblockCatch, "label=\"PEI to catch\",style=dotted" );
-					}else if(-1 < tryblockFinally && -1 == tryblockCatch){
-						// handeled by a FINALLY
-						branching( idx, tryblockFinally, "label=\"PEI to finally\",style=dotted" );
-					}else{
-						Analyzer.die("PEI found, but neither catch, nor finally block");
-					}
-//*/
+
 					// start new block
 					branchNextIteration = true;
 				}
@@ -348,11 +310,9 @@ Analyzer.db("XXX handler " + current.getHandlerAddr());
 				this.blocklist.add( new ArrayList<AbstractInsnNode>() );
 
 				// fallthrough edge
-// TODO recheck this
-//				if( isFinallyBlock ){
+// TODO it's a mess - re-check
 				if( checkExceptionState( EState.FINALIZING, current )){
-					branching( idx-1, idx+6, "label=\"finally fallthrou\""); // ATHROWS callback to label
-//					isFinallyBlock = false;
+					branching( idx-1, idx+6, "label=\"finally fallthrou\""); // ATHROWS callback to label, magic number 6 steps (worry!)
 					current = null;
 				}else{
 					// forward pointing block fallthrough
@@ -413,7 +373,6 @@ Analyzer.db("XXX handler " + current.getHandlerAddr());
 		case Opcodes.RETURN: // IllegalMonitorStateException (if synchronized)
 		case Opcodes.SALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
 		case Opcodes.SASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
-//			isPEI.set(idx, new Boolean( true ));
 			return true;
 		}
 		return false;
@@ -421,7 +380,6 @@ Analyzer.db("XXX handler " + current.getHandlerAddr());
 	
 	
 	public void dotPrintCFG(){
-		Analyzer.echo("# ---");
 		if( 0 == this.blocklist.size() ) return;
 
 		// header
