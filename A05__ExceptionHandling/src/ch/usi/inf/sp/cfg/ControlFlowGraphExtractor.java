@@ -173,10 +173,12 @@ public class ControlFlowGraphExtractor {
 							// e.g. a catch and a finally both start at the same addr
 							// but the finally's scope will be bigger (higher end)
 							if(current.getEndAddr() > exp.getEndAddr()){
-								this.stateStack.add(0, current);
+//								this.stateStack.add(0, current);
+								stateStackAdd(current);
 								current = exp;
 							}else{
-								this.stateStack.add(0, exp);
+//								this.stateStack.add(0, exp);
+								stateStackAdd( exp );
 							}
 						}else{
 							current = exp;
@@ -200,7 +202,8 @@ Analyzer.db("XXX idx " + idx);
 					// e.g. a catch and a finally both start at the same addr
 					// but the finally's scope will be bigger (higher end)
 					if(current.getEndAddr() > exp.getEndAddr()){
-						this.stateStack.add(0, current);
+//						this.stateStack.add(0, current);
+						stateStackAdd( current );
 Analyzer.db("AAA stack: " + current.getEndAddr() + ", kept " + exp.getEndAddr());
 						current = exp;
 					}else{
@@ -211,7 +214,8 @@ Analyzer.db("BBB stack: " + exp.getEndAddr() + ", kept "+ current.getEndAddr());
 
 
 // FIXME: order on "stack" is by order of push; still they should be ordered by lowest endAddr
-						this.stateStack.add(0, exp);
+//						this.stateStack.add(0, exp);
+						stateStackAdd( exp );
 					}
 //					this.stateStack.add(0, current);
 				}
