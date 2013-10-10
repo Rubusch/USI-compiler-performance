@@ -212,8 +212,7 @@ Analyzer.db("BBB stack: " + exp.getEndAddr() + ", kept "+ current.getEndAddr());
 
 
 
-
-// FIXME: order on "stack" is by order of push; still they should be ordered by lowest endAddr
+// FIXME: check outer function to be caught by outer exception case, and inner function to be caught by inner, currently both are cought by inner
 //						this.stateStack.add(0, exp);
 						stateStackAdd( exp );
 					}
