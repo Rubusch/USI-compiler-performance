@@ -80,6 +80,24 @@ public class ControlFlowGraphExtractor {
 		this.stateStack = new ArrayList<ExceptionState>(); 
 		initInstructions();
 	}
+	
+	private void stateStackAdd( ExceptionState exp){
+		// insert ordered
+		int insertAt = 0;
+		for(int idx=0; idx<this.stateStack.size(); ++idx){
+			ExceptionState onStack = this.stateStack.get(idx);
+			if( exp.getStartAddr() == onStack.getStartAddr()){
+				if( exp.getEndAddr() > onStack.getEndAddr()){
+					insertAt = idx+1;
+					continue;
+				}else{
+					insertAt = idx;
+					break;
+				}
+			}
+		}
+		this.stateStack.add(insertAt, exp);
+	}
 
 	private void branching( int srcidx, int dstidx ){
 		branching( srcidx, dstidx, "");
