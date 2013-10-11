@@ -347,33 +347,20 @@ Analyzer.db("BBB stack: " + exp.getEndAddr() + ", kept "+ current.getEndAddr());
 
 				// fallthrough edge
 
-// TODO it's a mess - re-check
 				AbstractInsnNode lastIns = instructions.get(idx-1);
-//if(-1 != ins.getOpcode()) Analyzer.db("finalizing: ins " + Printer.OPCODES[ins.getOpcode()] );
-//else Analyzer.db("finalizing: ins " + String.valueOf(ins.getOpcode() ));
-if(-1 != lastIns.getOpcode()) Analyzer.db("finalizing: ins " + Printer.OPCODES[lastIns.getOpcode()] );
-else Analyzer.db("finalizing: ins " + String.valueOf( lastIns.getOpcode() ));
-
-
-
 				if( Opcodes.ATHROW == lastIns.getOpcode()){
 					Analyzer.db("handling ATHROW");
 					branching( idx-1, instructions.size()-2, "label=\"ATHROW\"" );
 				}
 
+// TODO it's a mess - re-check
 				if( checkExceptionState( EState.FINALIZING, current )){
-
-// FIXME: athrow to exit
-Analyzer.db("finalizing ATHROW");
-
 //					branching( idx-1, idx+6, "label=\"finally fallthrou\""); // ATHROWS callback to label, magic number 6 steps (worry!)
 //					if( Opcodes.ATHROW == lastIns.getOpcode() ){
 //					if( Opcodes.ATHROW == ins.getOpcode()){
 //						
-//Analyzer.db("handling ATHROW");
 //						branching( idx-1, instructions.size()-2, "label=\"ATHROW\"" );
 //					}
-//Analyzer.db("handling ...");
 					current = null;
 				}else{
 					// forward pointing block fallthrough
