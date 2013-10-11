@@ -422,8 +422,8 @@ Analyzer.db("BBB stack: " + exp.getEndAddr() + ", kept "+ current.getEndAddr());
 		Analyzer.echo("  nodeS [label = \"{ <S> start }\"];");
 		Analyzer.echo("  nodeE [label = \"{ <E> end }\"];");
 
-		for( int idx=0; idx < this.blocklist.size(); ++idx){
-			Analyzer.echo(dotPrintBlock( idx, blocklist.get(idx)));
+		for( int idxBlock=0; idxBlock < this.blocklist.size(); ++idxBlock){
+			Analyzer.echo(dotPrintBlock( idxBlock, blocklist.get(idxBlock)));
 		}
 
 		// connections
