@@ -340,7 +340,8 @@ Analyzer.db("BBB stack: " + exp.getEndAddr() + ", kept "+ current.getEndAddr());
 				// fallthrough edge
 // TODO it's a mess - re-check
 				if( checkExceptionState( EState.FINALIZING, current )){
-					branching( idx-1, idx+6, "label=\"finally fallthrou\""); // ATHROWS callback to label, magic number 6 steps (worry!)
+// FIXME: athrow to exit
+//					branching( idx-1, idx+6, "label=\"finally fallthrou\""); // ATHROWS callback to label, magic number 6 steps (worry!)
 					current = null;
 				}else{
 					// forward pointing block fallthrough
