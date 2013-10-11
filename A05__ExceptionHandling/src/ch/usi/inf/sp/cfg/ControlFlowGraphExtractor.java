@@ -142,22 +142,27 @@ public class ControlFlowGraphExtractor {
 		}
 	}
 
-	private void stateStackAdd( ExceptionState exp){
+	int throwAthrow = -1;
+	private void stateStackAdd( ExceptionState newElem){
 		// insert ordered
 		int insertAt = 0;
 		for(int idx=0; idx<this.stateStack.size(); ++idx){
 			ExceptionState onStack = this.stateStack.get(idx);
-			if( exp.getStartAddr() == onStack.getStartAddr()){
-				if( exp.getEndAddr() > onStack.getEndAddr()){
+			if( newElem.getStartAddr() == onStack.getStartAddr()){
+				if( newElem.getEndAddr() > onStack.getEndAddr()){
+//					throwAthrow = newElem.getHandlerAddr(); // TODO check
 					insertAt = idx+1;
+					branching( throwAthrow, newElem.getHandlerAddr(), "label=\"ATHROW\",style=dotted" ); // TODO check
 					continue;
 				}else{
+//					throwAthrow = onStack.getHandlerAddr(); // TODO check
+					branching( throwAthrow, onStack.getHandlerAddr(), "label=\"ATHROW\",style=dotted" ); // TODO check
 					insertAt = idx;
 					break;
 				}
 			}
 		}
-		this.stateStack.add(insertAt, exp);
+		this.stateStack.add(insertAt, newElem);
 	}
 
 	private ExceptionState stateStackFetch( int idx, ExceptionState current, List<ExceptionState> statestack ){
@@ -325,7 +330,8 @@ public class ControlFlowGraphExtractor {
 					// PEI branching
 					branching( idx, current.getHandlerAddr(), "label=\"PEI\",style=dotted" );
 // TODO branch also to ATHROW block
-//					branching( idx, <next block addr>, "label=\"ATHROW\",style=dotted" );
+//					branching( idx, throwAthrow, "label=\"ATHROW\",style=dotted" ); // TODO check
+					throwAthrow = idx; // TODO check
 
 					// start new block
 					branchNextIteration = true;
