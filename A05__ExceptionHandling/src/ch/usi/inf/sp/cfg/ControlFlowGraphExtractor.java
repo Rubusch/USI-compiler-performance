@@ -484,8 +484,7 @@ public class ControlFlowGraphExtractor {
 	public static String dotPrintBlock( int blockId, List<AbstractInsnNode> blockinstructions ){
 		String szBlock = "";
 		szBlock += "  node" + blockId;
-		szBlock += " [label = \"block" + blockId + " | { <";
-		
+		szBlock += " [align=left,label=\"block" + blockId + " | { <";
 		int startAddr = instructions.indexOf( blockinstructions.get(0) );
 
 		for( int jdx=0; jdx < blockinstructions.size(); ++jdx){
@@ -493,7 +492,8 @@ public class ControlFlowGraphExtractor {
 			int opcode = ins.getOpcode();
 
 			//szBlock +=  instructions.indexOf( ins ) + "> ";
-			szBlock += String.valueOf(startAddr + jdx) + "> ";
+			String addr = String.valueOf(startAddr + jdx);
+			szBlock += addr + "> " + addr + ": ";
 
 			switch(ins.getType()){
 			case AbstractInsnNode.LABEL: 
