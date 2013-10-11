@@ -53,7 +53,12 @@ public class ControlFlowGraphExtractor {
 
 	private void edgeslistAdd(int srcidx, int dstidx, String opt){
 		String str = String.valueOf( srcidx );
-		str += ":" + String.valueOf( dstidx );
+		if( instructions.size() == dstidx){
+			// until end
+			str += ":E";
+		}else{
+			str += ":" + String.valueOf( dstidx );
+		}
 		if( 0 < opt.length() ){ str += ":" + opt; }
 		this.edgesList.add(str);
 	}
@@ -130,7 +135,7 @@ public class ControlFlowGraphExtractor {
 
 					// fallthrough edge
 // TODO is this necessary?
-					edgeslistAdd( dstidx-1, dstidx, "???");
+					edgeslistAdd( dstidx-1, dstidx, "label=\"???\"");
 
 					break;
 				}
@@ -350,7 +355,8 @@ Analyzer.db("BBB stack: " + exp.getEndAddr() + ", kept "+ current.getEndAddr());
 				AbstractInsnNode lastIns = instructions.get(idx-1);
 				if( Opcodes.ATHROW == lastIns.getOpcode()){
 					Analyzer.db("handling ATHROW");
-					branching( idx-1, instructions.size()-2, "label=\"ATHROW\"" );
+//					branching( idx-1, instructions.size()-2, "label=\"ATHROW\"" );
+					branching( idx-1, instructions.size(), "label=\"ATHROW\"" );
 				}
 
 // TODO it's a mess - re-check
@@ -464,9 +470,14 @@ Analyzer.db("BBB stack: " + exp.getEndAddr() + ", kept "+ current.getEndAddr());
 		String[] szbuf = this.edgesList.get(idx).split(":");
 		int idxSrc = Integer.valueOf( szbuf[0] ).intValue();
 		int idxNodeSrc = insId2NodeId( idxSrc );
-		int idxDst = Integer.valueOf( szbuf[1] ).intValue();
-		int idxNodeDst = insId2NodeId( idxDst );
-		String str = "  node" +  idxNodeSrc +":" + idxSrc + " -> node" + idxNodeDst + ":" + idxDst;
+		String str = "  node" +  idxNodeSrc +":" + idxSrc;
+		try{
+			int idxDst = Integer.valueOf( szbuf[1] ).intValue();
+			int idxNodeDst = insId2NodeId( idxDst );
+			str += " -> node" + idxNodeDst + ":" + idxDst;
+		}catch(NumberFormatException exp){
+			str += " -> nodeE:E";
+		}
 		if( 2 < szbuf.length ){
 			str += "[ " + szbuf[2] + " ]";
 		}
