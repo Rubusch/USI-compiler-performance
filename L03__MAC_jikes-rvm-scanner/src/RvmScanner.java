@@ -3,7 +3,7 @@ public class RvmScanner {
 /*
  * see the source of method
  * org.jikesrvm.mm.mmtk.ScanBootImage.processChunk
- * as reference implementation (ramp)
+ * as reference implementation (rmap)
  * 
  * extract object's class, use method:
  * org.jikesrvm.tools.bootImageViewer.ImageDecoder.getObjectClassDescriptor
@@ -25,7 +25,7 @@ public class RvmScanner {
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		org.jikesrvm.tools.bootImageViewer.ImageDecoder.getObjectClassDescriptor();
+//		org.jikesrvm.tools.bootImageViewer.ImageDecoder.getObjectClassDescriptor();
 	}
 
 }
