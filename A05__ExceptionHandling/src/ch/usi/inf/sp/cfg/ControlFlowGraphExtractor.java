@@ -83,24 +83,8 @@ public class ControlFlowGraphExtractor {
 		this.stateStack = new ArrayList<ExceptionState>(); 
 		initInstructions();
 	}
-	
-	private void stateStackAdd( ExceptionState exp){
-		// insert ordered
-		int insertAt = 0;
-		for(int idx=0; idx<this.stateStack.size(); ++idx){
-			ExceptionState onStack = this.stateStack.get(idx);
-			if( exp.getStartAddr() == onStack.getStartAddr()){
-				if( exp.getEndAddr() > onStack.getEndAddr()){
-					insertAt = idx+1;
-					continue;
-				}else{
-					insertAt = idx;
-					break;
-				}
-			}
-		}
-		this.stateStack.add(insertAt, exp);
-	}
+
+
 
 	private void branching( int srcidx, int dstidx ){
 		branching( srcidx, dstidx, "");
@@ -143,6 +127,8 @@ public class ControlFlowGraphExtractor {
 		} // no else: continue with next element
 	}
 
+
+
 	private void stateInit(){
 		List<TryCatchBlockNode> trycatchlist = method.tryCatchBlocks;
 		for( TryCatchBlockNode trycatch : trycatchlist){
@@ -152,13 +138,29 @@ public class ControlFlowGraphExtractor {
 			this.exceptionStateList.add(new ExceptionState(start, end, handler));
 
 			// debug
-			Analyzer.db("start " + String.valueOf(start));
-			Analyzer.db("end " + String.valueOf(end));
-			Analyzer.db("handler " + String.valueOf(handler));
+			Analyzer.db("EXCEPTION: start =" + String.valueOf(start) + ", end =" + String.valueOf(end) + ", handler =" + String.valueOf(handler));
 		}
 	}
 
-	private ExceptionState fetchState( final int idx, ExceptionState current, List<ExceptionState> statestack ){
+	private void stateStackAdd( ExceptionState exp){
+		// insert ordered
+		int insertAt = 0;
+		for(int idx=0; idx<this.stateStack.size(); ++idx){
+			ExceptionState onStack = this.stateStack.get(idx);
+			if( exp.getStartAddr() == onStack.getStartAddr()){
+				if( exp.getEndAddr() > onStack.getEndAddr()){
+					insertAt = idx+1;
+					continue;
+				}else{
+					insertAt = idx;
+					break;
+				}
+			}
+		}
+		this.stateStack.add(insertAt, exp);
+	}
+
+	private ExceptionState fetchState( int idx, ExceptionState current, List<ExceptionState> statestack ){
 		if( null == current){
 			// check stack
 			if( 0 < this.stateStack.size() ){
