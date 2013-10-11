@@ -129,7 +129,7 @@ public class ControlFlowGraphExtractor {
 
 
 
-	private void stateInit(){
+	private void stateStackEntry(){
 		List<TryCatchBlockNode> trycatchlist = method.tryCatchBlocks;
 		for( TryCatchBlockNode trycatch : trycatchlist){
 			int start = method.instructions.indexOf((LabelNode) trycatch.start);
@@ -160,7 +160,7 @@ public class ControlFlowGraphExtractor {
 		this.stateStack.add(insertAt, exp);
 	}
 
-	private ExceptionState fetchState( int idx, ExceptionState current, List<ExceptionState> statestack ){
+	private ExceptionState stateStackFetch( int idx, ExceptionState current, List<ExceptionState> statestack ){
 		if( null == current){
 			// check stack
 			if( 0 < this.stateStack.size() ){
@@ -250,7 +250,7 @@ public class ControlFlowGraphExtractor {
 
 	private void initInstructions(){
 		ExceptionState current = null;
-		stateInit();
+		stateStackEntry();
 
 // FOR
 		boolean branchNextIteration = false;
@@ -264,7 +264,7 @@ public class ControlFlowGraphExtractor {
 				branchNextIteration = false;
 			}
 
-			current = fetchState( idx, current, this.stateStack );
+			current = stateStackFetch( idx, current, this.stateStack );
 
 // BRANCHING
 			if( ins.getType() == AbstractInsnNode.JUMP_INSN ){
