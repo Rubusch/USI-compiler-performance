@@ -34,9 +34,6 @@ public class ControlFlowGraphExtractor {
 	private List<ExceptionState> exceptionStateList;
 	private List<Integer> omitFallthruList;
 	private List<ExceptionState> stateStack;
-	
-	
-//	static final int 
 
 	public List<List<AbstractInsnNode>> getBlocklist() {
 		return blocklist;
@@ -488,10 +485,16 @@ public class ControlFlowGraphExtractor {
 		String szBlock = "";
 		szBlock += "  node" + blockId;
 		szBlock += " [label = \"block" + blockId + " | { <";
+		
+		int startAddr = instructions.indexOf( blockinstructions.get(0) );
+
 		for( int jdx=0; jdx < blockinstructions.size(); ++jdx){
 			AbstractInsnNode ins = blockinstructions.get(jdx);
 			int opcode = ins.getOpcode();
-			szBlock +=  instructions.indexOf( ins ) + "> ";
+
+			//szBlock +=  instructions.indexOf( ins ) + "> ";
+			szBlock += String.valueOf(startAddr + jdx) + "> ";
+
 			switch(ins.getType()){
 			case AbstractInsnNode.LABEL: 
 				// pseudo-instruction (branch or exception target)
