@@ -35,6 +35,9 @@ public class ControlFlowGraphExtractor {
 	private List<Integer> omitFallthruList;
 	private List<Boolean> isPEI;
 	private List<ExceptionState> stateStack;
+	
+	
+//	static final int 
 
 	public List<List<AbstractInsnNode>> getBlocklist() {
 		return blocklist;
@@ -241,6 +244,11 @@ Analyzer.db("BBB stack: " + exp.getEndAddr() + ", kept "+ current.getEndAddr());
 		return (which == state.getState());
 	}
 
+
+
+
+
+
 	private void initInstructions(){
 		ExceptionState current = null;
 		stateInit();
@@ -338,10 +346,34 @@ Analyzer.db("BBB stack: " + exp.getEndAddr() + ", kept "+ current.getEndAddr());
 				this.blocklist.add( new ArrayList<AbstractInsnNode>() );
 
 				// fallthrough edge
+
 // TODO it's a mess - re-check
+				AbstractInsnNode lastIns = instructions.get(idx-1);
+//if(-1 != ins.getOpcode()) Analyzer.db("finalizing: ins " + Printer.OPCODES[ins.getOpcode()] );
+//else Analyzer.db("finalizing: ins " + String.valueOf(ins.getOpcode() ));
+if(-1 != lastIns.getOpcode()) Analyzer.db("finalizing: ins " + Printer.OPCODES[lastIns.getOpcode()] );
+else Analyzer.db("finalizing: ins " + String.valueOf( lastIns.getOpcode() ));
+
+
+
+				if( Opcodes.ATHROW == lastIns.getOpcode()){
+					Analyzer.db("handling ATHROW");
+					branching( idx-1, instructions.size()-2, "label=\"ATHROW\"" );
+				}
+
 				if( checkExceptionState( EState.FINALIZING, current )){
+
 // FIXME: athrow to exit
+Analyzer.db("finalizing ATHROW");
+
 //					branching( idx-1, idx+6, "label=\"finally fallthrou\""); // ATHROWS callback to label, magic number 6 steps (worry!)
+//					if( Opcodes.ATHROW == lastIns.getOpcode() ){
+//					if( Opcodes.ATHROW == ins.getOpcode()){
+//						
+//Analyzer.db("handling ATHROW");
+//						branching( idx-1, instructions.size()-2, "label=\"ATHROW\"" );
+//					}
+//Analyzer.db("handling ...");
 					current = null;
 				}else{
 					// forward pointing block fallthrough
