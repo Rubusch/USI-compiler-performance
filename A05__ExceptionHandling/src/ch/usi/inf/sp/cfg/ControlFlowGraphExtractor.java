@@ -140,7 +140,6 @@ public class ControlFlowGraphExtractor {
 			int end = method.instructions.indexOf((LabelNode) trycatch.end);
 			int handler = method.instructions.indexOf((LabelNode) trycatch.handler);
 			this.exceptionTableList.add(new ExceptionState(start, end, handler));
-
 			// debug
 			Analyzer.db("EXCEPTION: start =" + String.valueOf(start) + ", end =" + String.valueOf(end) + ", handler =" + String.valueOf(handler));
 		}
@@ -281,6 +280,7 @@ public class ControlFlowGraphExtractor {
 	private void initInstructions(){
 		ExceptionState current = null;
 		exceptionTableInit();
+//		expli.init(method.tryCatchBlocks); // TODO
 
 // FOR
 		boolean branchNextIteration = false;
