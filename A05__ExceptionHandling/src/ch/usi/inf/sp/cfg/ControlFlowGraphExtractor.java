@@ -33,7 +33,6 @@ public class ControlFlowGraphExtractor {
 	private List<String> edgesList; // TODO rename "jumpTable"?
 	private List<ExceptionState> exceptionStateList;
 	private List<Integer> omitFallthruList;
-	private List<Boolean> isPEI;
 	private List<ExceptionState> stateStack;
 	
 	
@@ -81,7 +80,6 @@ public class ControlFlowGraphExtractor {
 		}
 		
 		// exception handling
-		this.isPEI = new ArrayList<Boolean>();
 		exceptionStateList = new ArrayList<ExceptionState>();
 
 // TODO LinkedList?
@@ -328,6 +326,7 @@ public class ControlFlowGraphExtractor {
 					// PEI branching
 					branching( idx, current.getHandlerAddr(), "label=\"PEI\",style=dotted" );
 // TODO branch also to ATHROW block
+//					branching( idx, <next block addr>, "label=\"ATHROW\",style=dotted" );
 
 					// start new block
 					branchNextIteration = true;
