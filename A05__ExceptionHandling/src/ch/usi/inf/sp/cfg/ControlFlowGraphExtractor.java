@@ -386,9 +386,6 @@ Analyzer.db("BBB stack: " + exp.getEndAddr() + ", kept "+ current.getEndAddr());
 	}
 
 
-
-
-
 	public void dotPrintCFG(){
 		if( 0 == this.blocklist.size() ) return;
 
