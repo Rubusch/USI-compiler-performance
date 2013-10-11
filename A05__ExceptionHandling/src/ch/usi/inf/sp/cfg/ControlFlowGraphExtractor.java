@@ -206,16 +206,13 @@ public class ControlFlowGraphExtractor {
 			for( int idxexp=0; idxexp < this.exceptionStateList.size(); ++idxexp ){
 				ExceptionState exp = this.exceptionStateList.get(idxexp);
 				if( idx == exp.getStartAddr() ){
-Analyzer.db("XXX idx " + idx);	
 					// e.g. a catch and a finally both start at the same addr
 					// but the finally's scope will be bigger (higher end)
 					if(current.getEndAddr() > exp.getEndAddr()){
 //						this.stateStack.add(0, current);
 						stateStackAdd( current );
-Analyzer.db("AAA stack: " + current.getEndAddr() + ", kept " + exp.getEndAddr());
 						current = exp;
 					}else{
-Analyzer.db("BBB stack: " + exp.getEndAddr() + ", kept "+ current.getEndAddr());
 
 
 
@@ -282,6 +279,7 @@ Analyzer.db("BBB stack: " + exp.getEndAddr() + ", kept "+ current.getEndAddr());
 				LabelNode target = ((JumpInsnNode) ins).label;
 				int targetIdx = instructions.indexOf(target);
 
+				// GOTO instructions
 				if( Opcodes.GOTO == ins.getOpcode()){
 					branching( idx, targetIdx, "label=\"GOTO\"" );
 				}else{
@@ -329,6 +327,7 @@ Analyzer.db("BBB stack: " + exp.getEndAddr() + ", kept "+ current.getEndAddr());
 
 					// PEI branching
 					branching( idx, current.getHandlerAddr(), "label=\"PEI\",style=dotted" );
+// TODO branch also to ATHROW block
 
 					// start new block
 					branchNextIteration = true;
@@ -351,8 +350,9 @@ Analyzer.db("BBB stack: " + exp.getEndAddr() + ", kept "+ current.getEndAddr());
 				this.blocklist.add( new ArrayList<AbstractInsnNode>() );
 
 				// fallthrough edge
-
 				AbstractInsnNode lastIns = instructions.get(idx-1);
+
+				// ATHROW, re-throw an exception which cannot be handeled
 				if( Opcodes.ATHROW == lastIns.getOpcode()){
 					Analyzer.db("handling ATHROW");
 //					branching( idx-1, instructions.size()-2, "label=\"ATHROW\"" );
