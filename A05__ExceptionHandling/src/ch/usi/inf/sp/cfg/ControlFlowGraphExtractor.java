@@ -31,9 +31,9 @@ public class ControlFlowGraphExtractor {
 	private MethodNode method;
 	private List<Integer> forwardJump;
 	private List<String> edgesList; // TODO rename "jumpTable"?
-	private List<ExceptionState> exceptionStateList;
 	private List<Integer> omitFallthruList;
-	private List<ExceptionState> stateStack;
+	private List<ExceptionState> exceptionTableList;
+	private List<ExceptionState> exceptionTable;
 	private List<Integer> throwAthrow;
 
 	public List<List<AbstractInsnNode>> getBlocklist() {
@@ -78,12 +78,12 @@ public class ControlFlowGraphExtractor {
 		}
 		
 		// exception handling
-		exceptionStateList = new ArrayList<ExceptionState>();
+		exceptionTableList = new ArrayList<ExceptionState>();
 
 		this.throwAthrow = new ArrayList<Integer>();
 
 // TODO LinkedList?
-		this.stateStack = new ArrayList<ExceptionState>(); 
+		this.exceptionTable = new ArrayList<ExceptionState>(); 
 		initInstructions();
 	}
 
@@ -132,24 +132,25 @@ public class ControlFlowGraphExtractor {
 
 
 
-	private void stateStackEntry(){
+
+	private void exceptionTableInit(){
 		List<TryCatchBlockNode> trycatchlist = method.tryCatchBlocks;
 		for( TryCatchBlockNode trycatch : trycatchlist){
 			int start = method.instructions.indexOf((LabelNode) trycatch.start);
 			int end = method.instructions.indexOf((LabelNode) trycatch.end);
 			int handler = method.instructions.indexOf((LabelNode) trycatch.handler);
-			this.exceptionStateList.add(new ExceptionState(start, end, handler));
+			this.exceptionTableList.add(new ExceptionState(start, end, handler));
 
 			// debug
 			Analyzer.db("EXCEPTION: start =" + String.valueOf(start) + ", end =" + String.valueOf(end) + ", handler =" + String.valueOf(handler));
 		}
 	}
 
-	private void stateStackAdd( ExceptionState newElem){
+	private void exceptionTableAdd( ExceptionState newElem){
 		// insert ordered
 		int insertAt = 0;
-		for(int idx=0; idx<this.stateStack.size(); ++idx){
-			ExceptionState onStack = this.stateStack.get(idx);
+		for(int idx=0; idx<this.exceptionTable.size(); ++idx){
+			ExceptionState onStack = this.exceptionTable.get(idx);
 			if( newElem.getStartAddr() == onStack.getStartAddr()){
 				if( newElem.getEndAddr() > onStack.getEndAddr()){
 					insertAt = idx+1;
@@ -184,20 +185,27 @@ public class ControlFlowGraphExtractor {
 				}
 			}
 		}
-		this.stateStack.add(insertAt, newElem);
+		this.exceptionTable.add(insertAt, newElem);
 	}
 
-	private ExceptionState stateStackFetch( int idx, ExceptionState current, List<ExceptionState> statestack ){
+	private boolean exceptionTableCheck( final EState which, final ExceptionState state){
+		if( null == state ){
+			return false;
+		}
+		return (which == state.getState());
+	}
+
+	private ExceptionState exceptionTableFetch( int idx, ExceptionState current, List<ExceptionState> statestack ){
 		if( null == current){
 			// check stack
-			if( 0 < this.stateStack.size() ){
-				current = this.stateStack.get(0);
-				this.stateStack.remove(0);
+			if( 0 < this.exceptionTable.size() ){
+				current = this.exceptionTable.get(0);
+				this.exceptionTable.remove(0);
 
 			// else check list
 			}else{
-				for( int idxexp=0; idxexp < this.exceptionStateList.size(); ++idxexp ){
-					ExceptionState exp = this.exceptionStateList.get(idxexp);
+				for( int idxexp=0; idxexp < this.exceptionTableList.size(); ++idxexp ){
+					ExceptionState exp = this.exceptionTableList.get(idxexp);
 					if( idx == exp.getStartAddr() ){
 						if(null != current){
 							// we have a tryblock for a finally, so put it on the stack
@@ -206,11 +214,11 @@ public class ControlFlowGraphExtractor {
 							// but the finally's scope will be bigger (higher end)
 							if(current.getEndAddr() > exp.getEndAddr()){
 //								this.stateStack.add(0, current);
-								stateStackAdd(current);
+								exceptionTableAdd(current);
 								current = exp;
 							}else{
 //								this.stateStack.add(0, exp);
-								stateStackAdd( exp );
+								exceptionTableAdd( exp );
 							}
 						}else{
 							current = exp;
@@ -225,16 +233,16 @@ public class ControlFlowGraphExtractor {
 				return null;
 			}
 
-		}else if( checkExceptionState( EState.TRYING, current )){
+		}else if( exceptionTableCheck( EState.TRYING, current )){
 			// we're in TRYING, and there is a nested trying
-			for( int idxexp=0; idxexp < this.exceptionStateList.size(); ++idxexp ){
-				ExceptionState exp = this.exceptionStateList.get(idxexp);
+			for( int idxexp=0; idxexp < this.exceptionTableList.size(); ++idxexp ){
+				ExceptionState exp = this.exceptionTableList.get(idxexp);
 				if( idx == exp.getStartAddr() ){
 					// e.g. a catch and a finally both start at the same addr
 					// but the finally's scope will be bigger (higher end)
 					if(current.getEndAddr() > exp.getEndAddr()){
 //						this.stateStack.add(0, current);
-						stateStackAdd( current );
+						exceptionTableAdd( current );
 						current = exp;
 					}else{
 
@@ -243,7 +251,7 @@ public class ControlFlowGraphExtractor {
 
 // FIXME: check outer function to be caught by outer exception case, and inner function to be caught by inner, currently both are cought by inner
 //						this.stateStack.add(0, exp);
-						stateStackAdd( exp );
+						exceptionTableAdd( exp );
 					}
 //					this.stateStack.add(0, current);
 				}
@@ -263,12 +271,7 @@ public class ControlFlowGraphExtractor {
 		return current;
 	}
 
-	private boolean checkExceptionState( final EState which, final ExceptionState state){
-		if( null == state ){
-			return false;
-		}
-		return (which == state.getState());
-	}
+
 
 
 
@@ -277,7 +280,7 @@ public class ControlFlowGraphExtractor {
 
 	private void initInstructions(){
 		ExceptionState current = null;
-		stateStackEntry();
+		exceptionTableInit();
 
 // FOR
 		boolean branchNextIteration = false;
@@ -291,7 +294,7 @@ public class ControlFlowGraphExtractor {
 				branchNextIteration = false;
 			}
 
-			current = stateStackFetch( idx, current, this.stateStack );
+			current = exceptionTableFetch( idx, current, this.exceptionTable );
 
 // BRANCHING
 			if( ins.getType() == AbstractInsnNode.JUMP_INSN ){
@@ -332,7 +335,7 @@ public class ControlFlowGraphExtractor {
 				branchNextIteration = true;
 			}
 
-			if( checkExceptionState( EState.TRYING, current )){
+			if( exceptionTableCheck( EState.TRYING, current )){
 				// types of instructions of PEIs are:
 				// ins.getType() == AbstractInsnNode.INSN
 				// ins.getType() == AbstractInsnNode.TYPE_INSN
@@ -360,8 +363,8 @@ public class ControlFlowGraphExtractor {
 					// start new block
 					branchNextIteration = true;
 				}
-
-			}else if( checkExceptionState( EState.CATCHING, current )){
+//XXXXXXX
+			}else if( exceptionTableCheck( EState.CATCHING, current )){
 				if( idx == current.getEndAddr() && current.getEndAddr() == current.getHandlerAddr()){
 					// case try-catch-finally
 					branching( idx, current.getHandlerAddr(), "label=\"catching to finally\",style=dotted" );
@@ -386,7 +389,7 @@ public class ControlFlowGraphExtractor {
 //					branching( idx-1, instructions.size()-2, "label=\"ATHROW\"" );
 					branching( idx-1, instructions.size(), "label=\"ATHROW\"" );
 
-				}else if( checkExceptionState( EState.FINALIZING, current )){
+				}else if( exceptionTableCheck( EState.FINALIZING, current )){
 // TODO it's a mess - re-check
 					current = null;
 				}else{
