@@ -284,7 +284,9 @@ public class ControlFlowGraphExtractor {
 		ExceptionState current = null;
 		exceptionTableInit();
 		exceptionTable.init(method.tryCatchBlocks, instructions); // TODO
+		exceptionTable.initStates(instructions);
 		exceptionTable.printExceptionTable(); // XXX
+		exceptionTable.printStateTable(); // XXX
 
 // FOR
 		boolean branchNextIteration = false;

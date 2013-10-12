@@ -50,7 +50,7 @@ public class ExceptionTable {
 		// sort by "start", if equal, then sort reversely by "end"
 		Collections.sort( exceptionTable, new ExceptionComparator() );
 	}
-	
+
 	public void initStates(final InsnList instructions){
 		stateTable.add( EState.NONE );
 		EState state = EState.NONE;
@@ -69,7 +69,7 @@ public class ExceptionTable {
 				}
 			}
 
-			stateTable.add(EState.TRYING);
+			stateTable.add(state);
 		}
 	}
 
@@ -88,7 +88,13 @@ public class ExceptionTable {
 		return -1;
 	}
 
-
+	public void printStateTable(){
+		System.out.println( "--- State Table ---");
+		for(int idx=0; idx<stateTable.size(); ++idx){
+			System.out.println( String.valueOf(idx) + ":" + printer(stateTable.get(idx)));
+		}
+		System.out.println("---");
+	}
 
 	public void printExceptionTable(){
 		System.out.println( "--- Exception Table ---" );
@@ -97,5 +103,15 @@ public class ExceptionTable {
 			System.out.println(", STATE='" + (es.getState()==EState.NONE?"NONE":(es.getState()==EState.TRYING?"TRYING":(es.getState()==EState.CATCHING?"CATCHING":"FINALIZING")) ) + "'");
 		}
 		System.out.println( "---" );
+	}
+	
+	private String printer( EState state ){
+		switch (state){
+			case NONE: return "NONE";
+			case TRYING: return "TRYING";
+			case CATCHING: return "CATCHING";
+			case FINALIZING: return "FINALIZING";
+		}
+		return "FAIL";
 	}
 }
