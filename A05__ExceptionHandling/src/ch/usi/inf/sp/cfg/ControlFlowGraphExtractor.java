@@ -363,7 +363,6 @@ public class ControlFlowGraphExtractor {
 
 					// PEI branching
 //					branching( idx, current.getHandlerAddr(), "label=\"PEI\",style=dotted" );
-Analyzer.db( "AAA idx " + String.valueOf(idx));
 Analyzer.db( "BBB getNextHandeler("+ String.valueOf(idx) + ") " + String.valueOf(exceptionTable.getNextHandler(idx)));
 Analyzer.db( "CCC getOverNextHandeler("+String.valueOf(idx)+") " + String.valueOf(exceptionTable.getOverNextHandler(idx)));
 
