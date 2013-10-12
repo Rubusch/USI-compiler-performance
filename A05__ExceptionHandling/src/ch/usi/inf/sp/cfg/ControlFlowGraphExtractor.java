@@ -397,10 +397,10 @@ System.out.println("AA");
 System.out.println("B");
 					branching( idx, exceptionTable.getNextHandler(idx), "label=\"catching to finally\",style=dotted" );
 System.out.println("BB");
-				}
+				
 					// start new block
 					branchNextIteration = true;
-//				} // else try-catch, normal ending
+				} // else try-catch, normal ending
 			}
 
 // APPEND
