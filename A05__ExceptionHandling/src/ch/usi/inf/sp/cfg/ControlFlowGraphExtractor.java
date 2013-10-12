@@ -364,15 +364,11 @@ public class ControlFlowGraphExtractor {
 					// PEI branching
 //					branching( idx, current.getHandlerAddr(), "label=\"PEI\",style=dotted" );
 					branching( idx, exceptionTable.getNextHandler(idx), "label=\"PEI\",style=dotted" );
+					branching( idx, exceptionTable.getOverNextHandler(idx), "label=\"PEI\",style=dotted" );
 
-					
-					
-					
-// FIXME					
+// FIXME
 Analyzer.die("STOP");
-					
-// TODO branch also to ATHROW block
-//					branching( idx, exceptionTable.getOverNextHandler(idx), "label=\"PEI\",style=dotted" );
+
 
 //					throwAthrow = idx; // TODO check
 // FIXME throwAthrow == null ?!?

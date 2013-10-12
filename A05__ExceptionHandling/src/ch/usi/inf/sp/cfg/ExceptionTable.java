@@ -79,11 +79,6 @@ public class ExceptionTable {
 	}
 
 
-	
-	
-	
-	
-	
 	public int getNextHandler( int idx ){
 		if( 0 == exceptionTable.size()) return -1;
 
@@ -94,44 +89,37 @@ public class ExceptionTable {
 			}
 		}
 
+		// selftest
 		if(idxHandler == exceptionTable.size()){
+			Analyzer.die("getNextHandler() - index overrun");
 // TODO what to do in this case?
-			return -1; // overrun, ERROR
+//			return -1; // overrun, ERROR
 		}
-		int handlerAddr = exceptionTable.get( idxHandler - 1 ).getHandlerAddr(); 
-		return handlerAddr;
+
+		return exceptionTable.get( idxHandler - 1 ).getHandlerAddr(); 
 	}
 
-	
-	
-	
-	
-	
-	
 	public int getOverNextHandler( int idx ){
-// FIXME may fail, since there is no overnext handler
-//Analyzer.db("idx " + String.valueOf(idx));
-
 		if( 0 == exceptionTable.size()) return -1;
+
 		int idxHandler=0;
 		for( idxHandler=1; idxHandler < exceptionTable.size(); ++idxHandler){
-			if( idx > exceptionTable.get(idxHandler).getHandlerAddr()){
+			if( idx < exceptionTable.get(idxHandler).getStartAddr()){
 				break;
 			}
 		}
 
-//Analyzer.db("idxHandler " + String.valueOf(idxHandler));
-//Analyzer.db("exceptionTable.size " + String.valueOf(exceptionTable.size()));
-
+		// selftest
 		if(idxHandler == exceptionTable.size()){
-			; // overrun, ERROR
-		}else{
-			idxHandler--;
-			idxHandler--;
+			Analyzer.db("getOverNextHandler() - index overrun");
+			return -1; // overrun, ERROR
 		}
-		if( 0 > idxHandler) return -1;
-		
-		return exceptionTable.get(idxHandler).getHandlerAddr(); // if this fails, it is definitely a bug
+
+		if( exceptionTable.get(idxHandler-1).getStartAddr() != exceptionTable.get(idxHandler-2).getStartAddr()){
+			Analyzer.die("getOverNextHandler() - no finally handler");
+		}
+
+		return exceptionTable.get(idxHandler - 2).getHandlerAddr(); // if this fails, it is definitely a bug
 	}
 
 	public void printStateTable(){
@@ -146,11 +134,12 @@ public class ExceptionTable {
 		System.out.println( "--- Exception Table ---" );
 		for( ExceptionState es : exceptionTable ){
 			System.out.print( "start='" + String.valueOf(es.getStartAddr()) + "', end='" + String.valueOf(es.getEndAddr()) + "', handler=" + String.valueOf(es.getHandlerAddr()) +"'");
-			System.out.println(", STATE='" + (es.getState()==EState.NONE?"NONE":(es.getState()==EState.TRYING?"TRYING":(es.getState()==EState.CATCHING?"CATCHING":"FINALIZING")) ) + "'");
+//			System.out.println(", STATE='" + (es.getState()==EState.NONE?"NONE":(es.getState()==EState.TRYING?"TRYING":(es.getState()==EState.CATCHING?"CATCHING":"FINALIZING")) ) + "'");
+			System.out.println(", STATE='" + ExceptionTable.printer(es.getState()));
 		}
 		System.out.println( "---" );
 	}
-	
+
 	public static String printer( EState state ){
 		switch (state){
 			case NONE: return "NONE";
