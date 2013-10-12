@@ -95,8 +95,20 @@ public class ExceptionTable {
 	}
 
 	public int getOverNextHandler( int idx ){
-// TODO
-		return -1;
+		int idxHandler=0;
+		for( idxHandler=1; idxHandler < exceptionTable.size(); ++idxHandler){
+			if( idx > exceptionTable.get(idxHandler).getHandlerAddr()){
+				break;
+			}
+		}
+	
+		if(idxHandler == exceptionTable.size()){
+			; // overrun, ERROR
+		}else{
+			idxHandler--;
+			idxHandler--;
+		}
+		return exceptionTable.get(idxHandler).getHandlerAddr(); // if this fails, it is definitely a bug
 	}
 
 	public void printStateTable(){
