@@ -42,7 +42,11 @@ public class ExceptionTable {
 			int start = insns.indexOf((LabelNode) trycatch.start);
 			int end = insns.indexOf((LabelNode) trycatch.end);
 			int handler = insns.indexOf((LabelNode) trycatch.handler);
-			this.exceptionTable.add(new ExceptionState(start, end, handler));
+//			this.exceptionTable.add(new ExceptionState(start, end, handler));
+			ExceptionState es = new ExceptionState(start, end, handler);
+			es.setState(EState.CATCHING);
+			exceptionTable.add( es );
+
 			// debug
 //			Analyzer.db("EXCEPTION: start =" + String.valueOf(start) + ", end =" + String.valueOf(end) + ", handler =" + String.valueOf(handler));
 		}
@@ -52,7 +56,7 @@ public class ExceptionTable {
 	}
 
 	public void initStates(final InsnList instructions){
-		stateTable.add( EState.NONE );
+//		stateTable.add( EState.NONE );
 		EState state = EState.NONE;
 		for( int idxIns=0; idxIns < instructions.size(); ++idxIns){
 			for( int idxETable = 0; idxETable < exceptionTable.size(); ++idxETable){
@@ -75,7 +79,7 @@ public class ExceptionTable {
 					break;
 				}
 			}
-
+// TODO determine where the handler ends?!
 			stateTable.add(state);
 		}
 	}
@@ -148,6 +152,26 @@ public class ExceptionTable {
 		return false;
 	}
 
+	
+	public boolean isHavingFinally(int idx){
+		if( 2 > exceptionTable.size()) return false;
+
+		int idxHandler=0;
+		for( idxHandler=2; idxHandler < exceptionTable.size(); ++idxHandler){
+			if( idx < exceptionTable.get(idxHandler).getStartAddr()){
+				break;
+			}
+		}
+
+		ExceptionState item = exceptionTable.get(idxHandler-1);
+		ExceptionState itemBefore = exceptionTable.get(idxHandler-2);
+
+		if(item.getStartAddr() != itemBefore.getStartAddr()) return false;
+
+		if( idx <= item.getEndAddr()) return true;
+
+		return false;
+	}
 
 	public void printStateTable(){
 		System.out.println( "--- State Table ---");

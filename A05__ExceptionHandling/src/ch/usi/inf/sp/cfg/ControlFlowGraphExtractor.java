@@ -368,8 +368,9 @@ public class ControlFlowGraphExtractor {
 
 					branching( idx, exceptionTable.getNextHandler(idx), "label=\"PEI\",style=dotted" );
 // FIXME check here if finally is available
-					branching( idx, exceptionTable.getOverNextHandler(idx), "label=\"PEI\",style=dotted" );
-
+					if( exceptionTable.isHavingFinally(idx)){
+						branching( idx, exceptionTable.getOverNextHandler(idx), "label=\"PEI\",style=dotted" );
+					}
 
 //					throwAthrow = idx; // TODO check
 // FIXME throwAthrow == null ?!?
