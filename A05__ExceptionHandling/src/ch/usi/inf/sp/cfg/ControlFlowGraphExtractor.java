@@ -548,8 +548,6 @@ System.out.println("BB");
 		for( int jdx=0; jdx < blockinstructions.size(); ++jdx){
 			AbstractInsnNode ins = blockinstructions.get(jdx);
 			int opcode = ins.getOpcode();
-
-			//szBlock +=  instructions.indexOf( ins ) + "> ";
 			String addr = String.valueOf(startAddr + jdx);
 			szBlock += addr + "> " + addr + ": ";
 
@@ -703,10 +701,10 @@ System.out.println("BB");
 			}// end
 
 			if(jdx < blockinstructions.size() -1 ){
-				szBlock += " | <";
+				szBlock += "\\l | <";
 			}
 		}
-		szBlock += " }\"];";
+		szBlock += "\\l }\"];";
 
 		return szBlock;
 	}
