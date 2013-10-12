@@ -117,6 +117,36 @@ public class ExceptionTable {
 	}
 
 
+	public List<Integer> getFurtherHandlers( int idx ){
+		List<Integer> handlers = new ArrayList();
+		if( 2 > exceptionTable.size()) return handlers;
+
+		int idxHandler=0;
+		for( idxHandler=2; idxHandler < exceptionTable.size(); ++idxHandler){
+			if( idx < exceptionTable.get(idxHandler).getStartAddr()){
+				break;
+			}
+		}
+
+		int startAddr = exceptionTable.get(idxHandler-1).getStartAddr();
+		ExceptionState item = null;
+		do{
+			item = exceptionTable.get(idxHandler-1);
+			if(startAddr == item.getStartAddr()){
+				// idx within start-end?
+				if( idx <= item.getEndAddr()){
+					handlers.add(item.getHandlerAddr());
+				} // no else, may be the first is not valid, but a sec or third handler?
+			}else{
+				// next handler set
+				break;
+			}
+			--idxHandler;
+		}while(0 < idxHandler);
+//		Analyzer.die("getFurtherHandlers() - index overrun for catch and finally, '" + String.valueOf(idx) + "'");
+		return handlers;
+	}
+/*
 	public int getOverNextHandler( int idx ){
 		if( 2 > exceptionTable.size()) return -1;
 
@@ -143,7 +173,7 @@ public class ExceptionTable {
 		Analyzer.die("getOverNextHandler() - index overrun for catch and finally, '" + String.valueOf(idx) + "'");
 		return -1;
 	}
-
+//*/
 
 	public boolean isHandlerAddr(int idx){
 		for( ExceptionState es : exceptionTable){

@@ -367,8 +367,16 @@ public class ControlFlowGraphExtractor {
 //System.out.println("A");
 					branching( idx, exceptionTable.getNextHandler(idx), "label=\"PEI\",style=dotted" );
 //System.out.println("AA");
+					
+// TODO better PEI connections to all involved handlers
 					if( exceptionTable.isHavingFinally(idx)){
-						branching( idx, exceptionTable.getOverNextHandler(idx), "label=\"PEI\",style=dotted" );
+//						branching( idx, exceptionTable.getOverNextHandler(idx), "label=\"PEI\",style=dotted" );
+						
+						List<Integer> furtherHandlers = exceptionTable.getFurtherHandlers(idx);
+						for(int idxHandlers=0; idxHandlers < furtherHandlers.size(); ++idxHandlers){
+							Integer handlerAddr = furtherHandlers.get(idxHandlers);
+							branching( idx, handlerAddr, "label=\"PEI\",style=dotted" );
+						}
 					}
 
 //					throwAthrow = idx; // TODO check

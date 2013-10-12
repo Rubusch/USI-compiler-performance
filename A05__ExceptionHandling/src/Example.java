@@ -52,12 +52,12 @@ public class Example {
 			try{
 				tryitout();
 			}catch(Exception ee){
-				ee.printStackTrace();
+				System.out.println("inner catch");
 			}
 		}catch(Exception e){
-			System.out.println( "my catch" );
+			System.out.println( "outer catch" );
 		}finally{
-			System.out.println("my finally");
+			System.out.println("outer finally");
 		}
 /* /
 		try{
