@@ -363,10 +363,11 @@ public class ControlFlowGraphExtractor {
 
 					// PEI branching
 //					branching( idx, current.getHandlerAddr(), "label=\"PEI\",style=dotted" );
-Analyzer.db( "BBB getNextHandeler("+ String.valueOf(idx) + ") " + String.valueOf(exceptionTable.getNextHandler(idx)));
-Analyzer.db( "CCC getOverNextHandeler("+String.valueOf(idx)+") " + String.valueOf(exceptionTable.getOverNextHandler(idx)));
+//Analyzer.db( "BBB getNextHandeler("+ String.valueOf(idx) + ") " + String.valueOf(exceptionTable.getNextHandler(idx)));
+//Analyzer.db( "CCC getOverNextHandeler("+String.valueOf(idx)+") " + String.valueOf(exceptionTable.getOverNextHandler(idx)));
 
 					branching( idx, exceptionTable.getNextHandler(idx), "label=\"PEI\",style=dotted" );
+// FIXME check here if finally is available
 					branching( idx, exceptionTable.getOverNextHandler(idx), "label=\"PEI\",style=dotted" );
 
 
@@ -389,7 +390,7 @@ Analyzer.db( "CCC getOverNextHandeler("+String.valueOf(idx)+") " + String.valueO
 // FIXME
 //Analyzer.db( "FINALIZING");
 //Analyzer.db( "EEE getNextHandeler("+ String.valueOf(idx) + ") " + String.valueOf(exceptionTable.getNextHandler(idx)));
-//					branching( idx, exceptionTable.getNextHandler(idx), "label=\"catching to finally\",style=dotted" );
+					branching( idx, exceptionTable.getNextHandler(idx), "label=\"catching to finally\",style=dotted" );
 					// start new block
 					branchNextIteration = true;
 //				} // else try-catch, normal ending

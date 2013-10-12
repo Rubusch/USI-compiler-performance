@@ -27,7 +27,7 @@ public class Example {
 		
 /*
 		tryitout();
-/* /
+/*/
 		try{
 			tryitout();
 		}catch(Exception e){
@@ -59,7 +59,7 @@ public class Example {
 		}finally{
 			System.out.println("my finally");
 		}
-/*/
+/* /
 		try{
 			tryitout();
 			try{
