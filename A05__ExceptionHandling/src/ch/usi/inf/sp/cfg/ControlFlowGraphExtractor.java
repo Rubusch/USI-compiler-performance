@@ -119,7 +119,7 @@ public class ControlFlowGraphExtractor {
 					this.blocklist.get( listIdx-1 ).removeAll( this.blocklist.get( listIdx ) );
 
 					// fallthrough edge
-// TODO is this necessary?
+// TODO is this necessary? Probably for for loops
 					edgeslistAdd( dstidx-1, dstidx, "label=\"???\"");
 
 					break;
@@ -363,19 +363,15 @@ public class ControlFlowGraphExtractor {
 
 					// PEI branching
 //					branching( idx, current.getHandlerAddr(), "label=\"PEI\",style=dotted" );
-//Analyzer.db( "BBB getNextHandeler("+ String.valueOf(idx) + ") " + String.valueOf(exceptionTable.getNextHandler(idx)));
-//Analyzer.db( "CCC getOverNextHandeler("+String.valueOf(idx)+") " + String.valueOf(exceptionTable.getOverNextHandler(idx)));
 
-System.out.println("A");
+//System.out.println("A");
 					branching( idx, exceptionTable.getNextHandler(idx), "label=\"PEI\",style=dotted" );
-System.out.println("AA");
-// FIXME check here if finally is available
+//System.out.println("AA");
 					if( exceptionTable.isHavingFinally(idx)){
 						branching( idx, exceptionTable.getOverNextHandler(idx), "label=\"PEI\",style=dotted" );
 					}
 
 //					throwAthrow = idx; // TODO check
-// FIXME throwAthrow == null ?!?
 //					this.throwAthrow.add(0, new Integer(idx)); // TODO check
 
 					// start new block
@@ -383,20 +379,18 @@ System.out.println("AA");
 				}
 				
 //			}else if( exceptionTableCheck( EState.CATCHING, current )){
-//			}else if( EState.FINALIZING == exceptionTable.state(idx)){
 			}else if( isHandler(idx)){
 //				if( idx == current.getEndAddr() && current.getEndAddr() == current.getHandlerAddr()){
 					// case try-catch-finally
 //					branching( idx, current.getHandlerAddr(), "label=\"catching to finally\",style=dotted" );
 //					current.setState(EState.FINALIZING);
 
-// FIXME
 //Analyzer.db( "FINALIZING");
 //Analyzer.db( "EEE getNextHandeler("+ String.valueOf(idx) + ") " + String.valueOf(exceptionTable.getNextHandler(idx)));
 				if( exceptionTable.isHavingFinally(idx)){
-System.out.println("B");
+//System.out.println("B");
 					branching( idx, exceptionTable.getNextHandler(idx), "label=\"catching to finally\",style=dotted" );
-System.out.println("BB");
+//System.out.println("BB");
 				
 					// start new block
 					branchNextIteration = true;
@@ -404,7 +398,7 @@ System.out.println("BB");
 			}
 
 // APPEND
-			if( -1 < forwardJump.indexOf( idx ) && blocklist.get( blocklist.size() -1 ).size() > 1 ){
+			if( -1 < forwardJump.indexOf( idx ) && blocklist.get( blocklist.size()-1 ).size() > 1 ){
 
 				// there was a forward jump to this address
 				this.blocklist.add( new ArrayList<AbstractInsnNode>() );
@@ -420,8 +414,9 @@ System.out.println("BB");
 //				}else if( exceptionTableCheck( EState.FINALIZING, current )){
 // TODO it's a mess - re-check
 //					current = null;
-//				}else{
-				}else if( EState.FINALIZING != exceptionTable.state(idx)){
+				}else{
+				//}else if( EState.FINALIZING != exceptionTable.state(idx)){
+//System.out.println("XXX");
 					// forward pointing block fallthrough
 					branching( idx-1, idx, "label=\"forward fallthrou\"");
 				}
