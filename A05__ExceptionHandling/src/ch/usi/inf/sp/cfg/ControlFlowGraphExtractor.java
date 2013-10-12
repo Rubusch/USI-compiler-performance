@@ -32,9 +32,11 @@ public class ControlFlowGraphExtractor {
 	private List<Integer> forwardJump;
 	private List<String> edgesList; // TODO rename "jumpTable"?
 	private List<Integer> omitFallthruList;
-	private List<ExceptionState> exceptionTableList;
-	private List<ExceptionState> exceptionTable;
+	private List<ExceptionState> stateTableList;
+	private List<ExceptionState> stateTable;
 	private List<Integer> throwAthrow;
+	
+	private final ExceptionTable exceptionTable	;
 
 	public List<List<AbstractInsnNode>> getBlocklist() {
 		return blocklist;
@@ -78,12 +80,13 @@ public class ControlFlowGraphExtractor {
 		}
 		
 		// exception handling
-		exceptionTableList = new ArrayList<ExceptionState>();
+		exceptionTable = new ExceptionTable();
+		stateTableList = new ArrayList<ExceptionState>();
 
 		this.throwAthrow = new ArrayList<Integer>();
 
 // TODO LinkedList?
-		this.exceptionTable = new ArrayList<ExceptionState>(); 
+		this.stateTable = new ArrayList<ExceptionState>(); 
 		initInstructions();
 	}
 
@@ -139,7 +142,7 @@ public class ControlFlowGraphExtractor {
 			int start = method.instructions.indexOf((LabelNode) trycatch.start);
 			int end = method.instructions.indexOf((LabelNode) trycatch.end);
 			int handler = method.instructions.indexOf((LabelNode) trycatch.handler);
-			this.exceptionTableList.add(new ExceptionState(start, end, handler));
+			this.stateTableList.add(new ExceptionState(start, end, handler));
 			// debug
 			Analyzer.db("EXCEPTION: start =" + String.valueOf(start) + ", end =" + String.valueOf(end) + ", handler =" + String.valueOf(handler));
 		}
@@ -148,12 +151,12 @@ public class ControlFlowGraphExtractor {
 	private void exceptionTableAdd( ExceptionState newElem){
 		// insert ordered
 		int insertAt = 0;
-		for(int idx=0; idx<this.exceptionTable.size(); ++idx){
-			ExceptionState onStack = this.exceptionTable.get(idx);
+		for(int idx=0; idx<this.stateTable.size(); ++idx){
+			ExceptionState onStack = this.stateTable.get(idx);
 			if( newElem.getStartAddr() == onStack.getStartAddr()){
 				if( newElem.getEndAddr() > onStack.getEndAddr()){
 					insertAt = idx+1;
-
+// TODO this is actually crap... reimplementing the approach
 //					branching( throwAthrow, newElem.getHandlerAddr(), "label=\"ATHROW\",style=dotted" ); // TODO check
 
 //					int invokeAddr = throwAthrow.get(0);
@@ -184,7 +187,7 @@ public class ControlFlowGraphExtractor {
 				}
 			}
 		}
-		this.exceptionTable.add(insertAt, newElem);
+		this.stateTable.add(insertAt, newElem);
 	}
 
 	private boolean exceptionTableCheck( final EState which, final ExceptionState state){
@@ -197,14 +200,14 @@ public class ControlFlowGraphExtractor {
 	private ExceptionState exceptionTableFetch( int idx, ExceptionState current, List<ExceptionState> statestack ){
 		if( null == current){
 			// check stack
-			if( 0 < this.exceptionTable.size() ){
-				current = this.exceptionTable.get(0);
-				this.exceptionTable.remove(0);
+			if( 0 < this.stateTable.size() ){
+				current = this.stateTable.get(0);
+				this.stateTable.remove(0);
 
 			// else check list
 			}else{
-				for( int idxexp=0; idxexp < this.exceptionTableList.size(); ++idxexp ){
-					ExceptionState exp = this.exceptionTableList.get(idxexp);
+				for( int idxexp=0; idxexp < this.stateTableList.size(); ++idxexp ){
+					ExceptionState exp = this.stateTableList.get(idxexp);
 					if( idx == exp.getStartAddr() ){
 						if(null != current){
 							// we have a tryblock for a finally, so put it on the stack
@@ -234,8 +237,8 @@ public class ControlFlowGraphExtractor {
 
 		}else if( exceptionTableCheck( EState.TRYING, current )){
 			// we're in TRYING, and there is a nested trying
-			for( int idxexp=0; idxexp < this.exceptionTableList.size(); ++idxexp ){
-				ExceptionState exp = this.exceptionTableList.get(idxexp);
+			for( int idxexp=0; idxexp < this.stateTableList.size(); ++idxexp ){
+				ExceptionState exp = this.stateTableList.get(idxexp);
 				if( idx == exp.getStartAddr() ){
 					// e.g. a catch and a finally both start at the same addr
 					// but the finally's scope will be bigger (higher end)
@@ -280,7 +283,8 @@ public class ControlFlowGraphExtractor {
 	private void initInstructions(){
 		ExceptionState current = null;
 		exceptionTableInit();
-//		expli.init(method.tryCatchBlocks); // TODO
+		exceptionTable.init(method.tryCatchBlocks, instructions); // TODO
+		exceptionTable.printExceptionTable(); // XXX
 
 // FOR
 		boolean branchNextIteration = false;
@@ -294,7 +298,7 @@ public class ControlFlowGraphExtractor {
 				branchNextIteration = false;
 			}
 
-			current = exceptionTableFetch( idx, current, this.exceptionTable );
+			current = exceptionTableFetch( idx, current, this.stateTable );
 
 // BRANCHING
 			if( ins.getType() == AbstractInsnNode.JUMP_INSN ){

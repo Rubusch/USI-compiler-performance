@@ -18,7 +18,6 @@ public class ExceptionTable {
 	}
 
 	public class ExceptionComparator implements Comparator<ExceptionState>{
-
 		@Override
 		public int compare(ExceptionState arg0, ExceptionState arg1) {
 			if(arg0.getStartAddr() < arg1.getStartAddr()) return -1;
@@ -31,9 +30,9 @@ public class ExceptionTable {
 		}
 	}
 
-	public void init( final List<TryCatchBlockNode> trycatchlist, final InsnList insns){
+	public void init( final List<TryCatchBlockNode> exceptions, final InsnList insns){
 //		List<TryCatchBlockNode> trycatchlist = method.tryCatchBlocks;
-		for( TryCatchBlockNode trycatch : trycatchlist){
+		for( TryCatchBlockNode trycatch : exceptions){
 			int start = insns.indexOf((LabelNode) trycatch.start);
 			int end = insns.indexOf((LabelNode) trycatch.end);
 			int handler = insns.indexOf((LabelNode) trycatch.handler);
@@ -46,7 +45,10 @@ public class ExceptionTable {
 		Collections.sort( exceptionTable, new ExceptionComparator() );
 	}
 
-
+	public EState state( int idx ){
+//		for( int i=0; i)
+		return EState.TRYING;
+	}
 
 
 
