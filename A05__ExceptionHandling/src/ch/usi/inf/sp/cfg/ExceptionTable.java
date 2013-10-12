@@ -10,11 +10,12 @@ import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.TryCatchBlockNode;
 
 public class ExceptionTable {
-	
 	private List<ExceptionState> exceptionTable;
-	
+	private List<EState> stateTable;
+
 	public ExceptionTable(){
 		exceptionTable = new ArrayList<ExceptionState>();
+		stateTable = new ArrayList<EState>();
 	}
 
 	public class ExceptionComparator implements Comparator<ExceptionState>{
@@ -49,26 +50,32 @@ public class ExceptionTable {
 		// sort by "start", if equal, then sort reversely by "end"
 		Collections.sort( exceptionTable, new ExceptionComparator() );
 	}
+	
+	public void initStates(final InsnList instructions){
+		stateTable.add( EState.NONE );
+		EState state = EState.NONE;
+		for( int idx=0; idx < instructions.size(); ++idx){
+			for( int idxSub = 0; idxSub < exceptionTable.size(); ++idxSub){
+				if(idx == exceptionTable.get(idxSub).getStartAddr()){
+					state = EState.TRYING;
+					break;
+				}
+			}
+
+			for( int idxSub = 0; idxSub < exceptionTable.size(); ++idxSub){
+				if(idx == exceptionTable.get(idxSub).getHandlerAddr()){
+					state = exceptionTable.get(idxSub).getState();
+					break;
+				}
+			}
+
+			stateTable.add(EState.TRYING);
+		}
+	}
 
 	public EState state( int idx ){
 		if(0 == exceptionTable.size()) return EState.NONE;
-
-		// get last start index
-		int idxStart=0;
-		for( idxStart=1; idxStart< exceptionTable.size(); ++idxStart){
-			if(idx < exceptionTable.get(idxStart).getStartAddr()){
-				break;
-			}
-		}
-		ExceptionState entry = exceptionTable.get(idxStart - 1);
-
-		// check end addrss
-		if(idx < entry.getEndAddr()) return EState.TRYING;
-
-		
-		
-
-		return EState.TRYING;
+		return this.stateTable.get(idx);
 	}
 	
 	public int getNextHandler( int idx ){
