@@ -118,7 +118,7 @@ public class ExceptionTable {
 
 
 	public List<Integer> getFurtherHandlers( int idx ){
-		List<Integer> handlers = new ArrayList();
+		List<Integer> handlers = new ArrayList<Integer>();
 		if( 2 > exceptionTable.size()) return handlers;
 
 		int idxHandler=0;
