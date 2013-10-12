@@ -365,7 +365,7 @@ public class ControlFlowGraphExtractor {
 //					branching( idx, current.getHandlerAddr(), "label=\"PEI\",style=dotted" );
 
 //System.out.println("A");
-					branching( idx, exceptionTable.getNextHandler(idx), "label=\"PEI\",style=dotted" );
+//					branching( idx, exceptionTable.getNextHandler(idx), "label=\"PEI\",style=dotted" );
 //System.out.println("AA");
 					
 // TODO better PEI connections to all involved handlers
@@ -377,6 +377,8 @@ public class ControlFlowGraphExtractor {
 							Integer handlerAddr = furtherHandlers.get(idxHandlers);
 							branching( idx, handlerAddr, "label=\"PEI\",style=dotted" );
 						}
+					}else{
+						branching( idx, exceptionTable.getNextHandler(idx), "label=\"PEI\",style=dotted" );
 					}
 
 //					throwAthrow = idx; // TODO check
