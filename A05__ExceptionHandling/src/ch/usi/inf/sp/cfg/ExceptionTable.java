@@ -77,12 +77,23 @@ public class ExceptionTable {
 		if(0 == exceptionTable.size()) return EState.NONE;
 		return this.stateTable.get(idx);
 	}
-	
+
 	public int getNextHandler( int idx ){
-// TODO
-		return -1;
-	}
+		int idxHandler=0;
+		for( idxHandler=1; idxHandler < exceptionTable.size(); ++idxHandler){
+			if( idx > exceptionTable.get(idxHandler).getHandlerAddr()){
+				break;
+			}
+		}
 	
+		if(idxHandler == exceptionTable.size()){
+			; // overrun, ERROR
+		}else{
+			idxHandler--;
+		}
+		return exceptionTable.get(idxHandler).getHandlerAddr();
+	}
+
 	public int getOverNextHandler( int idx ){
 // TODO
 		return -1;
