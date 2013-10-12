@@ -363,6 +363,10 @@ public class ControlFlowGraphExtractor {
 
 					// PEI branching
 //					branching( idx, current.getHandlerAddr(), "label=\"PEI\",style=dotted" );
+Analyzer.db( "AAA idx " + String.valueOf(idx));
+Analyzer.db( "BBB getNextHandeler("+ String.valueOf(idx) + ") " + String.valueOf(exceptionTable.getNextHandler(idx)));
+Analyzer.db( "CCC getOverNextHandeler("+String.valueOf(idx)+") " + String.valueOf(exceptionTable.getOverNextHandler(idx)));
+
 					branching( idx, exceptionTable.getNextHandler(idx), "label=\"PEI\",style=dotted" );
 					branching( idx, exceptionTable.getOverNextHandler(idx), "label=\"PEI\",style=dotted" );
 
@@ -382,9 +386,8 @@ public class ControlFlowGraphExtractor {
 //					branching( idx, current.getHandlerAddr(), "label=\"catching to finally\",style=dotted" );
 //					current.setState(EState.FINALIZING);
 
-Analyzer.db("FINALIZING");
-Analyzer.db("source idx " + String.valueOf(idx));
-Analyzer.db("target idx " + String.valueOf(exceptionTable.getNextHandler(idx)));
+Analyzer.db( "FINALIZING");
+Analyzer.db( "EEE getNextHandeler("+ String.valueOf(idx) + ") " + String.valueOf(exceptionTable.getNextHandler(idx)));
 					branching( idx, exceptionTable.getNextHandler(idx), "label=\"catching to finally\",style=dotted" );
 
 

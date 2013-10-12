@@ -90,7 +90,26 @@ Analyzer.db("XXX getNextHandler() - idx " + String.valueOf(idx));
 			}
 		}
 
-		// selftest
+		// range test
+		ExceptionState item = null;
+		do{
+			item = exceptionTable.get(idxHandler-1);
+			// idx within start-end?
+			if( idx <= item.getEndAddr()){
+				// inside
+				return item.getHandlerAddr();
+			}else{
+				// outside
+				 --idxHandler;
+			}
+		}while(0 < idxHandler);
+		Analyzer.die("getNextHandler() - index overrun for catch and finally");
+		return -1;
+// TOOD fail
+//		
+
+
+/*
 		ExceptionState item = exceptionTable.get(idxHandler-1);
 		ExceptionState itemBefore = null;
 		if( 0 < idxHandler - 1) itemBefore = exceptionTable.get(idxHandler - 2);
@@ -114,6 +133,7 @@ Analyzer.db("XXX getNextHandler() - idx " + String.valueOf(idx));
 				Analyzer.die("getNextHandler() - index overrun for catch");
 			}
 		}
+//*/
 
 
 /*
@@ -148,7 +168,7 @@ Analyzer.db("XXX getNextHandler() - idx " + String.valueOf(idx));
 		}
 //*/
 //		return exceptionTable.get( idxHandler - 1 ).getHandlerAddr();
-		return item.getHandlerAddr();
+//		return item.getHandlerAddr();
 	}
 
 	public int getOverNextHandler( int idx ){
