@@ -46,8 +46,19 @@ public class ExceptionTable {
 	}
 
 	public EState state( int idx ){
-//		for( int i=0; i)
+//		for( int i=0; i<size)
+		
 		return EState.TRYING;
+	}
+	
+	public int getNextHandler( int idx ){
+// TODO
+		return -1;
+	}
+	
+	public int getOverNextHandler( int idx ){
+// TODO
+		return -1;
 	}
 
 
