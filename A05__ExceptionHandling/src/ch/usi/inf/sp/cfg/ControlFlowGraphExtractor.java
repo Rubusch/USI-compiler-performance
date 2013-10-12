@@ -84,7 +84,6 @@ public class ControlFlowGraphExtractor {
 	}
 
 	private void branching( int srcidx, int dstidx, String opt){
-	Analyzer.db("XXX branching( " + String.valueOf(srcidx) + ", " + String.valueOf(dstidx) + ", " + opt );
 		edgeslistAdd( srcidx, dstidx, opt);
 
 		if( dstidx < srcidx ){
@@ -222,12 +221,11 @@ public class ControlFlowGraphExtractor {
 				// there was a forward jump to this address
 				this.blocklist.add( new ArrayList<AbstractInsnNode>() );
 
-				// fallthrough edge
+				// fallthrou edge
 				AbstractInsnNode lastIns = instructions.get(idx-1);
 
 				// ATHROW, re-throw an exception which cannot be handeled
 				if( Opcodes.ATHROW == lastIns.getOpcode()){
-					Analyzer.db("handling ATHROW");
 					branching( idx-1, instructions.size(), "label=\"ATHROW\"" );
 				}else{
 					// forward pointing block fallthrough

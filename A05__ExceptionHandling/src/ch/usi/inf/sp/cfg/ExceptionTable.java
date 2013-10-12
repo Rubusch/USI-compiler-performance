@@ -42,21 +42,16 @@ public class ExceptionTable {
 			int start = insns.indexOf((LabelNode) trycatch.start);
 			int end = insns.indexOf((LabelNode) trycatch.end);
 			int handler = insns.indexOf((LabelNode) trycatch.handler);
-//			this.exceptionTable.add(new ExceptionState(start, end, handler));
 			ExceptionState es = new ExceptionState(start, end, handler);
 			es.setState(EState.CATCHING);
 			exceptionTable.add( es );
-
-			// debug
-//			Analyzer.db("EXCEPTION: start =" + String.valueOf(start) + ", end =" + String.valueOf(end) + ", handler =" + String.valueOf(handler));
 		}
-		
+
 		// sort by "start", if equal, then sort reversely by "end"
 		Collections.sort( exceptionTable, new ExceptionComparator() );
 	}
 
 	public void initStates(final InsnList instructions){
-//		stateTable.add( EState.NONE );
 		EState state = EState.NONE;
 		for( int idxIns=0; idxIns < instructions.size(); ++idxIns){
 			for( int idxETable = 0; idxETable < exceptionTable.size(); ++idxETable){
@@ -143,37 +138,8 @@ public class ExceptionTable {
 			}
 			--idxHandler;
 		}while(0 < idxHandler);
-//		Analyzer.die("getFurtherHandlers() - index overrun for catch and finally, '" + String.valueOf(idx) + "'");
 		return handlers;
 	}
-/*
-	public int getOverNextHandler( int idx ){
-		if( 2 > exceptionTable.size()) return -1;
-
-		int idxHandler=0;
-		for( idxHandler=2; idxHandler < exceptionTable.size(); ++idxHandler){
-			if( idx < exceptionTable.get(idxHandler).getStartAddr()){
-				break;
-			}
-		}
-
-		// range test
-		ExceptionState item = null;
-		do{
-			item = exceptionTable.get(idxHandler-2);
-			// idx within start-end?
-			if( idx <= item.getEndAddr()){
-				// inside
-				return item.getHandlerAddr();
-			}else{
-				// outside
-				 --idxHandler;
-			}
-		}while(0 < idxHandler);
-		Analyzer.die("getOverNextHandler() - index overrun for catch and finally, '" + String.valueOf(idx) + "'");
-		return -1;
-	}
-//*/
 
 	public boolean isHandlerAddr(int idx){
 		for( ExceptionState es : exceptionTable){
@@ -215,7 +181,6 @@ public class ExceptionTable {
 		System.out.println( "--- Exception Table ---" );
 		for( ExceptionState es : exceptionTable ){
 			System.out.print( "start='" + String.valueOf(es.getStartAddr()) + "', end='" + String.valueOf(es.getEndAddr()) + "', handler=" + String.valueOf(es.getHandlerAddr()) +"'");
-//			System.out.println(", STATE='" + (es.getState()==EState.NONE?"NONE":(es.getState()==EState.TRYING?"TRYING":(es.getState()==EState.CATCHING?"CATCHING":"FINALIZING")) ) + "'");
 			System.out.println(", STATE='" + ExceptionTable.printer(es.getState()));
 		}
 		System.out.println( "---" );
