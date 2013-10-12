@@ -37,7 +37,7 @@ public class ExceptionTable {
 		}
 	}
 
-	public void init( final List<TryCatchBlockNode> exceptions, final InsnList insns){
+	public void initTable( final List<TryCatchBlockNode> exceptions, final InsnList insns){
 		for( TryCatchBlockNode trycatch : exceptions){
 			int start = insns.indexOf((LabelNode) trycatch.start);
 			int end = insns.indexOf((LabelNode) trycatch.end);
@@ -58,6 +58,13 @@ public class ExceptionTable {
 			for( int idxETable = 0; idxETable < exceptionTable.size(); ++idxETable){
 				if(idxIns == exceptionTable.get(idxETable).getStartAddr()){
 					state = EState.TRYING;
+					break;
+				}
+			}
+
+			for( int idxETable = 0; idxETable < exceptionTable.size(); ++idxETable){
+				if(idxIns == exceptionTable.get(idxETable).getEndAddr()){
+					state = EState.NONE;
 					break;
 				}
 			}

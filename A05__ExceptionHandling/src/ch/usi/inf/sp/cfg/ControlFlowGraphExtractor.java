@@ -285,10 +285,10 @@ public class ControlFlowGraphExtractor {
 	private void initInstructions(){
 //		ExceptionState current = null;
 //		exceptionTableInit();
-		exceptionTable.init(method.tryCatchBlocks, ControlFlowGraphExtractor.instructions); // TODO
+		exceptionTable.initTable(method.tryCatchBlocks, ControlFlowGraphExtractor.instructions); // TODO
 		exceptionTable.initStates(instructions);
 		exceptionTable.printExceptionTable(); // XXX
-//		exceptionTable.printStateTable(); // XXX
+		exceptionTable.printStateTable(); // XXX
 
 // FOR
 		boolean branchNextIteration = false;
@@ -378,7 +378,7 @@ public class ControlFlowGraphExtractor {
 					// start new block
 					branchNextIteration = true;
 				}
-//XXXXXXX
+				
 //			}else if( exceptionTableCheck( EState.CATCHING, current )){
 //			}else if( EState.FINALIZING == exceptionTable.state(idx)){
 			}else if( isHandler(idx)){
