@@ -366,13 +366,10 @@ public class ControlFlowGraphExtractor {
 					branching( idx, exceptionTable.getNextHandler(idx), "label=\"PEI\",style=dotted" );
 					branching( idx, exceptionTable.getOverNextHandler(idx), "label=\"PEI\",style=dotted" );
 
-// FIXME
-Analyzer.die("STOP");
-
 
 //					throwAthrow = idx; // TODO check
 // FIXME throwAthrow == null ?!?
-					this.throwAthrow.add(0, new Integer(idx)); // TODO check
+//					this.throwAthrow.add(0, new Integer(idx)); // TODO check
 
 					// start new block
 					branchNextIteration = true;
@@ -384,7 +381,18 @@ Analyzer.die("STOP");
 					// case try-catch-finally
 //					branching( idx, current.getHandlerAddr(), "label=\"catching to finally\",style=dotted" );
 //					current.setState(EState.FINALIZING);
+
+Analyzer.db("FINALIZING");
+Analyzer.db("source idx " + String.valueOf(idx));
+Analyzer.db("target idx " + String.valueOf(exceptionTable.getNextHandler(idx)));
 					branching( idx, exceptionTable.getNextHandler(idx), "label=\"catching to finally\",style=dotted" );
+
+
+
+// FIXME
+Analyzer.die("STOP");
+
+
 					// start new block
 					branchNextIteration = true;
 //				} // else try-catch, normal ending

@@ -80,6 +80,7 @@ public class ExceptionTable {
 
 
 	public int getNextHandler( int idx ){
+Analyzer.db("XXX getNextHandler() - idx " + String.valueOf(idx));
 		if( 0 == exceptionTable.size()) return -1;
 
 		int idxHandler=0;
@@ -90,13 +91,64 @@ public class ExceptionTable {
 		}
 
 		// selftest
-		if(idxHandler == exceptionTable.size()){
-			Analyzer.die("getNextHandler() - index overrun");
-// TODO what to do in this case?
-//			return -1; // overrun, ERROR
+		ExceptionState item = exceptionTable.get(idxHandler-1);
+		ExceptionState itemBefore = null;
+		if( 0 < idxHandler - 1) itemBefore = exceptionTable.get(idxHandler - 2);
+
+		// idx within start-end?
+		if( idx > item.getEndAddr()){
+			// outside
+			if(null != itemBefore){
+				// there is a higher level handler (finally)
+				if( idx > itemBefore.getEndAddr() ){
+					// outside, too
+					Analyzer.die("getNextHandler() - index overrun for catch and finally");
+				}else{
+					// ok, finally handler takes over
+					idxHandler--;
+					item = exceptionTable.get(idxHandler-1);
+					if( 0 < idxHandler - 1) itemBefore = exceptionTable.get(idxHandler - 2);
+				}
+			}else{
+				// overrun, and outside of last interval
+				Analyzer.die("getNextHandler() - index overrun for catch");
+			}
 		}
 
-		return exceptionTable.get( idxHandler - 1 ).getHandlerAddr(); 
+
+/*
+		if(idxHandler == exceptionTable.size()){
+			if( idx > item.getEndAddr()){
+				if(null != itemBefore){
+					// there is a higher level handler
+					if( idx <= itemBefore.getEndAddr() ){
+						// higher level handler can handle it
+						idxHandler--;
+					}else{
+						// overrun, and outside of higher level interval as well
+						Analyzer.die("getNextHandler() - index overrun");
+					}
+				}else{
+					// overrun, and outside of last interval
+					Analyzer.die("getNextHandler() - index overrun");
+				}
+			}else{
+				// within the last interval
+				if(null != itemBefore){
+					if( item.getStartAddr() == itemBefore.getStartAddr() ){
+						// we may fall back to a finally handler
+						idxHandler--;
+					}
+				}
+				// not in observed space
+				Analyzer.die("getNextHandler() - index overrun");
+// TODO what to do in this case?
+//			return -1; // overrun, ERROR
+			}
+		}
+//*/
+//		return exceptionTable.get( idxHandler - 1 ).getHandlerAddr();
+		return item.getHandlerAddr();
 	}
 
 	public int getOverNextHandler( int idx ){
