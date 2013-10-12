@@ -97,6 +97,7 @@ public class ControlFlowGraphExtractor {
 	}
 
 	private void branching( int srcidx, int dstidx, String opt){
+	Analyzer.db("XXX branching( " + String.valueOf(srcidx) + ", " + String.valueOf(dstidx) + ", " + opt );
 		edgeslistAdd( srcidx, dstidx, opt);
 
 		if( dstidx < srcidx ){
@@ -191,14 +192,14 @@ public class ControlFlowGraphExtractor {
 		this.stateTable.add(insertAt, newElem);
 	}
 //*/
-	
+/*	
 	private boolean exceptionTableCheck( final EState which, final ExceptionState state){
 		if( null == state ){
 			return false;
 		}
 		return (which == state.getState());
 	}
-/*
+/ *
 	private ExceptionState exceptionTableFetch( int idx, ExceptionState current, List<ExceptionState> statestack ){
 		if( null == current){
 			// check stack
@@ -385,16 +386,10 @@ Analyzer.db( "CCC getOverNextHandeler("+String.valueOf(idx)+") " + String.valueO
 //					branching( idx, current.getHandlerAddr(), "label=\"catching to finally\",style=dotted" );
 //					current.setState(EState.FINALIZING);
 
-Analyzer.db( "FINALIZING");
-Analyzer.db( "EEE getNextHandeler("+ String.valueOf(idx) + ") " + String.valueOf(exceptionTable.getNextHandler(idx)));
-					branching( idx, exceptionTable.getNextHandler(idx), "label=\"catching to finally\",style=dotted" );
-
-
-
 // FIXME
-Analyzer.die("STOP");
-
-
+//Analyzer.db( "FINALIZING");
+//Analyzer.db( "EEE getNextHandeler("+ String.valueOf(idx) + ") " + String.valueOf(exceptionTable.getNextHandler(idx)));
+//					branching( idx, exceptionTable.getNextHandler(idx), "label=\"catching to finally\",style=dotted" );
 					// start new block
 					branchNextIteration = true;
 //				} // else try-catch, normal ending
@@ -411,13 +406,13 @@ Analyzer.die("STOP");
 				// ATHROW, re-throw an exception which cannot be handeled
 				if( Opcodes.ATHROW == lastIns.getOpcode()){
 					Analyzer.db("handling ATHROW");
-//					branching( idx-1, instructions.size()-2, "label=\"ATHROW\"" );
 					branching( idx-1, instructions.size(), "label=\"ATHROW\"" );
 
 //				}else if( exceptionTableCheck( EState.FINALIZING, current )){
 // TODO it's a mess - re-check
 //					current = null;
-				}else{
+//				}else{
+				}else if( EState.FINALIZING != exceptionTable.state(idx)){
 					// forward pointing block fallthrough
 					branching( idx-1, idx, "label=\"forward fallthrou\"");
 				}

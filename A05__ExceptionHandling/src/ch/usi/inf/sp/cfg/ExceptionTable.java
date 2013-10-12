@@ -44,7 +44,7 @@ public class ExceptionTable {
 			int handler = insns.indexOf((LabelNode) trycatch.handler);
 			this.exceptionTable.add(new ExceptionState(start, end, handler));
 			// debug
-			Analyzer.db("EXCEPTION: start =" + String.valueOf(start) + ", end =" + String.valueOf(end) + ", handler =" + String.valueOf(handler));
+//			Analyzer.db("EXCEPTION: start =" + String.valueOf(start) + ", end =" + String.valueOf(end) + ", handler =" + String.valueOf(handler));
 		}
 		
 		// sort by "start", if equal, then sort reversely by "end"
@@ -102,7 +102,7 @@ public class ExceptionTable {
 				 --idxHandler;
 			}
 		}while(0 < idxHandler);
-		Analyzer.die("getNextHandler() - index overrun for catch and finally");
+		Analyzer.die("getNextHandler() - index overrun, '" + String.valueOf(idx) + "'");
 		return -1;
 	}
 
@@ -130,22 +130,8 @@ public class ExceptionTable {
 				 --idxHandler;
 			}
 		}while(0 < idxHandler);
-		Analyzer.die("getOverNextHandler() - index overrun for catch and finally");
+		Analyzer.die("getOverNextHandler() - index overrun for catch and finally, '" + String.valueOf(idx) + "'");
 		return -1;
-
-/*
-		// selftest
-		if(idxHandler == exceptionTable.size()){
-			Analyzer.db("getOverNextHandler() - index overrun");
-			return -1; // overrun, ERROR
-		}
-
-		if( exceptionTable.get(idxHandler-1).getStartAddr() != exceptionTable.get(idxHandler-2).getStartAddr()){
-			Analyzer.die("getOverNextHandler() - no finally handler");
-		}
-
-		return exceptionTable.get(idxHandler - 2).getHandlerAddr(); // if this fails, it is definitely a bug
-//*/
 	}
 
 	public void printStateTable(){
