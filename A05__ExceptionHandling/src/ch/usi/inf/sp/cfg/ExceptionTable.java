@@ -24,14 +24,19 @@ public class ExceptionTable {
 			if(arg0.getStartAddr() > arg1.getStartAddr()) return 1;
 			
 			// both are equal (twisted)
-			if(arg1.getEndAddr() < arg0.getEndAddr()) return -1;
+			if(arg1.getEndAddr() < arg0.getEndAddr()){
+				arg0.setState(EState.FINALIZING);
+				arg1.setState(EState.CATCHING);
+				return -1;
+			}
 			if(arg1.getEndAddr() == arg0.getEndAddr()) Analyzer.die("comparison between two identical entries in Exception Table"); // XXX
+			arg0.setState(EState.CATCHING);
+			arg1.setState(EState.FINALIZING);
 			return 1;
 		}
 	}
 
 	public void init( final List<TryCatchBlockNode> exceptions, final InsnList insns){
-//		List<TryCatchBlockNode> trycatchlist = method.tryCatchBlocks;
 		for( TryCatchBlockNode trycatch : exceptions){
 			int start = insns.indexOf((LabelNode) trycatch.start);
 			int end = insns.indexOf((LabelNode) trycatch.end);
@@ -46,8 +51,23 @@ public class ExceptionTable {
 	}
 
 	public EState state( int idx ){
-//		for( int i=0; i<size)
+		if(0 == exceptionTable.size()) return EState.NONE;
+
+		// get last start index
+		int idxStart=0;
+		for( idxStart=1; idxStart< exceptionTable.size(); ++idxStart){
+			if(idx < exceptionTable.get(idxStart).getStartAddr()){
+				break;
+			}
+		}
+		ExceptionState entry = exceptionTable.get(idxStart - 1);
+
+		// check end addrss
+		if(idx < entry.getEndAddr()) return EState.TRYING;
+
 		
+		
+
 		return EState.TRYING;
 	}
 	
@@ -66,7 +86,8 @@ public class ExceptionTable {
 	public void printExceptionTable(){
 		System.out.println( "--- Exception Table ---" );
 		for( ExceptionState es : exceptionTable ){
-			System.out.println( "start='" + String.valueOf(es.getStartAddr()) + "', end='" + String.valueOf(es.getEndAddr()) + "', handler=" + String.valueOf(es.getHandlerAddr()) +"'");
+			System.out.print( "start='" + String.valueOf(es.getStartAddr()) + "', end='" + String.valueOf(es.getEndAddr()) + "', handler=" + String.valueOf(es.getHandlerAddr()) +"'");
+			System.out.println(", STATE='" + (es.getState()==EState.NONE?"NONE":(es.getState()==EState.TRYING?"TRYING":(es.getState()==EState.CATCHING?"CATCHING":"FINALIZING")) ) + "'");
 		}
 		System.out.println( "---" );
 	}
