@@ -78,25 +78,41 @@ public class ExceptionTable {
 		return this.stateTable.get(idx);
 	}
 
+
+	
+	
+	
+	
+	
 	public int getNextHandler( int idx ){
+Analyzer.db("ET idx " + String.valueOf(idx));
 		if( 0 == exceptionTable.size()) return -1;
-		
+
 		int idxHandler=0;
 		for( idxHandler=1; idxHandler < exceptionTable.size(); ++idxHandler){
-			if( idx > exceptionTable.get(idxHandler).getHandlerAddr()){
+			if( idx < exceptionTable.get(idxHandler).getStartAddr()){
 				break;
 			}
 		}
-	
+
 		if(idxHandler == exceptionTable.size()){
+// TODO what to do in this case?
 			return -1; // overrun, ERROR
-		}else{
-			idxHandler--;
 		}
-		return exceptionTable.get(idxHandler).getHandlerAddr();
+		int handlerAddr = exceptionTable.get( idxHandler - 1 ).getHandlerAddr(); 
+		return handlerAddr;
 	}
 
+	
+	
+	
+	
+	
+	
 	public int getOverNextHandler( int idx ){
+// FIXME may fail, since there is no overnext handler
+//Analyzer.db("idx " + String.valueOf(idx));
+
 		if( 0 == exceptionTable.size()) return -1;
 		int idxHandler=0;
 		for( idxHandler=1; idxHandler < exceptionTable.size(); ++idxHandler){
@@ -104,7 +120,10 @@ public class ExceptionTable {
 				break;
 			}
 		}
-	
+
+//Analyzer.db("idxHandler " + String.valueOf(idxHandler));
+//Analyzer.db("exceptionTable.size " + String.valueOf(exceptionTable.size()));
+
 		if(idxHandler == exceptionTable.size()){
 			; // overrun, ERROR
 		}else{
@@ -112,6 +131,7 @@ public class ExceptionTable {
 			idxHandler--;
 		}
 		if( 0 > idxHandler) return -1;
+		
 		return exceptionTable.get(idxHandler).getHandlerAddr(); // if this fails, it is definitely a bug
 	}
 
@@ -132,7 +152,7 @@ public class ExceptionTable {
 		System.out.println( "---" );
 	}
 	
-	private String printer( EState state ){
+	public static String printer( EState state ){
 		switch (state){
 			case NONE: return "NONE";
 			case TRYING: return "TRYING";

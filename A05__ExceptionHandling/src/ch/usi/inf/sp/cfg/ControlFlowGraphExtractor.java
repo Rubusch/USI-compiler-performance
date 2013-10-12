@@ -288,7 +288,7 @@ public class ControlFlowGraphExtractor {
 		exceptionTable.init(method.tryCatchBlocks, instructions); // TODO
 		exceptionTable.initStates(instructions);
 		exceptionTable.printExceptionTable(); // XXX
-		exceptionTable.printStateTable(); // XXX
+//		exceptionTable.printStateTable(); // XXX
 
 // FOR
 		boolean branchNextIteration = false;
@@ -363,9 +363,12 @@ public class ControlFlowGraphExtractor {
 
 					// PEI branching
 //					branching( idx, current.getHandlerAddr(), "label=\"PEI\",style=dotted" );
+Analyzer.db("this idx " + String.valueOf(idx ));
+Analyzer.db("this state " + ExceptionTable.printer( exceptionTable.state(idx) ));
 					branching( idx, exceptionTable.getNextHandler(idx), "label=\"PEI\",style=dotted" );
-					branching( idx, exceptionTable.getOverNextHandler(idx), "label=\"PEI\",style=dotted" );
+Analyzer.die("next handler " + String.valueOf(exceptionTable.getNextHandler(idx) ));
 // TODO branch also to ATHROW block
+//					branching( idx, exceptionTable.getOverNextHandler(idx), "label=\"PEI\",style=dotted" );
 
 //					throwAthrow = idx; // TODO check
 // FIXME throwAthrow == null ?!?
