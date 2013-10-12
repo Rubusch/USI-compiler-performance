@@ -366,7 +366,9 @@ public class ControlFlowGraphExtractor {
 //Analyzer.db( "BBB getNextHandeler("+ String.valueOf(idx) + ") " + String.valueOf(exceptionTable.getNextHandler(idx)));
 //Analyzer.db( "CCC getOverNextHandeler("+String.valueOf(idx)+") " + String.valueOf(exceptionTable.getOverNextHandler(idx)));
 
+System.out.println("A");
 					branching( idx, exceptionTable.getNextHandler(idx), "label=\"PEI\",style=dotted" );
+System.out.println("AA");
 // FIXME check here if finally is available
 					if( exceptionTable.isHavingFinally(idx)){
 						branching( idx, exceptionTable.getOverNextHandler(idx), "label=\"PEI\",style=dotted" );
@@ -391,7 +393,11 @@ public class ControlFlowGraphExtractor {
 // FIXME
 //Analyzer.db( "FINALIZING");
 //Analyzer.db( "EEE getNextHandeler("+ String.valueOf(idx) + ") " + String.valueOf(exceptionTable.getNextHandler(idx)));
+				if( exceptionTable.isHavingFinally(idx)){
+System.out.println("B");
 					branching( idx, exceptionTable.getNextHandler(idx), "label=\"catching to finally\",style=dotted" );
+System.out.println("BB");
+				}
 					// start new block
 					branchNextIteration = true;
 //				} // else try-catch, normal ending
