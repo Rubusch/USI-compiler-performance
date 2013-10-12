@@ -54,16 +54,16 @@ public class ExceptionTable {
 	public void initStates(final InsnList instructions){
 		stateTable.add( EState.NONE );
 		EState state = EState.NONE;
-		for( int idx=0; idx < instructions.size(); ++idx){
-			for( int idxSub = 0; idxSub < exceptionTable.size(); ++idxSub){
-				if(idx == exceptionTable.get(idxSub).getStartAddr()){
+		for( int idxIns=0; idxIns < instructions.size(); ++idxIns){
+			for( int idxETable = 0; idxETable < exceptionTable.size(); ++idxETable){
+				if(idxIns == exceptionTable.get(idxETable).getStartAddr()){
 					state = EState.TRYING;
 					break;
 				}
 			}
 
 			for( int idxSub = 0; idxSub < exceptionTable.size(); ++idxSub){
-				if(idx == exceptionTable.get(idxSub).getHandlerAddr()){
+				if(idxIns == exceptionTable.get(idxSub).getHandlerAddr()){
 					state = exceptionTable.get(idxSub).getState();
 					break;
 				}
@@ -77,7 +77,6 @@ public class ExceptionTable {
 		if(0 == exceptionTable.size()) return EState.NONE;
 		return this.stateTable.get(idx);
 	}
-
 
 	public int getNextHandler( int idx ){
 		if( 0 == exceptionTable.size()) return -1;
@@ -133,6 +132,15 @@ public class ExceptionTable {
 		Analyzer.die("getOverNextHandler() - index overrun for catch and finally, '" + String.valueOf(idx) + "'");
 		return -1;
 	}
+
+
+	public boolean isHandlerAddr(int idx){
+		for( ExceptionState es : exceptionTable){
+			if( idx == es.getHandlerAddr()) return true;
+		}
+		return false;
+	}
+
 
 	public void printStateTable(){
 		System.out.println( "--- State Table ---");

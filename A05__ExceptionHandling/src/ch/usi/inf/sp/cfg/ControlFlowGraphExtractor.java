@@ -107,7 +107,6 @@ public class ControlFlowGraphExtractor {
 				AbstractInsnNode firstIns = this.blocklist.get(listIdx).get(0);
 				int idxFirstIns = this.blocklist.indexOf( firstIns );
 				if( dstidx < idxFirstIns ){
-
 					// we overran one, so the last one is it: go back
 					int start = idxLastFirstIns;
 					int diff = dstidx - start;
@@ -286,7 +285,7 @@ public class ControlFlowGraphExtractor {
 	private void initInstructions(){
 //		ExceptionState current = null;
 //		exceptionTableInit();
-		exceptionTable.init(method.tryCatchBlocks, instructions); // TODO
+		exceptionTable.init(method.tryCatchBlocks, ControlFlowGraphExtractor.instructions); // TODO
 		exceptionTable.initStates(instructions);
 		exceptionTable.printExceptionTable(); // XXX
 //		exceptionTable.printStateTable(); // XXX
@@ -354,7 +353,7 @@ public class ControlFlowGraphExtractor {
 				// ins.getType() == AbstractInsnNode.MULTIANEWARRAY_INSN
 				// ins.getType() == AbstractInsnNode.INT_INSN
 				// check current instruction being escaped
-				if( checkPEI(ins) ){
+				if( isPEI(ins) ){
 //					Analyzer.db("PEI: " + Printer.OPCODES[idx]);
 
 					// fallthrou
@@ -380,7 +379,8 @@ Analyzer.db( "CCC getOverNextHandeler("+String.valueOf(idx)+") " + String.valueO
 				}
 //XXXXXXX
 //			}else if( exceptionTableCheck( EState.CATCHING, current )){
-			}else if( EState.FINALIZING == exceptionTable.state(idx)){
+//			}else if( EState.FINALIZING == exceptionTable.state(idx)){
+			}else if( isHandler(idx)){
 //				if( idx == current.getEndAddr() && current.getEndAddr() == current.getHandlerAddr()){
 					// case try-catch-finally
 //					branching( idx, current.getHandlerAddr(), "label=\"catching to finally\",style=dotted" );
@@ -397,6 +397,7 @@ Analyzer.db( "CCC getOverNextHandeler("+String.valueOf(idx)+") " + String.valueO
 
 // APPEND
 			if( -1 < forwardJump.indexOf( idx ) && blocklist.get( blocklist.size() -1 ).size() > 1 ){
+
 				// there was a forward jump to this address
 				this.blocklist.add( new ArrayList<AbstractInsnNode>() );
 
@@ -424,7 +425,7 @@ Analyzer.db( "CCC getOverNextHandeler("+String.valueOf(idx)+") " + String.valueO
 	}
 
 
-	private boolean checkPEI(final AbstractInsnNode ins){
+	private boolean isPEI(final AbstractInsnNode ins){
 		switch (ins.getOpcode()) {
 		case Opcodes.AALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
 		case Opcodes.AASTORE: // NullPointerException, ArrayIndexOutOfBoundsException, ArrayStoreException
@@ -476,6 +477,10 @@ Analyzer.db( "CCC getOverNextHandeler("+String.valueOf(idx)+") " + String.valueO
 		return false;
 	}
 
+	
+	private boolean isHandler(int idx){
+		return exceptionTable.isHandlerAddr(idx);
+	}
 
 	public void dotPrintCFG(){
 		if( 0 == this.blocklist.size() ) return;
