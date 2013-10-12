@@ -363,10 +363,14 @@ public class ControlFlowGraphExtractor {
 
 					// PEI branching
 //					branching( idx, current.getHandlerAddr(), "label=\"PEI\",style=dotted" );
-Analyzer.db("this idx " + String.valueOf(idx ));
-Analyzer.db("this state " + ExceptionTable.printer( exceptionTable.state(idx) ));
 					branching( idx, exceptionTable.getNextHandler(idx), "label=\"PEI\",style=dotted" );
-Analyzer.die("next handler " + String.valueOf(exceptionTable.getNextHandler(idx) ));
+
+					
+					
+					
+// FIXME					
+Analyzer.die("STOP");
+					
 // TODO branch also to ATHROW block
 //					branching( idx, exceptionTable.getOverNextHandler(idx), "label=\"PEI\",style=dotted" );
 

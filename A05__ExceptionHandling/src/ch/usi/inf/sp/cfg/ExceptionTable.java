@@ -85,7 +85,6 @@ public class ExceptionTable {
 	
 	
 	public int getNextHandler( int idx ){
-Analyzer.db("ET idx " + String.valueOf(idx));
 		if( 0 == exceptionTable.size()) return -1;
 
 		int idxHandler=0;
