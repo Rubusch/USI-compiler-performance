@@ -79,6 +79,8 @@ public class ExceptionTable {
 	}
 
 	public int getNextHandler( int idx ){
+		if( 0 == exceptionTable.size()) return -1;
+		
 		int idxHandler=0;
 		for( idxHandler=1; idxHandler < exceptionTable.size(); ++idxHandler){
 			if( idx > exceptionTable.get(idxHandler).getHandlerAddr()){
@@ -87,7 +89,7 @@ public class ExceptionTable {
 		}
 	
 		if(idxHandler == exceptionTable.size()){
-			; // overrun, ERROR
+			return -1; // overrun, ERROR
 		}else{
 			idxHandler--;
 		}
@@ -95,6 +97,7 @@ public class ExceptionTable {
 	}
 
 	public int getOverNextHandler( int idx ){
+		if( 0 == exceptionTable.size()) return -1;
 		int idxHandler=0;
 		for( idxHandler=1; idxHandler < exceptionTable.size(); ++idxHandler){
 			if( idx > exceptionTable.get(idxHandler).getHandlerAddr()){
@@ -108,6 +111,7 @@ public class ExceptionTable {
 			idxHandler--;
 			idxHandler--;
 		}
+		if( 0 > idxHandler) return -1;
 		return exceptionTable.get(idxHandler).getHandlerAddr(); // if this fails, it is definitely a bug
 	}
 

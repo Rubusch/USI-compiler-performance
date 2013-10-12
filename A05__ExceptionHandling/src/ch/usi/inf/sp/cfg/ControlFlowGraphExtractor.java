@@ -32,8 +32,8 @@ public class ControlFlowGraphExtractor {
 	private List<Integer> forwardJump;
 	private List<String> edgesList; // TODO rename "jumpTable"?
 	private List<Integer> omitFallthruList;
-	private List<ExceptionState> stateTableList;
-	private List<ExceptionState> stateTable;
+//	private List<ExceptionState> stateTableList;
+//	private List<ExceptionState> stateTable;
 	private List<Integer> throwAthrow;
 	
 	private final ExceptionTable exceptionTable	;
@@ -81,12 +81,12 @@ public class ControlFlowGraphExtractor {
 		
 		// exception handling
 		exceptionTable = new ExceptionTable();
-		stateTableList = new ArrayList<ExceptionState>();
+//		stateTableList = new ArrayList<ExceptionState>();
 
 		this.throwAthrow = new ArrayList<Integer>();
 
 // TODO LinkedList?
-		this.stateTable = new ArrayList<ExceptionState>(); 
+//		this.stateTable = new ArrayList<ExceptionState>(); 
 		initInstructions();
 	}
 
@@ -135,7 +135,7 @@ public class ControlFlowGraphExtractor {
 
 
 
-
+/*
 	private void exceptionTableInit(){
 		List<TryCatchBlockNode> trycatchlist = method.tryCatchBlocks;
 		for( TryCatchBlockNode trycatch : trycatchlist){
@@ -147,7 +147,8 @@ public class ControlFlowGraphExtractor {
 			Analyzer.db("EXCEPTION: start =" + String.valueOf(start) + ", end =" + String.valueOf(end) + ", handler =" + String.valueOf(handler));
 		}
 	}
-
+//*/
+/*
 	private void exceptionTableAdd( ExceptionState newElem){
 		// insert ordered
 		int insertAt = 0;
@@ -189,14 +190,15 @@ public class ControlFlowGraphExtractor {
 		}
 		this.stateTable.add(insertAt, newElem);
 	}
-
+//*/
+	
 	private boolean exceptionTableCheck( final EState which, final ExceptionState state){
 		if( null == state ){
 			return false;
 		}
 		return (which == state.getState());
 	}
-
+/*
 	private ExceptionState exceptionTableFetch( int idx, ExceptionState current, List<ExceptionState> statestack ){
 		if( null == current){
 			// check stack
@@ -272,7 +274,7 @@ public class ControlFlowGraphExtractor {
 
 		return current;
 	}
-
+//*/
 
 
 
@@ -281,8 +283,8 @@ public class ControlFlowGraphExtractor {
 
 
 	private void initInstructions(){
-		ExceptionState current = null;
-		exceptionTableInit();
+//		ExceptionState current = null;
+//		exceptionTableInit();
 		exceptionTable.init(method.tryCatchBlocks, instructions); // TODO
 		exceptionTable.initStates(instructions);
 		exceptionTable.printExceptionTable(); // XXX
@@ -300,7 +302,7 @@ public class ControlFlowGraphExtractor {
 				branchNextIteration = false;
 			}
 
-			current = exceptionTableFetch( idx, current, this.stateTable );
+//			current = exceptionTableFetch( idx, current, this.stateTable );
 
 // BRANCHING
 			if( ins.getType() == AbstractInsnNode.JUMP_INSN ){
@@ -341,7 +343,8 @@ public class ControlFlowGraphExtractor {
 				branchNextIteration = true;
 			}
 
-			if( exceptionTableCheck( EState.TRYING, current )){
+//			if( exceptionTableCheck( EState.TRYING, current )){
+			if( EState.TRYING == exceptionTable.state(idx) ){
 				// types of instructions of PEIs are:
 				// ins.getType() == AbstractInsnNode.INSN
 				// ins.getType() == AbstractInsnNode.TYPE_INSN
@@ -359,7 +362,9 @@ public class ControlFlowGraphExtractor {
 					}
 
 					// PEI branching
-					branching( idx, current.getHandlerAddr(), "label=\"PEI\",style=dotted" );
+//					branching( idx, current.getHandlerAddr(), "label=\"PEI\",style=dotted" );
+					branching( idx, exceptionTable.getNextHandler(idx), "label=\"PEI\",style=dotted" );
+					branching( idx, exceptionTable.getOverNextHandler(idx), "label=\"PEI\",style=dotted" );
 // TODO branch also to ATHROW block
 
 //					throwAthrow = idx; // TODO check
@@ -370,15 +375,16 @@ public class ControlFlowGraphExtractor {
 					branchNextIteration = true;
 				}
 //XXXXXXX
-			}else if( exceptionTableCheck( EState.CATCHING, current )){
-				if( idx == current.getEndAddr() && current.getEndAddr() == current.getHandlerAddr()){
+//			}else if( exceptionTableCheck( EState.CATCHING, current )){
+			}else if( EState.FINALIZING == exceptionTable.state(idx)){
+//				if( idx == current.getEndAddr() && current.getEndAddr() == current.getHandlerAddr()){
 					// case try-catch-finally
-					branching( idx, current.getHandlerAddr(), "label=\"catching to finally\",style=dotted" );
-					current.setState(EState.FINALIZING);
-
+//					branching( idx, current.getHandlerAddr(), "label=\"catching to finally\",style=dotted" );
+//					current.setState(EState.FINALIZING);
+					branching( idx, exceptionTable.getNextHandler(idx), "label=\"catching to finally\",style=dotted" );
 					// start new block
 					branchNextIteration = true;
-				} // else try-catch, normal ending
+//				} // else try-catch, normal ending
 			}
 
 // APPEND
@@ -395,9 +401,9 @@ public class ControlFlowGraphExtractor {
 //					branching( idx-1, instructions.size()-2, "label=\"ATHROW\"" );
 					branching( idx-1, instructions.size(), "label=\"ATHROW\"" );
 
-				}else if( exceptionTableCheck( EState.FINALIZING, current )){
+//				}else if( exceptionTableCheck( EState.FINALIZING, current )){
 // TODO it's a mess - re-check
-					current = null;
+//					current = null;
 				}else{
 					// forward pointing block fallthrough
 					branching( idx-1, idx, "label=\"forward fallthrou\"");
