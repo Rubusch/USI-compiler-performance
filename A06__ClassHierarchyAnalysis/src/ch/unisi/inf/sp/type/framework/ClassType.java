@@ -117,7 +117,7 @@ public final class ClassType implements Type {
 	}
 	
 	/**
-	 * Add interfa to the list of this class (or interface's) interfaces
+	 * Add interfaces to the list of this class (or interface's) interfaces
 	 * when you read in the class.
 	 * @param interfa The interface implemented by this class, resp. extended by this interface.
 	 */

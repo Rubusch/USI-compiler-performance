@@ -1,10 +1,12 @@
 package ch.unisi.inf.sp.type.assignment;
 
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.MethodNode;
 
 import ch.unisi.inf.sp.type.framework.ClassAnalyzer;
 import ch.unisi.inf.sp.type.framework.ClassHierarchy;
 import ch.unisi.inf.sp.type.framework.ClassType;
+import ch.unisi.inf.sp.type.framework.Method;
 import ch.unisi.inf.sp.type.framework.TypeInconsistencyException;
 
 
@@ -37,10 +39,25 @@ public final class ClassHierarchyBuilder implements ClassAnalyzer {
 			
 			
 			// TODO extract modifiers, super class, interfaces, methods
-			classType.getModifiers(); // TODO
-			classType.getSuperClass(); // TODO
-			classType.getInterfaces(); // TODO
-			classType.getMethods(); // TODO
+			
+			// modifiers / asm.access
+			classType.setModifiers(clazz.access);
+//			classType.getModifiers(); // TODO
+
+			// super class
+//			classType.setSuperClass(clazz.superName);
+			//classType.getSuperClass(); // TODO
+
+			// interfaces
+//			classType.addInterface();
+			//classType.getInterfaces(); // TODO
+
+			// methods
+			for( MethodNode methodNode : clazz.methods){
+				Method method = new Method(clazz.name, methodNode.name, methodNode.desc, methodNode.access);
+//				classType.addMethod(method);
+			}
+			//classType.getMethods(); // TODO
 			
 			
 			classType.setResolved();
