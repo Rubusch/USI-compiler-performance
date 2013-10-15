@@ -37,7 +37,10 @@ public final class ClassHierarchyBuilder implements ClassAnalyzer {
 			
 			
 			// TODO extract modifiers, super class, interfaces, methods
-
+			classType.getModifiers(); // TODO
+			classType.getSuperClass(); // TODO
+			classType.getInterfaces(); // TODO
+			classType.getMethods(); // TODO
 			
 			
 			classType.setResolved();
