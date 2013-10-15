@@ -11,7 +11,7 @@ import ch.unisi.inf.sp.type.framework.TypeInconsistencyException;
 /**
  * Build a class hierarchy (including methods).
  * 
- * @author ?
+ * @author Lothar Rubusch
  */
 public final class ClassHierarchyBuilder implements ClassAnalyzer {
 

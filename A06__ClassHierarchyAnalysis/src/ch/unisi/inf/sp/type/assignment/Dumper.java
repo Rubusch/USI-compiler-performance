@@ -12,7 +12,7 @@ import ch.unisi.inf.sp.type.framework.Type;
 /**
  * Dump out information about the given ClassHierarchy.
  * 
- * @author ?
+ * @author Lothar Rubusch
  */
 public final class Dumper {
 

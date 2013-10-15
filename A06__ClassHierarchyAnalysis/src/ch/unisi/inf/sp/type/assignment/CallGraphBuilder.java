@@ -17,7 +17,7 @@ import ch.unisi.inf.sp.type.framework.TypeInconsistencyException;
  * Build a call graph (as part of the class hierarchy)
  * consisting of CallSite nodes pointing to Method nodes.
  * 
- * @author ?
+ * @author Lothar Rubusch
  */
 public final class CallGraphBuilder implements ClassAnalyzer {
 

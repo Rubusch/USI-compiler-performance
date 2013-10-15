@@ -9,6 +9,8 @@
 *.s
 *.out
 *.orig
+*.dot
+*.jpg
 
 ## eclipse setup
 bin

@@ -8,7 +8,7 @@ import ch.unisi.inf.sp.type.framework.ArchiveScanner;
 /**
  * Main class.
  * 
- * @author ?
+ * @author Lothar Rubusch
  */
 public final class Main {
 
@@ -37,5 +37,6 @@ public final class Main {
 		// TODO probably change this
 		new Dumper().dumpDot(classHierarchyBuilder.getClassHierarchy(), "graph.dot");
 		
+		System.out.println("READY.");
 	}
 }
