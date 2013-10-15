@@ -36,10 +36,10 @@ public final class CallGraphBuilder implements ClassAnalyzer {
 				final Method method = type.getMethod(methodNode.name, methodNode.desc);
 				final InsnList instructions = methodNode.instructions;
 				for (int i=0; i<instructions.size(); i++) {
-					
+
 					// TODO implement this
 //					new CallSite(opcode, declaredTargetClassName, targetMethodName, targetMethodDescriptor);
-					
+
 				}
 			}
 		} catch (final TypeInconsistencyException ex) {

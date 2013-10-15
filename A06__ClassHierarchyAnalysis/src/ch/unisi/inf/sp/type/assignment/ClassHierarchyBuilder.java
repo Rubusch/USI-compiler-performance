@@ -1,5 +1,7 @@
 package ch.unisi.inf.sp.type.assignment;
 
+import java.util.List;
+
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
@@ -47,16 +49,19 @@ public final class ClassHierarchyBuilder implements ClassAnalyzer {
 			classType.setSuperClass(classHierarchy.getOrCreateClass(clazz.superName));
 
 			// interfaces
-//			classType.addInterface();
-			//classType.getInterfaces(); // TODO
+// TODO checkout interfaces are kind of ClassTypes??
+			List<String> listInterfaces = (List<String>) clazz.interfaces;
+			for( String inf: listInterfaces ){
+				classType.addInterface(classHierarchy.getOrCreateClass(inf));
+			}
 
 			// methods
-			for( MethodNode methodNode : clazz.methods){
+// TODO test, check out getClass().name(), as well
+			List<MethodNode> listMethodNodes = (List<MethodNode>) clazz.methods;
+			for( MethodNode methodNode : listMethodNodes ){
 				Method method = new Method(clazz.name, methodNode.name, methodNode.desc, methodNode.access);
-//				classType.addMethod(method);
+				classType.addMethod(method);
 			}
-			//classType.getMethods(); // TODO
-
 
 			classType.setResolved();
 
