@@ -7,7 +7,6 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.util.Printer;
 
 import ch.unisi.inf.sp.type.framework.CallSite;
 import ch.unisi.inf.sp.type.framework.ClassAnalyzer;
@@ -35,6 +34,7 @@ public final class CallGraphBuilder implements ClassAnalyzer {
 	public void analyze(final String location, final ClassNode classNode) {
 		try {
 			final ClassType type = hierarchy.getOrCreateClass(classNode.name);
+			@SuppressWarnings("unchecked")
 			final List<MethodNode> methodNodes = (List<MethodNode>)classNode.methods;
 			CallSite callSite;
 			for (final MethodNode methodNode : methodNodes) {
@@ -56,6 +56,8 @@ public final class CallGraphBuilder implements ClassAnalyzer {
 // TODO check parameters
 // TODO check if the method functions, actually just return the values set by approaching CallSite (if so, use the ones in comments above)
 						callSite = new CallSite(ins.getOpcode(), method.getDeclaringClassName(), method.getName(), method.getDescriptor());
+
+						// register the method with the callsite
 						method.addCallSite(callSite);
 					}
 				}
