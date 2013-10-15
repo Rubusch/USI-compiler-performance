@@ -42,11 +42,9 @@ public final class ClassHierarchyBuilder implements ClassAnalyzer {
 			
 			// modifiers / asm.access
 			classType.setModifiers(clazz.access);
-//			classType.getModifiers(); // TODO
 
 			// super class
-//			classType.setSuperClass(clazz.superName);
-			//classType.getSuperClass(); // TODO
+			classType.setSuperClass(classHierarchy.getOrCreateClass(clazz.superName));
 
 			// interfaces
 //			classType.addInterface();
@@ -58,9 +56,10 @@ public final class ClassHierarchyBuilder implements ClassAnalyzer {
 //				classType.addMethod(method);
 			}
 			//classType.getMethods(); // TODO
-			
-			
+
+
 			classType.setResolved();
+
 		} catch (final TypeInconsistencyException ex) {
 			System.err.println(ex);
 		}

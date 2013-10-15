@@ -38,7 +38,7 @@ public final class CallGraphBuilder implements ClassAnalyzer {
 				for (int i=0; i<instructions.size(); i++) {
 					
 					// TODO implement this
-					new CallSite(opcode, declaredTargetClassName, targetMethodName, targetMethodDescriptor);
+//					new CallSite(opcode, declaredTargetClassName, targetMethodName, targetMethodDescriptor);
 					
 				}
 			}
