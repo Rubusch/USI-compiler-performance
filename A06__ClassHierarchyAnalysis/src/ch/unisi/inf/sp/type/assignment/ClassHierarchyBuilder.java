@@ -38,10 +38,9 @@ public final class ClassHierarchyBuilder implements ClassAnalyzer {
 				return;
 			}
 			classType.setLocation(location);
-			
-			
-			// TODO extract modifiers, super class, interfaces, methods
-			
+
+			// extract modifiers, super class, interfaces, methods
+
 			// modifiers / asm.access
 			classType.setModifiers(clazz.access);
 
@@ -63,6 +62,10 @@ public final class ClassHierarchyBuilder implements ClassAnalyzer {
 				classType.addMethod(method);
 			}
 
+
+// TODO check if classType needs to be registered somewhere explicitely, or if 
+// the pointer classType registeres automatically by using the getOrCreate... 
+// method
 			classType.setResolved();
 
 		} catch (final TypeInconsistencyException ex) {
