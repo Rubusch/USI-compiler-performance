@@ -41,27 +41,22 @@ public final class CallGraphBuilder implements ClassAnalyzer {
 				final Method method = type.getMethod(methodNode.name, methodNode.desc);
 				final InsnList instructions = methodNode.instructions;
 				for (int i=0; i<instructions.size(); i++) {
+
+					// implementation
 					AbstractInsnNode ins = instructions.get(i);
 					if( ins.getType() == AbstractInsnNode.METHOD_INSN ){
 // TODO register callSite somewhere
-						
-/*
-				// Opcodes: INVOKEVIRTUAL, INVOKESPECIAL, INVOKESTATIC,
-				// INVOKEINTERFACE or INVOKEDYNAMIC.
-				szBlock += Printer.OPCODES[ins.getOpcode()];
-				szBlock += " ";
-				szBlock += ((MethodInsnNode)ins).owner;
-				szBlock += ".";
-				String tmp = ((MethodInsnNode)ins).name;
-				tmp = tmp.replace('<', '(');
-				tmp = tmp.replace('>', ')');
-				szBlock += tmp;
-				szBlock += " ";
-				szBlock += ((MethodInsnNode)ins).desc;
-				break;
-*/
+
+						// Method(final String declaringClassName, final String name, final String descriptor, final int modifiers)
+						// CallSite(final int opcode, final String declaredTargetClassName, final String targetMethodName, final String targetMethodDescriptor) {
+						// by javadoc
+						// declaredTargetClassName  = ((MethodInsnNode)ins).owner
+						// targetMethodName         = ((MethodInsnNode)ins).name
+						// targetMethodDescriptor   = ((MethodInsnNode)ins).desc
 // TODO check parameters
-						callSite = new CallSite(ins.getOpcode(), declaredTargetClassName, targetMethodName, targetMethodDescriptor);
+// TODO check if the method functions, actually just return the values set by approaching CallSite (if so, use the ones in comments above)
+						callSite = new CallSite(ins.getOpcode(), method.getDeclaringClassName(), method.getName(), method.getDescriptor());
+						method.addCallSite(callSite);
 					}
 				}
 			}
