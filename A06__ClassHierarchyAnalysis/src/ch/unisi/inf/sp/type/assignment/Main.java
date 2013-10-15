@@ -17,7 +17,7 @@ public final class Main {
 			System.out.println(arg);
 		}
 		final ArchiveScanner scanner = new ArchiveScanner();
-		
+
 		// phase 1: build inheritance hierarchy
 		final ClassHierarchyBuilder classHierarchyBuilder = new ClassHierarchyBuilder();
 		scanner.addAnalyzer(classHierarchyBuilder);
@@ -34,7 +34,6 @@ public final class Main {
 		}
 		
 		// dump info about structure (e.g. inheritance hierarchy, call graph, statistics, ...)
-		// TODO probably change this
 		new Dumper().dumpDot(classHierarchyBuilder.getClassHierarchy(), "graph.dot");
 		
 		System.out.println("READY.");

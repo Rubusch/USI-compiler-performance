@@ -20,12 +20,19 @@ public final class Dumper {
 		final PrintWriter pw = new PrintWriter(new FileWriter(fileName));
 		pw.println("digraph types {");
 		pw.println("  rankdir=\"BT\"");
+
 		for (final Type type : hierarchy.getTypes()) {
+			pw.println("AAA"); // XXX
+
 			if (type instanceof ClassType) {
 				final ClassType classType = (ClassType)type;
-
-				// TODO implement this
 				
+				System.out.println(classType.getSimpleName() + "->" + classType.getSuperClass().getSimpleName());
+
+
+				// implement this
+				pw.println("CCC"); // XXX
+				// TODO
 			}
 		}
 		pw.println("}");
