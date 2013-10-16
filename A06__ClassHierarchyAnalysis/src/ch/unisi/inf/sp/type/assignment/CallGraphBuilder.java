@@ -77,8 +77,6 @@ public final class CallGraphBuilder implements ClassAnalyzer {
 					}
 				}
 			}
-			System.out.println("total INVOKEVIRTUAL: " + String.valueOf(nINVOKEVIRTUAL));
-			System.out.println("total INVOKEINTERFACE: " + String.valueOf(nINVOKEINTERFACE));
 		} catch (final TypeInconsistencyException ex) {
 			System.err.println(ex);
 		}
