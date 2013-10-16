@@ -2,6 +2,7 @@ package ch.unisi.inf.sp.type.assignment;
 
 import java.util.List;
 
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
@@ -37,6 +38,8 @@ public final class CallGraphBuilder implements ClassAnalyzer {
 			@SuppressWarnings("unchecked")
 			final List<MethodNode> methodNodes = (List<MethodNode>)classNode.methods;
 			CallSite callSite;
+			int nINVOKEVIRTUAL = 0;
+			int nINVOKEINTERFACE = 0;
 			for (final MethodNode methodNode : methodNodes) {
 				final Method method = type.getMethod(methodNode.name, methodNode.desc);
 				final InsnList instructions = methodNode.instructions;
@@ -45,7 +48,14 @@ public final class CallGraphBuilder implements ClassAnalyzer {
 					// implementation
 					AbstractInsnNode ins = instructions.get(i);
 					if( ins.getType() == AbstractInsnNode.METHOD_INSN ){
-// TODO register callSite somewhere
+						switch (ins.getOpcode()){
+							case Opcodes.INVOKEVIRTUAL: nINVOKEVIRTUAL++; break;
+//								System.out.println("INVOKE_VIRTUAL"); break;
+							case Opcodes.INVOKEINTERFACE: nINVOKEINTERFACE++; break;
+//								System.out.println("INVOKE_INTERFACE"); break;
+						}
+					
+					// TODO register callSite somewhere
 
 						// in the source I found the following...
 						//
@@ -67,6 +77,8 @@ public final class CallGraphBuilder implements ClassAnalyzer {
 					}
 				}
 			}
+			System.out.println("total INVOKEVIRTUAL: " + String.valueOf(nINVOKEVIRTUAL));
+			System.out.println("total INVOKEINTERFACE: " + String.valueOf(nINVOKEINTERFACE));
 		} catch (final TypeInconsistencyException ex) {
 			System.err.println(ex);
 		}
