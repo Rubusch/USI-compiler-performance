@@ -20,16 +20,15 @@ import ch.unisi.inf.sp.type.framework.TypeInconsistencyException;
 public final class ClassHierarchyBuilder implements ClassAnalyzer {
 
 	private final ClassHierarchy classHierarchy;
-	
-	
+
 	public ClassHierarchyBuilder() {
 		this.classHierarchy = new ClassHierarchy();
 	}
-	
+
 	public ClassHierarchy getClassHierarchy() {
 		return classHierarchy;
 	}
-	
+
 	public void analyze(final String location, final ClassNode clazz) {
 		try {
 			final ClassType classType = classHierarchy.getOrCreateClass(clazz.name);
@@ -61,7 +60,6 @@ public final class ClassHierarchyBuilder implements ClassAnalyzer {
 				Method method = new Method(clazz.name, methodNode.name, methodNode.desc, methodNode.access);
 				classType.addMethod(method);
 			}
-
 
 // TODO check if classType needs to be registered somewhere explicitely, or if 
 // the pointer classType registeres automatically by using the getOrCreate... 

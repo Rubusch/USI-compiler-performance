@@ -4,6 +4,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import org.objectweb.asm.Opcodes;
+
+import ch.unisi.inf.sp.type.framework.CallSite;
 import ch.unisi.inf.sp.type.framework.ClassHierarchy;
 import ch.unisi.inf.sp.type.framework.ClassType;
 import ch.unisi.inf.sp.type.framework.Method;
@@ -25,13 +28,43 @@ public final class Dumper {
 		pw.println("nodesep=.5");
 		pw.println("node [shape=record,width=.1,height=.1]");
 
+		int nINVOKEVIRTUAL=0;
+		float avgINVOKEVIRTUAL=0;
+		int nINVOKEINTERFACE=0;
+		float avgINVOKEINTERFACE=0;
+
 		for (final Type type : hierarchy.getTypes()) {
 			if (type instanceof ClassType) {
 				final ClassType classType = (ClassType)type;
 
-				System.out.println(classType.getSimpleName());
+				System.out.println("class name: " + classType.getSimpleName());
 				for( Method method : classType.getMethods()) {
-					System.out.println("\t" + method.getName() + ", " + method.getModifiers());
+					int nINVIRT = 0;
+					int nININT = 0;
+
+					for(CallSite callSite : method.getCallSites()){
+						switch (callSite.getOpcode()){
+						case Opcodes.INVOKEVIRTUAL: nINVIRT++; break;
+//							System.out.println("INVOKE_VIRTUAL"); break;
+						case Opcodes.INVOKEINTERFACE: nININT++; break;
+//							System.out.println("INVOKE_INTERFACE"); break;
+						}
+					}
+					System.out.println("\t" + method.getName());
+					System.out.println("\t\tINVOKEVIRTUAL:\t\t" + String.valueOf(nINVIRT));
+					nINVOKEVIRTUAL += nINVIRT;
+					if(avgINVOKEVIRTUAL==0){
+						avgINVOKEVIRTUAL = nINVIRT;
+					}else{
+						avgINVOKEVIRTUAL = (avgINVOKEVIRTUAL + (float)nINVIRT)/2;
+					}
+					System.out.println("\t\tINVOKEINTERFACE:\t" + String.valueOf(nININT));
+					nINVOKEINTERFACE += nININT;
+					if(avgINVOKEINTERFACE == 0){
+						avgINVOKEINTERFACE = nININT;
+					}else{
+						avgINVOKEINTERFACE = (avgINVOKEINTERFACE + (float)nININT)/2;
+					}
 				}
 				
 				
@@ -49,6 +82,9 @@ public final class Dumper {
 		}
 		pw.println("}");
 		pw.close();
+
+		System.out.println("avg INVOKEVIRTUAL: " + avgINVOKEVIRTUAL);
+		System.out.println("avg INVOKEINTERFACE: " + avgINVOKEINTERFACE);
 	}
 
 }
