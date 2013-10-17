@@ -39,7 +39,7 @@ public final class Dumper {
 				final ClassType classType = (ClassType)type;
 				System.out.println("classType: " + classType.getSimpleName());
 				
-				
+// TODO do treelike output
 				int nTmpINVIRT = 0;
 				int nTmpININT = 0;
 				int nTmpCallSites = 0;
