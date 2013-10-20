@@ -57,7 +57,7 @@ public final class Dumper {
 						}
 					}
 
-//					System.out.println( "\t\tCallSites:\t" + String.valueOf(nCallSites));
+					System.out.println( "\t\tCallSites:\t" + String.valueOf(nCallSites));
 				}
 				nCallSites += nTmpCallSites;
 				nINVIRT += nTmpINVIRT;
