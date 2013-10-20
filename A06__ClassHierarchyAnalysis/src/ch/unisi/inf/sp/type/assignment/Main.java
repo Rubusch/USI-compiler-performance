@@ -35,8 +35,13 @@ public final class Main {
 		}
 		
 		// dump info about structure (e.g. inheritance hierarchy, call graph, statistics, ...)
-		new Dumper().dumpDot(classHierarchyBuilder.getClassHierarchy(), "graph.dot");
+		for( final String arg : args){
+			new Dumper().dumpDot(classHierarchyBuilder.getClassHierarchy(), "graph.dot", arg);
+		}
+//		new Dumper().dumpDot(classHierarchyBuilder.getClassHierarchy(), "graph.dot");
 		
 		System.out.println("READY.");
 	}
+	
+	
 }
