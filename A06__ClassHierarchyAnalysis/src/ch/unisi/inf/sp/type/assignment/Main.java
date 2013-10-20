@@ -1,6 +1,8 @@
 package ch.unisi.inf.sp.type.assignment;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import ch.unisi.inf.sp.type.framework.ArchiveScanner;
 
@@ -17,29 +19,36 @@ public final class Main {
 		for (final String arg : args) {
 			System.out.println(arg);
 		}
-		final ArchiveScanner scanner = new ArchiveScanner();
+		System.out.println("---");
 
 		// phase 1: build inheritance hierarchy
-		final ClassHierarchyBuilder classHierarchyBuilder = new ClassHierarchyBuilder();
-		scanner.addAnalyzer(classHierarchyBuilder);
+//		final List<ClassHierarchyBuilder> hierarchyList = new ArrayList<ClassHierarchyBuilder>();
 		for (int i=0; i<args.length; i++) {
+			final ArchiveScanner scanner = new ArchiveScanner();
+			final ClassHierarchyBuilder classHierarchyBuilder = new ClassHierarchyBuilder();
+//			hierarchyList.add(classHierarchyBuilder);
+			scanner.addAnalyzer(classHierarchyBuilder);
 			scanner.scan(args[i]);
-		}
-		scanner.removeAnalyzer(classHierarchyBuilder);
+			scanner.removeAnalyzer(classHierarchyBuilder);
+//		}
 		
 		// phase 2: add call sites and edges
-		final CallGraphBuilder callGraphBuilder = new CallGraphBuilder(classHierarchyBuilder.getClassHierarchy());
-		scanner.addAnalyzer(callGraphBuilder);
-		for (int i=0; i<args.length; i++) {
+//		for (int i=0; i<args.length; i++) {
+
+//			final ClassHierarchyBuilder classHierarchyBuilder = hierarchyList.get(i);
+			final CallGraphBuilder callGraphBuilder = new CallGraphBuilder(classHierarchyBuilder.getClassHierarchy());
+			scanner.addAnalyzer(callGraphBuilder);
+//		for (int i=0; i<args.length; i++) {
 			scanner.scan(args[i]);
-		}
+//		}
 		
 		// dump info about structure (e.g. inheritance hierarchy, call graph, statistics, ...)
-		for( final String arg : args){
-			new Dumper().dumpDot(classHierarchyBuilder.getClassHierarchy(), "graph.dot", arg);
+//		for( int i=0; i<args.length; ++i){
+//			final ClassHierarchyBuilder classHierarchyBuilder = hierarchyList.get(i);
+//		for( final String arg : args){
+			new Dumper().dumpDot(classHierarchyBuilder.getClassHierarchy(), "graph.dot", args[i]);
 		}
-//		new Dumper().dumpDot(classHierarchyBuilder.getClassHierarchy(), "graph.dot");
-		
+
 		System.out.println("READY.");
 	}
 	

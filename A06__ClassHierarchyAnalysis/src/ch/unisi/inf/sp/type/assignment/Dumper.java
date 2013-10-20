@@ -63,16 +63,15 @@ public final class Dumper {
 		pw.println("}");
 		pw.close();
 
-
 		avgINVIRT = getAvg(nINVIRT, nCallSites);
-
 		avgININT = getAvg(nININT, nCallSites);
 
-		System.out.println("---");
 		System.out.println("Benchmark, InvocationType, CallSites, Call by CallSites");
 		System.out.println(jarFileName + ", INVOKE_VIRTUAL, " + String.valueOf(nINVIRT) + ", " + String.valueOf(avgINVIRT) );
-		System.out.println(jarFileName + ", INVOKE_VIRTUAL, " + String.valueOf(nININT) + ", " + String.valueOf(avgININT) );
+		System.out.println(jarFileName + ", INVOKE_INTERFACE, " + String.valueOf(nININT) + ", " + String.valueOf(avgININT) );
 		System.out.println("---");
+		
+		nINVIRT = 0;
 	}
 	
 	private float getAvg( int sum, int divided){
