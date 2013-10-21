@@ -50,28 +50,10 @@ public final class CallGraphBuilder implements ClassAnalyzer {
 					if( ins.getType() == AbstractInsnNode.METHOD_INSN ){
 						switch (ins.getOpcode()){
 							case Opcodes.INVOKEVIRTUAL: nINVOKEVIRTUAL++; break;
-//								System.out.println("INVOKE_VIRTUAL"); break;
 							case Opcodes.INVOKEINTERFACE: nINVOKEINTERFACE++; break;
-//								System.out.println("INVOKE_INTERFACE"); break;
 						}
-					
-					// TODO register callSite somewhere
-
-						// in the source I found the following...
-						//
-						// Method(final String declaringClassName, final String name, final String descriptor, final int modifiers)
-						// CallSite(final int opcode, final String declaredTargetClassName, final String targetMethodName, final String targetMethodDescriptor) {
-						// by javadoc
-						// declaredTargetClassName  = ((MethodInsnNode)ins).owner
-						// targetMethodName         = ((MethodInsnNode)ins).name
-						// targetMethodDescriptor   = ((MethodInsnNode)ins).desc
-// TODO check parameters
-// TODO check if the method functions, actually just return the values set by approaching CallSite (if so, use the ones in comments above)
-/*
-						callSite = new CallSite(ins.getOpcode(), method.getDeclaringClassName(), method.getName(), method.getDescriptor());
-/*/
 						callSite = new CallSite(ins.getOpcode(), ((MethodInsnNode)ins).owner, ((MethodInsnNode)ins).name, ((MethodInsnNode)ins).desc);
-//*/
+
 						// register the method with the callsite
 						method.addCallSite(callSite);
 					}
