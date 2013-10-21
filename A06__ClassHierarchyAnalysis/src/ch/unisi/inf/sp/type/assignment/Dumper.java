@@ -66,10 +66,9 @@ public final class Dumper {
 		avgINVIRT = getAvg(nINVIRT, nCallSites);
 		avgININT = getAvg(nININT, nCallSites);
 
-		System.out.println("Benchmark, InvocationType, CallSites, Call by CallSites");
 		System.out.println(jarFileName + ", INVOKE_VIRTUAL, " + String.valueOf(nINVIRT) + ", " + String.valueOf(avgINVIRT) );
 		System.out.println(jarFileName + ", INVOKE_INTERFACE, " + String.valueOf(nININT) + ", " + String.valueOf(avgININT) );
-		System.out.println("---");
+//		System.out.println("---");
 		
 		nINVIRT = 0;
 	}
