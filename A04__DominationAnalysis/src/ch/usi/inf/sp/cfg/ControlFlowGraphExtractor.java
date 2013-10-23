@@ -56,7 +56,8 @@ public class ControlFlowGraphExtractor {
 	}
 
 // TODO switch targetIDx with idx
-	private void branching( int dstidx, int srcidx ){
+//	private void branching( int dstidx, int srcidx ){
+	private void branching( int srcidx, int dstidx ){
 		branching( srcidx, dstidx, "");
 	}
 
@@ -114,7 +115,8 @@ public class ControlFlowGraphExtractor {
 				}
 				LabelNode target = ((JumpInsnNode) ins).label;
 				int targetIdx = instructions.indexOf(target);
-				branching( targetIdx, idx );
+//				branching( targetIdx, idx );
+				branching( idx, targetIdx );
 
 				// provoke a new basic block
 				branchNextIteration = true;
@@ -125,12 +127,15 @@ public class ControlFlowGraphExtractor {
 				for( int t=0; t<keys.size(); t++ ){
 					final LabelNode targetInstruction = (LabelNode)labels.get(t);
 					final int targetIdx = instructions.indexOf(targetInstruction);
-					branching( targetIdx, idx );
+//					branching( targetIdx, idx );
+					branching( idx, targetIdx );
 				}
 
 				final LabelNode defaultTargetInstruction = ((LookupSwitchInsnNode)ins).dflt;
 				final int targetIdx = instructions.indexOf(defaultTargetInstruction);
-				branching( targetIdx, idx );
+//				branching( targetIdx, idx );
+				branching( idx, targetIdx );
+
 				// create a new basic block
 				branchNextIteration = true;
 			}
