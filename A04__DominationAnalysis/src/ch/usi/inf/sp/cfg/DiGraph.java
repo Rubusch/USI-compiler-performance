@@ -14,6 +14,7 @@ public class DiGraph {
 	public final static int START = -1;
 	public final static int END = -2;
 
+// FIXME
 	public DiGraph(ControlFlowGraphExtractor controlFlow){
 		this.nodelist = new ArrayList<Node>();
 		for( int nodeId = 0; nodeId < controlFlow.getBlocklist().size(); ++nodeId){
@@ -119,7 +120,7 @@ public class DiGraph {
 		}
 	}
 
-
+// FIXME: forEver connected to end, this is wrong!
 	public void dotPrintDA(){
 		Analyzer.echo("# ---");
 		if( 0 == this.nodelist.size() ) return;
@@ -144,6 +145,8 @@ public class DiGraph {
 		for( Edge edge : DAedgelist ){
 			edge.dotPrint();
 		}
+		
+// FIXME: nodeE should be part of the "common" process
 		Analyzer.echo("  node" + String.valueOf(nodelist.size()-1) + " -> nodeE" );
 
 		Analyzer.echo("}");

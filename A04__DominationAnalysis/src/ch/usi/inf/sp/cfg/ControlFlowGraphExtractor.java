@@ -22,14 +22,14 @@ import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.util.Printer;
 
 public class ControlFlowGraphExtractor {
-	private final List< List<AbstractInsnNode>> blocklist;
+	private final List< List<AbstractInsnNode>> blockList;
 	private static InsnList instructions;
 	private final List<Integer> forwardJump;
 	private final List<String> edgesList;
 	private final List<Integer> omitFallthruList;
 
 	public List<List<AbstractInsnNode>> getBlocklist() {
-		return blocklist;
+		return blockList;
 	}
 
 	public List<String> getEdgeslist() {
@@ -53,8 +53,8 @@ public class ControlFlowGraphExtractor {
 	}
 
 	public ControlFlowGraphExtractor( final InsnList instructions ){
-		blocklist = new ArrayList< List<AbstractInsnNode>>();
-		blocklist.add(new ArrayList<AbstractInsnNode>());
+		blockList = new ArrayList< List<AbstractInsnNode>>();
+		blockList.add(new ArrayList<AbstractInsnNode>());
 		ControlFlowGraphExtractor.instructions = instructions;
 		this.forwardJump = new ArrayList<Integer>();
 		this.edgesList = new ArrayList<String>();
@@ -79,33 +79,28 @@ public class ControlFlowGraphExtractor {
 
 	private void branching( int srcidx, int dstidx, String opt ){
 		edgeslistAdd( srcidx, dstidx, opt);
-//		String dotConnection = "";
-//		dotConnection += String.valueOf( srcidx ) + ":" + String.valueOf(dstidx);
-//		this.edgesList.add(dotConnection);
 
 		if( dstidx < srcidx ){
 			// backward jump
 			int idxLastFirstIns = 0;
-			for( int listIdx = 1; listIdx < this.blocklist.size()-1; ++listIdx ){
-				AbstractInsnNode firstIns = this.blocklist.get(listIdx).get(0);
-				int idxFirstIns = this.blocklist.indexOf( firstIns );
+			for( int listIdx = 1; listIdx < this.blockList.size()-1; ++listIdx ){
+				AbstractInsnNode firstIns = this.blockList.get(listIdx).get(0);
+				int idxFirstIns = this.blockList.indexOf( firstIns );
 				if( dstidx < idxFirstIns ){
 					// we ultrapassed one, so the last one is it: go back
 					int start = idxLastFirstIns;
 					int diff = dstidx - start;
 
 					// break sublist, and insert new sublist
-					List<AbstractInsnNode> sublist = this.blocklist.get(listIdx-1).subList( diff, this.blocklist.get(listIdx-1).size());
-					this.blocklist.add( listIdx, new ArrayList<AbstractInsnNode>( sublist ));
+					List<AbstractInsnNode> sublist = this.blockList.get(listIdx-1).subList( diff, this.blockList.get(listIdx-1).size());
+					this.blockList.add( listIdx, new ArrayList<AbstractInsnNode>( sublist ));
 
 					// now remove sublist from old location
-					this.blocklist.get( listIdx-1 ).removeAll( this.blocklist.get( listIdx ) );
+					this.blockList.get( listIdx-1 ).removeAll( this.blockList.get( listIdx ) );
 
 // TODO is this necessary?
 					// fallthrough edge
 					edgeslistAdd( dstidx-1, dstidx, "label=\"???\"");
-//					this.edgesList.add(String.valueOf( dstidx-1 ) + ":" + String.valueOf(dstidx));
-
 					break;
 				}
 				idxLastFirstIns = idxFirstIns;
@@ -126,11 +121,11 @@ public class ControlFlowGraphExtractor {
 
 			// create new block
 			if(true == branchNextIteration){
-				blocklist.add(new ArrayList<AbstractInsnNode>());
+				blockList.add(new ArrayList<AbstractInsnNode>());
 				branchNextIteration = false;
 			}
-//*
-			// BRANCHING
+
+// BRANCHING
 			if( ins.getType() == AbstractInsnNode.JUMP_INSN ){
 				// conditional jumps
 				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
@@ -168,61 +163,23 @@ public class ControlFlowGraphExtractor {
 				// provoke a new basic block
 				branchNextIteration = true;
 			}
-/*/
-			if( ins.getType() == AbstractInsnNode.JUMP_INSN ){
-				String dotConnection = "";
-				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
-					dotConnection += String.valueOf( idx ) + ":" + String.valueOf( idx+1 );
-					this.edgesList.add(dotConnection);
-				}
-				LabelNode target = ((JumpInsnNode) ins).label;
-				int targetIdx = instructions.indexOf(target);
-//				branching( targetIdx, idx );
-				branching( idx, targetIdx );
 
-				// provoke a new basic block
-				branchNextIteration = true;
-
-			}else if( ins.getType() == AbstractInsnNode.LOOKUPSWITCH_INSN){
-				final List<?> keys = ((LookupSwitchInsnNode)ins).keys;
-				final List<?> labels = ((LookupSwitchInsnNode)ins).labels;
-				for( int t=0; t<keys.size(); t++ ){
-					final LabelNode targetInstruction = (LabelNode)labels.get(t);
-					final int targetIdx = instructions.indexOf(targetInstruction);
-//					branching( targetIdx, idx );
-					branching( idx, targetIdx );
-				}
-
-				final LabelNode defaultTargetInstruction = ((LookupSwitchInsnNode)ins).dflt;
-				final int targetIdx = instructions.indexOf(defaultTargetInstruction);
-//				branching( targetIdx, idx );
-				branching( idx, targetIdx );
-
-				// create a new basic block
-				branchNextIteration = true;
-			}
-//*/
 // APPEND
-			if( -1 < forwardJump.indexOf( idx ) && blocklist.get( blocklist.size() -1 ).size() > 1 ){
+			if( -1 < forwardJump.indexOf( idx ) && blockList.get( blockList.size() -1 ).size() > 1 ){
 
 				// there was a forward jump to this address
-				blocklist.add( new ArrayList<AbstractInsnNode>() );
-//*
+				blockList.add( new ArrayList<AbstractInsnNode>() );
+
 				// forward pointing block fallthrough
 				branching( idx-1, idx, "label=\"forward fallthrou\"");
-/*/
-				// fallthrough edge
-// TODO are there instructions that cannot fall through here? check!
-				this.edgesList.add(String.valueOf( idx-1 ) + ":" + String.valueOf(idx));
-//*/
 			}
 			// append instruction at last position
-			blocklist.get( blocklist.size()-1 ).add( ins );
+			blockList.get( blockList.size()-1 ).add( ins );
 		}
 	}
 
 	public void dotPrintCFG(){
-		if( 0 == this.blocklist.size() ) return;
+		if( 0 == this.blockList.size() ) return;
 
 		// header
 		Analyzer.echo( "digraph G {" );
@@ -233,10 +190,10 @@ public class ControlFlowGraphExtractor {
 		Analyzer.echo( "  nodeS [label = \"{ <S> start }\"];" );
 		Analyzer.echo( "  nodeE [label = \"{ <E> end }\"];" );
 
-		for( int idx=0; idx < this.blocklist.size(); ++idx){
-			System.out.print( dotPrintBlock( idx, blocklist.get(idx)) );
+		for( int idx=0; idx < this.blockList.size(); ++idx){
+			System.out.print( dotPrintBlock( idx, blockList.get(idx)) );
 		}
-//*
+
 		// connections
 		Analyzer.echo("  nodeS:S -> node0:0");
 		for( int idx = 0; idx < this.edgesList.size(); ++idx ){
@@ -245,32 +202,10 @@ public class ControlFlowGraphExtractor {
 
 		// trailer
 // TODO back from RETURN, here just the forelast instruction
-		Analyzer.echo("  node" + String.valueOf(blocklist.size()-1)
+		Analyzer.echo("  node" + String.valueOf(blockList.size()-1)
 				+ ":" + String.valueOf(instructions.size()-2)
 				+ " -> nodeE:E");
 		Analyzer.echo("}");
-/*/
-		// connections
-		Analyzer.echo( "  nodeS:S -> node0:0" );
-
-		for( int idx = 0; idx < this.edgesList.size(); ++idx ){
-			String str = this.edgesList.get(idx);
-			int idxSrc = Integer.valueOf( str.split(":")[0] ).intValue();
-			int idxNodeSrc = insId2NodeId( idxSrc );
-			int idxDst = Integer.valueOf( str.split(":")[1] ).intValue();
-			int idxNodeDst = insId2NodeId( idxDst );
-
-			Analyzer.echo( "  node" +  idxNodeSrc +":" + idxSrc + " -> node" + idxNodeDst + ":" + idxDst );
-		}
-
-		// trailer
-// TODO back from RETURN, here just the forelast instruction
-		Analyzer.echo("  node" + String.valueOf(blocklist.size()-1)
-				+ ":" + String.valueOf(instructions.size()-2)
-				+ " -> nodeE:E" );
-
-		Analyzer.echo("}");
-//*/
 	}
 
 	private String dotEdges( int idx ){
@@ -462,8 +397,8 @@ public class ControlFlowGraphExtractor {
 
 	public int insId2NodeId( int insId ){
 		int nodeId = 1;
-		for( ; nodeId < blocklist.size(); ++nodeId ){
-			if( instructions.indexOf( blocklist.get( nodeId ).get(0) ) > insId){
+		for( ; nodeId < blockList.size(); ++nodeId ){
+			if( instructions.indexOf( blockList.get( nodeId ).get(0) ) > insId){
 				break;
 			}
 		}
