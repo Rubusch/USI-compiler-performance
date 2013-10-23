@@ -6,13 +6,13 @@ import java.util.List;
 import org.objectweb.asm.tree.AbstractInsnNode;
 
 public class Node {
-	private ArrayList<AbstractInsnNode> blockinstructions;
+	private final List<AbstractInsnNode> blockinstructions;
 	private final Integer Id; // TODO how to identify this node
 // TODO why is idom a Integer, and not a Node?
 	private Integer idom; // immediate dominator
-	private List<List<Integer>> inheritage;
+	private final List<List<Integer>> inheritage;
 
-	public Node( ArrayList<AbstractInsnNode> blockinstructions, final Integer startId){
+	public Node( List<AbstractInsnNode> blockinstructions, final Integer startId){
 		this.blockinstructions = blockinstructions;
 		this.Id = startId;
 		this.inheritage = new ArrayList<List<Integer>>();

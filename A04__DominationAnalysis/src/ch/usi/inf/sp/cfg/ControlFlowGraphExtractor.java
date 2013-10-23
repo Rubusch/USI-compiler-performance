@@ -22,13 +22,13 @@ import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.util.Printer;
 
 public class ControlFlowGraphExtractor {
-	private ArrayList< ArrayList<AbstractInsnNode>> blocklist;
+	private final List< List<AbstractInsnNode>> blocklist;
 	private static InsnList instructions;
-	private ArrayList<Integer> forwardJump;
-	private List<String> edgesList;
-	private ArrayList<Integer> omitFallthruList;
+	private final List<Integer> forwardJump;
+	private final List<String> edgesList;
+	private final List<Integer> omitFallthruList;
 
-	public ArrayList<ArrayList<AbstractInsnNode>> getBlocklist() {
+	public List<List<AbstractInsnNode>> getBlocklist() {
 		return blocklist;
 	}
 
@@ -53,7 +53,7 @@ public class ControlFlowGraphExtractor {
 	}
 
 	public ControlFlowGraphExtractor( final InsnList instructions ){
-		blocklist = new ArrayList< ArrayList<AbstractInsnNode>>();
+		blocklist = new ArrayList< List<AbstractInsnNode>>();
 		blocklist.add(new ArrayList<AbstractInsnNode>());
 		this.instructions = instructions;
 		this.forwardJump = new ArrayList<Integer>();
@@ -215,7 +215,7 @@ public class ControlFlowGraphExtractor {
 		System.out.println("}");
 	}
 
-	public static String dotPrintBlock( int blockId, ArrayList<AbstractInsnNode> blockinstructions ){
+	public static String dotPrintBlock( int blockId, List<AbstractInsnNode> blockinstructions ){
 		String szBlock = "";
 		szBlock += "  node" + blockId;
 		szBlock += " [label = \"block" + blockId + " | { <";

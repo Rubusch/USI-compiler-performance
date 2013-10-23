@@ -289,7 +289,6 @@ public class ControlFlowGraphExtractor {
 		return false;
 	}
 
-	
 	private boolean isHandler(int idx){
 		return exceptionTable.isHandlerAddr(idx);
 	}
