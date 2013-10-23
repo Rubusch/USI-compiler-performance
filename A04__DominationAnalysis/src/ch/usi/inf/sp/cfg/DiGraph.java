@@ -87,7 +87,7 @@ public class DiGraph {
 				// only one parent
 				Node parent = edges.get(0).getFromNode();
 				if( 0 == parent.getInheritage().size()){
-					System.out.println( "FATAL - only 1 parent, but inheritage is empty");
+					Analyzer.echo( "FATAL - only 1 parent, but inheritage is empty");
 				}
 				currCFG.inheritageInit( parent.getInheritage() );
 
@@ -97,14 +97,7 @@ public class DiGraph {
 				for( Edge edge : edges ){
 					parents.add(edge.getFromNode());
 				}
-//*
 				currCFG.inheritageMerge(parents);
-/*/
-				if( false == currCFG.inheritageMerge(parents) ){
-// TODO parse this node later again
-					passedIds.remove(passedIds.indexOf(currCFG.id()));
-				}
-//*/
 			}
 		}
 
@@ -128,31 +121,31 @@ public class DiGraph {
 
 
 	public void dotPrintDA(){
-		System.out.println("# ---");
+		Analyzer.echo("# ---");
 		if( 0 == this.nodelist.size() ) return;
 
 		// header
-		System.out.println( "digraph G {" );
-		System.out.println( "  nodesep=.5" );
-		System.out.println( "  node [shape=record,width=.1,height=.1]" );
+		Analyzer.echo( "digraph G {" );
+		Analyzer.echo( "  nodesep=.5" );
+		Analyzer.echo( "  node [shape=record,width=.1,height=.1]" );
 
 		// nodes
-		System.out.println( "  nodeS [label = \"start\"];" );
-		System.out.println( "  nodeE [label = \"end\"];" );
+		Analyzer.echo( "  nodeS [label = \"start\"];" );
+		Analyzer.echo( "  nodeE [label = \"end\"];" );
 		for( Node node : nodelist ){
 			node.dotPrint();
 // TODO another label?
-//			System.out.println("  node" + node.id() + "[ label = \""+ node.id() + "\"];");
+//			Analyzer.echo("  node" + node.id() + "[ label = \""+ node.id() + "\"];");
 		}
 
 		// edges
-		System.out.println( "  nodeS -> node0" );
+		Analyzer.echo( "  nodeS -> node0" );
 //		for( Edge edge : CFGedgelist ){
 		for( Edge edge : DAedgelist ){
 			edge.dotPrint();
 		}
-		System.out.println("  node" + String.valueOf(nodelist.size()-1) + " -> nodeE" );
+		Analyzer.echo("  node" + String.valueOf(nodelist.size()-1) + " -> nodeE" );
 
-		System.out.println("}");
+		Analyzer.echo("}");
 	}
 }
