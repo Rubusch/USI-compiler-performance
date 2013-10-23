@@ -25,7 +25,7 @@ public class Node {
 	public void inheritageInit( List<List<Integer>> inheritage){
 
 		if( null == inheritage ){
-			System.out.println("FATAL - inheritage was null");
+			Analyzer.echo("FATAL - inheritage was null");
 			return;
 		}
 		// add list as separate new initialized lists (does addAll copy thoroughly enough??)
@@ -37,13 +37,13 @@ public class Node {
 		}
 
 		if( 0 == this.inheritage.size() ){
-			System.out.println( "FATAL - inhertiage was empty");
+			Analyzer.echo( "FATAL - inhertiage was empty");
 			return;
 		}
 
 		List<Integer> inherit = this.inheritage.get(0);
 		if( 0 == inherit.size()){
-			System.out.println( "FATAL - first list in inheritage was empty");
+			Analyzer.echo( "FATAL - first list in inheritage was empty");
 			return;
 		}
 		Integer latestId = inherit.get( inherit.size()-1 );
@@ -67,7 +67,7 @@ public class Node {
 
 		// find dominator (reset dominator)
 		identifyDominator( parents );
-//System.out.println( "XXX result idom = " + this.idom); // XXX
+//Analyzer.echo( "XXX result idom = " + this.idom); // XXX
 	}
 
 	public Integer getIDom(){
@@ -97,7 +97,7 @@ public class Node {
 
 		
 		if( 2 > parents.size() ){
-			System.out.println("FATAL - compare at least 2 nodes, passed were " + parents.size());
+			Analyzer.echo("FATAL - compare at least 2 nodes, passed were " + parents.size());
 		}
 
 		// list of parents, each parent lists severan "inheritages", each is a list of Integers
@@ -134,7 +134,7 @@ public class Node {
 							this.idom = inherit.get(pos -1);
 						}else{
 							// list was empty - an ERROR
-							System.out.println( "FIXME: a node had just one inherit list, which was empty");
+							Analyzer.echo( "FIXME: a node had just one inherit list, which was empty");
 						}
 					return;
 					}else{
@@ -165,7 +165,7 @@ public class Node {
 								this.idom = inherit.get(pos -1);
 							}else{
 								// list was empty - an ERROR
-								System.out.println( "FIXME: a node had just one inherit list, which was empty");
+								Analyzer.echo( "FIXME: a node had just one inherit list, which was empty");
 							}
 							return;
 						}else{
@@ -183,9 +183,9 @@ public class Node {
 	public void dotPrint(){
 // TODO check, another label?
 //*
-		System.out.println( "  node" + Id + " [label = \"block" + Id + "\"]");
+		Analyzer.echo( "  node" + Id + " [label = \"block" + Id + "\"]");
 /*/
-		System.out.println( ControlFlowGraphExtractor.dotPrintBlock(Id, blockinstructions));
+		Analyzer.echo( ControlFlowGraphExtractor.dotPrintBlock(Id, blockinstructions));
 //*/
 	}
 
