@@ -129,7 +129,46 @@ public class ControlFlowGraphExtractor {
 				blocklist.add(new ArrayList<AbstractInsnNode>());
 				branchNextIteration = false;
 			}
+//*
+			// BRANCHING
+			if( ins.getType() == AbstractInsnNode.JUMP_INSN ){
+				// conditional jumps
+				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
+					edgeslistAdd( idx, idx+1, "label=\"TRUE\"");
+				}
 
+				LabelNode target = ((JumpInsnNode) ins).label;
+				int targetIdx = instructions.indexOf(target);
+
+				// GOTO instructions
+				if( Opcodes.GOTO == ins.getOpcode()){
+					branching( idx, targetIdx, "label=\"GOTO\"" );
+				}else{
+					branching( idx, targetIdx, "label=\"FALSE\"" );
+				}
+
+				// provoke a new basic block
+				branchNextIteration = true;
+
+			}else if( ins.getType() == AbstractInsnNode.LOOKUPSWITCH_INSN){
+				// switch / case
+				final List<?> keys = ((LookupSwitchInsnNode)ins).keys;
+				final List<?> labels = ((LookupSwitchInsnNode)ins).labels;
+				for( int t=0; t<keys.size(); t++ ){
+					final LabelNode targetInstruction = (LabelNode)labels.get(t);
+					final int targetIdx = instructions.indexOf(targetInstruction);
+					branching( idx, targetIdx );
+				}
+
+				final LabelNode defaultTargetInstruction = ((LookupSwitchInsnNode)ins).dflt;
+				final int targetIdx = instructions.indexOf(defaultTargetInstruction);
+
+				branching( idx, targetIdx );
+
+				// provoke a new basic block
+				branchNextIteration = true;
+			}
+/*/
 			if( ins.getType() == AbstractInsnNode.JUMP_INSN ){
 				String dotConnection = "";
 				if( !this.omitFallthruList.contains( ins.getOpcode() ) ){
@@ -162,42 +201,58 @@ public class ControlFlowGraphExtractor {
 				// create a new basic block
 				branchNextIteration = true;
 			}
+//*/
+// APPEND
+			if( -1 < forwardJump.indexOf( idx ) && blocklist.get( blocklist.size() -1 ).size() > 1 ){
 
-			// append
-			if( -1 < this.forwardJump.indexOf( idx ) && this.blocklist.get( this.blocklist.size() -1 ).size() > 1 ){
 				// there was a forward jump to this address
-				this.blocklist.add( new ArrayList<AbstractInsnNode>() );
+				blocklist.add( new ArrayList<AbstractInsnNode>() );
+//*
+				// forward pointing block fallthrough
+				branching( idx-1, idx, "label=\"forward fallthrou\"");
+/*/
 				// fallthrough edge
 // TODO are there instructions that cannot fall through here? check!
 				this.edgesList.add(String.valueOf( idx-1 ) + ":" + String.valueOf(idx));
+//*/
 			}
-
 			// append instruction at last position
 			blocklist.get( blocklist.size()-1 ).add( ins );
 		}
 	}
 
 	public void dotPrintCFG(){
-		System.out.println("# ---");
 		if( 0 == this.blocklist.size() ) return;
 
 		// header
-		System.out.println( "digraph G {" );
-		System.out.println( "  nodesep=.5" );
-		System.out.println( "  node [shape=record,width=.1,height=.1]" );
-		System.out.println( "" );
+		Analyzer.echo( "digraph G {" );
+		Analyzer.echo( "  nodesep=.5" );
+		Analyzer.echo( "  node [shape=record,width=.1,height=.1]" );
 
 		// start node
-		System.out.println( "  nodeS [label = \"{ <S> start }\"];" );
-		System.out.println( "  nodeE [label = \"{ <E> end }\"];" );
-		System.out.println( "" );
+		Analyzer.echo( "  nodeS [label = \"{ <S> start }\"];" );
+		Analyzer.echo( "  nodeE [label = \"{ <E> end }\"];" );
 
 		for( int idx=0; idx < this.blocklist.size(); ++idx){
 			System.out.print( dotPrintBlock( idx, blocklist.get(idx)) );
 		}
 
+//*
 		// connections
-		System.out.println( "  nodeS:S -> node0:0" );
+		Analyzer.echo("  nodeS:S -> node0:0");
+		for( int idx = 0; idx < this.edgesList.size(); ++idx ){
+			Analyzer.echo(dotEdges( idx ));
+		}
+
+		// trailer
+// TODO back from RETURN, here just the forelast instruction
+		Analyzer.echo("  node" + String.valueOf(blocklist.size()-1)
+				+ ":" + String.valueOf(instructions.size()-2)
+				+ " -> nodeE:E");
+		Analyzer.echo("}");
+/*/
+		// connections
+		Analyzer.echo( "  nodeS:S -> node0:0" );
 
 		for( int idx = 0; idx < this.edgesList.size(); ++idx ){
 			String str = this.edgesList.get(idx);
@@ -206,16 +261,17 @@ public class ControlFlowGraphExtractor {
 			int idxDst = Integer.valueOf( str.split(":")[1] ).intValue();
 			int idxNodeDst = insId2NodeId( idxDst );
 
-			System.out.println( "  node" +  idxNodeSrc +":" + idxSrc + " -> node" + idxNodeDst + ":" + idxDst );
+			Analyzer.echo( "  node" +  idxNodeSrc +":" + idxSrc + " -> node" + idxNodeDst + ":" + idxDst );
 		}
 
 		// trailer
 // TODO back from RETURN, here just the forelast instruction
-		System.out.println("  node" + String.valueOf(blocklist.size()-1)
+		Analyzer.echo("  node" + String.valueOf(blocklist.size()-1)
 				+ ":" + String.valueOf(instructions.size()-2)
 				+ " -> nodeE:E" );
 
-		System.out.println("}");
+		Analyzer.echo("}");
+//*/
 	}
 
 	public static String dotPrintBlock( int blockId, List<AbstractInsnNode> blockinstructions ){

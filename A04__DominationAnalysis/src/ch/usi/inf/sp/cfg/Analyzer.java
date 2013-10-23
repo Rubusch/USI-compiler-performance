@@ -18,8 +18,17 @@ public class Analyzer {
 		System.exit(-1);
 	}
 
+	public static void echo( String msg ){
+		System.out.println( msg );
+	}
+
+	public static void db( String msg){
+		echo( "# DEBUG: '" + msg + "'");
+	}
+
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		String classFileName = "";
+// TODO arguments
 		try{
 			classFileName = args[0];
 		}catch( Exception exp ){
@@ -40,7 +49,7 @@ public class Analyzer {
 			// no specific method provided, do all methods
 			control.flow( cnode );			
 		}
-		System.out.println( "\n# READY.");
+		echo( "\n# READY.");
 	}
 
 	private void flow( ClassNode cnode, String methodNameAndDescriptor ){
@@ -66,7 +75,7 @@ public class Analyzer {
 	 * @param method
 	 */
 	private void flowMethod( final MethodNode method ){
-		System.out.println("\n# " + method.name);
+		echo("\n# " + method.name + "()");
 		final InsnList instructions = method.instructions;
 		ControlFlowGraphExtractor controlFlow = new ControlFlowGraphExtractor( instructions );
 /*
@@ -75,5 +84,6 @@ public class Analyzer {
 		DiGraph dominator = new DiGraph(controlFlow);
 		dominator.dotPrintDA();
 //*/
+		echo("# ---");
 	}
 }
