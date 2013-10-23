@@ -55,7 +55,7 @@ public class ControlFlowGraphExtractor {
 	public ControlFlowGraphExtractor( final InsnList instructions ){
 		blocklist = new ArrayList< List<AbstractInsnNode>>();
 		blocklist.add(new ArrayList<AbstractInsnNode>());
-		this.instructions = instructions;
+		ControlFlowGraphExtractor.instructions = instructions;
 		this.forwardJump = new ArrayList<Integer>();
 		this.edgesList = new ArrayList<String>();
 		this.omitFallthruList = new ArrayList<Integer>();
@@ -117,9 +117,12 @@ public class ControlFlowGraphExtractor {
 	}
 
 	private void initInstructions(){
+
+// FOR
 		boolean branchNextIteration = false;
-		for( int idx = 0; idx < this.instructions.size(); ++idx ){
-			AbstractInsnNode ins = this.instructions.get(idx);
+		for( int idx = 0; idx < ControlFlowGraphExtractor.instructions.size(); ++idx ){
+			// get next INSTRUCTION
+			AbstractInsnNode ins = ControlFlowGraphExtractor.instructions.get(idx);
 
 			// create new block
 			if(true == branchNextIteration){
