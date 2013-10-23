@@ -112,7 +112,6 @@ public class ControlFlowGraphExtractor {
 				}
 				idxLastFirstIns = idxFirstIns;
 			}
-
 		}else if( dstidx > srcidx){
 			// forward jump
 			this.forwardJump.add(new Integer(dstidx));
