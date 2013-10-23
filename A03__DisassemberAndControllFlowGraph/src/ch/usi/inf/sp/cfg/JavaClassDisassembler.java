@@ -193,7 +193,7 @@ public final class JavaClassDisassembler {
 		case AbstractInsnNode.IINC_INSN:
 			// Opcodes: IINC.
 			System.out.print(((IincInsnNode)instruction).var);
-			System.out.println(" ");
+			System.out.print(" ");
 			System.out.print(((IincInsnNode)instruction).incr);
 			break;
 		case AbstractInsnNode.TYPE_INSN:
