@@ -25,15 +25,31 @@ public class ControlFlowGraphExtractor {
 	private ArrayList< ArrayList<AbstractInsnNode>> blocklist;
 	private static InsnList instructions;
 	private ArrayList<Integer> forwardJump;
-	private ArrayList<String> edgeslist;
+	private List<String> edgeslist;
 	private ArrayList<Integer> omitFallthruList;
 
 	public ArrayList<ArrayList<AbstractInsnNode>> getBlocklist() {
 		return blocklist;
 	}
 
-	public ArrayList<String> getEdgeslist() {
+	public List<String> getEdgeslist() {
 		return edgeslist;
+	}
+
+	private void edgeslistAdd(int srcidx, int dstidx){
+		edgeslistAdd( srcidx, dstidx, "");
+	}
+
+	private void edgeslistAdd(int srcidx, int dstidx, String opt){
+		String str = String.valueOf( srcidx );
+		if( instructions.size() == dstidx){
+			// until end
+			str += ":E";
+		}else{
+			str += ":" + String.valueOf( dstidx );
+		}
+		if( 0 < opt.length() ){ str += ":" + opt; }
+		this.edgesList.add(str);
 	}
 
 	public ControlFlowGraphExtractor( final InsnList instructions ){
