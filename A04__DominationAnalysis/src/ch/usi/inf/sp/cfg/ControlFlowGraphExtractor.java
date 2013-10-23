@@ -55,21 +55,26 @@ public class ControlFlowGraphExtractor {
 		initInstructions();
 	}
 
-	private void branching( int targetIdx, int idx ){
+// TODO switch targetIDx with idx
+	private void branching( int dstidx, int srcidx ){
+		branching( srcidx, dstidx, "");
+	}
+
+	private void branching( int srcidx, int dstidx, String opt ){
 		String dotConnection = "";
-		dotConnection += String.valueOf( idx ) + ":" + String.valueOf(targetIdx);
+		dotConnection += String.valueOf( srcidx ) + ":" + String.valueOf(dstidx);
 		this.edgeslist.add(dotConnection);
 
-		if( targetIdx < idx ){
+		if( dstidx < srcidx ){
 			// backward jump
 			int idxLastFirstIns = 0;
 			for( int listIdx = 1; listIdx < this.blocklist.size()-1; ++listIdx ){
 				AbstractInsnNode firstIns = this.blocklist.get(listIdx).get(0);
 				int idxFirstIns = this.blocklist.indexOf( firstIns );
-				if( targetIdx < idxFirstIns ){
+				if( dstidx < idxFirstIns ){
 					// we ultrapassed one, so the last one is it: go back
 					int start = idxLastFirstIns;
-					int diff = targetIdx - start;
+					int diff = dstidx - start;
 					// break sublist, and insert new sublist
 					List<AbstractInsnNode> sublist = this.blocklist.get(listIdx-1).subList( diff, this.blocklist.get(listIdx-1).size());
 					this.blocklist.add( listIdx, new ArrayList<AbstractInsnNode>( sublist ));
@@ -78,15 +83,15 @@ public class ControlFlowGraphExtractor {
 
 // TODO is this necessary?
 					// fallthrough edge
-					this.edgeslist.add(String.valueOf( targetIdx-1 ) + ":" + String.valueOf(targetIdx));
+					this.edgeslist.add(String.valueOf( dstidx-1 ) + ":" + String.valueOf(dstidx));
 
 					break;
 				}
 				idxLastFirstIns = idxFirstIns;
 			}
-		}else if( targetIdx > idx){
+		}else if( dstidx > srcidx){
 			// forward jump
-			this.forwardJump.add(new Integer(targetIdx));
+			this.forwardJump.add(new Integer(dstidx));
 		} // no else: jump to next element
 	}
 
