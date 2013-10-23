@@ -236,7 +236,6 @@ public class ControlFlowGraphExtractor {
 		for( int idx=0; idx < this.blocklist.size(); ++idx){
 			System.out.print( dotPrintBlock( idx, blocklist.get(idx)) );
 		}
-
 //*
 		// connections
 		Analyzer.echo("  nodeS:S -> node0:0");
@@ -274,6 +273,25 @@ public class ControlFlowGraphExtractor {
 //*/
 	}
 
+	private String dotEdges( int idx ){
+		String[] szbuf = this.edgesList.get(idx).split(":");
+		int idxSrc = Integer.valueOf( szbuf[0] ).intValue();
+		int idxNodeSrc = insId2NodeId( idxSrc );
+		String str = "  node" +  idxNodeSrc +":" + idxSrc;
+		try{
+			int idxDst = Integer.valueOf( szbuf[1] ).intValue();
+			int idxNodeDst = insId2NodeId( idxDst );
+			str += " -> node" + idxNodeDst + ":" + idxDst;
+		}catch(NumberFormatException exp){
+			str += " -> nodeE:E";
+		}
+		if( 2 < szbuf.length ){
+			str += "[ " + szbuf[2] + " ]";
+		}
+		return str;
+	}
+
+
 	public static String dotPrintBlock( int blockId, List<AbstractInsnNode> blockinstructions ){
 		String szBlock = "";
 		szBlock += "  node" + blockId;
@@ -310,7 +328,7 @@ public class ControlFlowGraphExtractor {
 				// FRETURN, DRETURN, ARETURN, RETURN, ARRAYLENGTH, ATHROW,
 				// MONITORENTER, or MONITOREXIT.
 				// zero operands, nothing to print
-				szBlock += Printer.OPCODES[ins.getOpcode()];//			if( -1 < opcode){
+				szBlock += Printer.OPCODES[ins.getOpcode()];
 				break;
 			case AbstractInsnNode.INT_INSN:
 				// Opcodes: NEWARRAY, BIPUSH, SIPUSH.
@@ -434,10 +452,10 @@ public class ControlFlowGraphExtractor {
 			}// end
 
 			if(jdx < blockinstructions.size() -1 ){
-				szBlock += " | <";
+				szBlock += "\\l | <";
 			}
 		}
-		szBlock += " }\"];\n";
+		szBlock += "\\l }\"];\n";
 
 		return szBlock;
 	}
