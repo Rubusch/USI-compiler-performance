@@ -69,7 +69,7 @@ public class DiGraph {
 
 /******************************************************************************/
 		// CFG prepared
-		NodeWrapper currCFG = getNodeById(CFGBlockList, START);
+		NodeWrapper currNode = getNodeById(CFGBlockList, START);
 
 		List<Integer> passedIds = new ArrayList<Integer>();
 		Stack<Edge> stack = new Stack<Edge>();
@@ -79,51 +79,56 @@ public class DiGraph {
 		List<Integer> inheritageElement = new ArrayList<Integer>();
 		inheritageElement.add(START);
 		inheritageList.add(inheritageElement);
-		currCFG.inheritageInit(inheritageList);
+		currNode.inheritageInit(inheritageList);
 
 		// longtime memory
-		passedIds.add(currCFG.id());
+		passedIds.add(currNode.id());
 
 		while( true ){
 			if( stack.isEmpty()){
 				// stack is empty, go discover next tier
-				for( Edge nextEdge : CFGEdgeList){
-					if( currCFG.id() == nextEdge.getFromNode().id() ){
-						if( -1 == passedIds.indexOf(nextEdge.getToNode().id())){
-							stack.push(nextEdge);
+				for( Edge probeEdge : CFGEdgeList){
+					if( currNode.id() == probeEdge.getFromNode().id() ){
+						// next node points to current node
+						if( -1 == passedIds.indexOf(probeEdge.getToNode().id())){
+							// this node is unknown, store for later
+							stack.push(probeEdge);
 						}
 					}
 				}
 
 				if( stack.isEmpty()){
-					// we're done when the stack still can't be filled anymore
+					// we're done when the stack can't be filled anymore
 					break;
 				}
 				continue;
 			}
 
-			// stack was NOT empty, candidate was ok
-			Edge followEdge = stack.pop();
-			currCFG = followEdge.getToNode();
-			passedIds.add( currCFG.id() );
+			// stack was NOT empty, fetch first candidate...
+			Edge nextEdge = stack.pop();
+			currNode = nextEdge.getToNode();
+			passedIds.add( currNode.id() );
 
-			// find all edges ending at the current block (linking down, but not linking upward, to avoid loop issues)
+			// set up a list of all edges pointing at the current node (linking down, but not linking upward, to avoid loop issues)
 			List<Edge> edges = new ArrayList<Edge>();
 			for( Edge edge: CFGEdgeList){
-				if( currCFG.id() == edge.getToNode().id()){
+				if( currNode.id() == edge.getToNode().id()){
 					edges.add(edge);
 				}
 			}
 
 			// set heritage to the children
-			final List<NodeWrapper> parents = new ArrayList<NodeWrapper>();
+			// set up another list of the sources (nodes) of those edges, pointing to current
+			final List<NodeWrapper> parentNodeList = new ArrayList<NodeWrapper>();
 			for( Edge edge : edges ){
-				parents.add(edge.getFromNode());
+				parentNodeList.add(edge.getFromNode());
 			}
-			if( 1 == parents.size()){
-				currCFG.inheritageInit( parents.get(0).getInheritage() );
+			if( 1 == parentNodeList.size()){
+				// pass heritage from a signle node
+				currNode.inheritageInit( parentNodeList.get(0).getInheritage() );
 			}else{
-				currCFG.inheritageMerge(parents);
+				// merge heritage from several parents together
+				currNode.inheritageMerge(parentNodeList);
 			}
 		}
 
