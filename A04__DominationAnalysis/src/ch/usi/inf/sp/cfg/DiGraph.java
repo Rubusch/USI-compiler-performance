@@ -40,6 +40,7 @@ public class DiGraph {
 		// populate CFGEdgelist
 		this.CFGEdgeList = new ArrayList<Edge>();
 		for( String szEdge : controlFlow.getEdgeslist() ){
+			Analyzer.db("XXX controlFlow element '" + szEdge + "'" ); // TODO rm
 
 			int srcId = controlFlow.insId2NodeId( Integer.valueOf( szEdge.split(":")[0]).intValue() );
 			if( 0 > srcId ){
@@ -51,11 +52,16 @@ public class DiGraph {
 				dstId = END;
 			}
 
+			// stupid check
+			if( srcId == dstId) continue;
+
 			NodeWrapper srcNode;
 			srcNode = getNodeById( CFGBlockList, srcId);
 
 			NodeWrapper dstNode;
 			dstNode = getNodeById( CFGBlockList, dstId );
+
+			Analyzer.db("initCFGEdgeList( srcNode " + String.valueOf(srcId) + ", dstNode " + String.valueOf(dstId) + ")"); // TODO rm
 
 			CFGEdgeList.add(new Edge( srcNode, dstNode));
 		}
@@ -88,11 +94,13 @@ public class DiGraph {
 			if( stack.isEmpty()){
 				// stack is empty, go discover next tier
 				for( Edge probeEdge : CFGEdgeList){
-					if( currNode.id() == probeEdge.getFromNode().id() ){
-						// next node points to current node
-						if( -1 == passedIds.indexOf(probeEdge.getToNode().id())){
-							// this node is unknown, store for later
-							stack.push(probeEdge);
+					if( null != probeEdge.getFromNode()){
+						if( currNode.id() == probeEdge.getFromNode().id() ){
+							// next node points to current node
+							if( -1 == passedIds.indexOf(probeEdge.getToNode().id())){
+								// this node is unknown, store for later
+								stack.push(probeEdge);
+							}
 						}
 					}
 				}
@@ -112,8 +120,10 @@ public class DiGraph {
 			// set up a list of all edges pointing at the current node (linking down, but not linking upward, to avoid loop issues)
 			List<Edge> edges = new ArrayList<Edge>();
 			for( Edge edge: CFGEdgeList){
-				if( currNode.id() == edge.getToNode().id()){
-					edges.add(edge);
+				if( null != edge.getToNode()){
+					if( currNode.id() == edge.getToNode().id()){
+						edges.add(edge);
+					}
 				}
 			}
 
