@@ -41,25 +41,9 @@ public class ControlFlowGraphExtractor {
 	}
 
 	private void edgeslistAdd(int srcidx, int dstidx, String opt){
-//		Analyzer.db("srcidx: '" + srcidx + "', dstidx: '" + dstidx + "', opt: '" + opt + "'"); // XXX
-// TODO in case do something for start, e.g. 0 > srcidx
 		String str = String.valueOf( srcidx );
-// TODO last instruction -> end is wrong
-/*
-		if(0 > dstidx){
-			str += ":E";
-/* / TODO rm
-		if( instructions.size() == dstidx){
-			// until end
-			str += ":E";
-//*/
-//		}else{
-			str += ":" + String.valueOf( dstidx );
-//		}
-
+		str += ":" + String.valueOf( dstidx );
 		if( 0 < opt.length() ){ str += ":" + opt; }
-
-		Analyzer.db("str: '" + str + "'"); // XXX
 		edgesList.add(str);
 	}
 
@@ -222,7 +206,18 @@ public class ControlFlowGraphExtractor {
 		Analyzer.echo( "  nodeS [label = \"{ <S> start }\"];" );
 		Analyzer.echo( "  nodeE [label = \"{ <E> end }\"];" );
 
-		for( int idx=0; idx < this.blockList.size(); ++idx){
+		// block nodes
+		int lastidx = blockList.size() -1;
+		if( 1 == blockList.get(lastidx).size()){
+			// final block consists of a single element
+			List<AbstractInsnNode> finalblock = blockList.get(lastidx);
+			if( finalblock.get(0).getType()== AbstractInsnNode.LABEL){
+				// this single element was just a label, so remove it
+				// in case this was an infinite loop w/o return
+				blockList.remove(lastidx);
+			}
+		}
+		for( int idx=0; idx < blockList.size(); ++idx){
 			System.out.print( dotPrintBlock( idx, blockList.get(idx)) );
 		}
 
@@ -231,14 +226,6 @@ public class ControlFlowGraphExtractor {
 		for( int idx = 0; idx < this.edgesList.size(); ++idx ){
 			Analyzer.echo(dotEdges( idx ));
 		}
-
-		/*
-		// trailer
-// TODO back from RETURN, here just the forelast instruction
-		Analyzer.echo("  node" + String.valueOf(blockList.size()-1)
-				+ ":" + String.valueOf(instructions.size()-2)
-				+ " -> nodeE:E");
-//*/
 
 		Analyzer.echo("}");
 	}
