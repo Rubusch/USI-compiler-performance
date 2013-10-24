@@ -9,16 +9,25 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 public class DiGraph {
 	private List<NodeWrapper> CFGBlockList;
 	private List<Edge> CFGEdgeList;
-	private final List<Edge> DAedgelist;
+	private final List<Edge> DAedgeList;
 
 	public final static int START = -1;
 	public final static int END = -2;
 
 
+	private NodeWrapper getNodeById( List<NodeWrapper> list, int id ){
+		for( NodeWrapper node : list ){
+			if( node.id() == id) return node;
+		}
+		return null;
+	}
+
+
 	private void initCFGBlockList( ControlFlowGraphExtractor controlFlow){
+		// populate CFGBlockList
 		this.CFGBlockList = new ArrayList<NodeWrapper>();
 		for( int nodeId = 0; nodeId < controlFlow.getBlocklist().size(); ++nodeId){
-//			Analyzer.db("AAA initCFGBlockList.add( new '" + String.valueOf(nodeId) + "'"); // TODO rm
+//			Analyzer.db("AAA initCFGBlockList.add( new '" + String.valueOf(nodeId) + "')"); // TODO rm
 			CFGBlockList.add(new NodeWrapper( nodeId ));
 		}
 
@@ -28,27 +37,17 @@ public class DiGraph {
 	}
 
 	private void initCFGEdgeList( ControlFlowGraphExtractor controlFlow){
+		// populate CFGEdgelist
 		this.CFGEdgeList = new ArrayList<Edge>();
 		for( String szEdge : controlFlow.getEdgeslist() ){
-			// populate CFGedgelist
 			int srcId = controlFlow.insId2NodeId( Integer.valueOf( szEdge.split(":")[0]).intValue() );
 			int dstId = controlFlow.insId2NodeId( Integer.valueOf( szEdge.split(":")[1]).intValue() );
 
 			NodeWrapper srcNode;
-			if( 0 > srcId ){
-				srcNode = new NodeWrapper(START);
-			}else{
-				srcNode = CFGBlockList.get(srcId);
-			}
+			srcNode = getNodeById( CFGBlockList, srcId);
 
 			NodeWrapper dstNode;
-//			Analyzer.db("DiGraph::createCFGEdgeList() - dstId " + String.valueOf(dstId)); // TODO rm
-			if( 0 > dstId ){
-//				Analyzer.db("XXX create edge for END XXX"); // TODO rm
-				dstNode = new NodeWrapper(END);
-			}else{
-				dstNode = CFGBlockList.get(dstId);
-			}
+			dstNode = getNodeById( CFGBlockList, dstId );
 
 			CFGEdgeList.add(new Edge( srcNode, dstNode));
 		}
@@ -58,48 +57,11 @@ public class DiGraph {
 // FIXME user END 
 	public DiGraph(ControlFlowGraphExtractor controlFlow){
 		initCFGBlockList( controlFlow );
-/*
-		this.CFGBlockList = new ArrayList<NodeWrapper>();
-		for( int nodeId = 0; nodeId < controlFlow.getBlocklist().size(); ++nodeId){
-//			nodelist.add(new NodeWrapper( controlFlow.getBlocklist().get(nodeId), nodeId)); // TODO rm
-			CFGBlockList.add(new NodeWrapper( nodeId ));
-		}
-//*/
-
 		initCFGEdgeList( controlFlow );
-/*
-		this.CFGedgeList = new ArrayList<Edge>();
-		for( String szEdge : controlFlow.getEdgeslist() ){
-			// populate CFGedgelist
-			int srcId = controlFlow.insId2NodeId( Integer.valueOf( szEdge.split(":")[0]).intValue() );
-			int dstId = controlFlow.insId2NodeId( Integer.valueOf( szEdge.split(":")[1]).intValue() );
-//			CFGedgelist.add(new Edge( nodelist.get(srcId), nodelist.get( dstId ))); // TODO rm
-
-			NodeWrapper srcNode;
-			if( 0 > srcId ){
-				srcNode = new NodeWrapper(START);
-			}else{
-				srcNode = nodeList.get(srcId);
-			}
-
-			NodeWrapper dstNode;
-			Analyzer.db("DiGraph::createCFGEdgeList() - dstId " + String.valueOf(dstId)); // TODO rm
-			if( 0 > dstId ){
-				Analyzer.db("XXX create edge for END XXX"); // TODO rm
-				dstNode = new NodeWrapper(END);
-			}else{
-				dstNode = nodeList.get(dstId);
-			}
-
-//			CFGedgelist.add(new Edge( nodelist.get(srcId), nodelist.get( dstId ))); // TODO rm
-			CFGedgeList.add(new Edge( srcNode, dstNode));
-		}
-//*/		
 
 /******************************************************************************/
 		// CFG prepared
-		NodeWrapper currCFG = new NodeWrapper(START); // TODO check this as start point
-//		NodeWrapper currCFG = CFGBlockList.get(0); // TODO orig
+		NodeWrapper currCFG = getNodeById(CFGBlockList, START);
 
 		List<Integer> passedIds = new ArrayList<Integer>();
 		Stack<Edge> stack = new Stack<Edge>();
@@ -196,7 +158,7 @@ public class DiGraph {
 
 /******************************************************************************/
 		// map CFG to DA
-		this.DAedgelist = new ArrayList<Edge>();
+		this.DAedgeList = new ArrayList<Edge>();
 
 		Analyzer.db("XXX size of CFGBlockList " + String.valueOf(CFGBlockList.size())); // TODO rm
 
@@ -222,7 +184,7 @@ public class DiGraph {
 				idom = CFGBlockList.get(idxidom);
 			}
 // FIXME
-			DAedgelist.add( new Edge(idom, currDA) );
+			DAedgeList.add( new Edge(idom, currDA) );
 		}
 	}
 
@@ -251,7 +213,7 @@ public class DiGraph {
 		// edges
 		Analyzer.echo( "  nodeS -> node0" ); // TODO replace by automatic detection
 //		for( Edge edge : CFGedgelist ){
-		for( Edge edge : DAedgelist ){
+		for( Edge edge : DAedgeList ){
 			edge.dotPrint();
 		}
 		

@@ -431,7 +431,7 @@ public class ControlFlowGraphExtractor {
 	}
 
 	public int insId2NodeId( int insId ){
-		Analyzer.db("insId2NodeId( insId=" + insId + ")"); // XXX
+//		Analyzer.db("insId2NodeId( insId=" + insId + ")"); // TODO rm
 		if( 0 > insId ){ return insId; }
 
 		int nodeId = 1;
