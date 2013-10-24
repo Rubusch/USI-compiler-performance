@@ -136,20 +136,19 @@ public class DiGraph {
 		// map CFG to DA
 		this.DAedgeList = new ArrayList<Edge>();
 
-		Analyzer.db("XXX size of CFGBlockList " + String.valueOf(CFGBlockList.size())); // TODO rm
+//		Analyzer.db("YYY size of CFGBlockList " + String.valueOf(CFGBlockList.size())); // TODO rm
 
 		for( int blockId = CFGBlockList.size()-1; blockId > 0; --blockId){
-			Analyzer.db("YYY blockId '" + String.valueOf(blockId) + "'"); // TODO rm
-			
+//			Analyzer.db("YYY blockId '" + String.valueOf(blockId) + "'"); // TODO rm
+
 			// find all edges ending at current (and no upward linking, to avoid loop issues)
 			NodeWrapper currDA = CFGBlockList.get(blockId);
 
-			Analyzer.db("YYY mapping CFG to DA: currDA.id() " + String.valueOf(currDA.id()) ); // TODO rm
+//			Analyzer.db("YYY mapping CFG to DA: currDA.id() " + String.valueOf(currDA.id()) ); // TODO rm
 
-//			DAedgelist.add( new Edge( nodelist.get( current.getIDom().intValue()), current )); // XXX -1
 			Integer idxidom = currDA.getIDom();
 			
-			Analyzer.db("YYY idxidom '" + String.valueOf(idxidom) + "'"); // TODO rm
+//			Analyzer.db("YYY idxidom '" + String.valueOf(idxidom) + "'"); // TODO rm
 			final NodeWrapper idom;
 			if( START == idxidom){
 //				idom = new NodeWrapper(null, START); // TODO rm
@@ -160,7 +159,9 @@ public class DiGraph {
 				idom = CFGBlockList.get(idxidom);
 			}
 // FIXME
-			DAedgeList.add( new Edge(idom, currDA) );
+			if(idom.id() != currDA.id()){
+				DAedgeList.add( new Edge(idom, currDA) ); // idom may be currDA?!!
+			}
 		}
 	}
 

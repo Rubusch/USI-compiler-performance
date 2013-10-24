@@ -12,6 +12,10 @@ public class Edge {
 	}
 */
 	public Edge( NodeWrapper fromNode, NodeWrapper toNode){
+		if( fromNode.id() == toNode.id() ){
+			// this check should not be necessary
+			return;
+		}
 		Analyzer.db("Edge( fromNode=" + fromNode.id() + ", toNode=" + toNode.id() + ")"); // XXX
 		this.fromNode = fromNode;
 		this.toNode = toNode;
@@ -27,7 +31,7 @@ public class Edge {
 	}
 
 	public void dotPrint(){
-		Analyzer.db("Edge::dotPrint() - fromNode.id() " + String.valueOf(fromNode.id()) + ", toNode.id() " + String.valueOf(toNode.id())); // TODO rm
+//		Analyzer.db("Edge::dotPrint() - fromNode.id() " + String.valueOf(fromNode.id()) + ", toNode.id() " + String.valueOf(toNode.id())); // TODO rm
 		final String srcNode;
 		if( DiGraph.START == fromNode.id() ){
 			srcNode = "nodeS";

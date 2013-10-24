@@ -12,8 +12,6 @@ public class NodeWrapper {
 	private Integer idom; // immediate dominator
 	private final List<List<Integer>> inheritage;
 
-//	public NodeWrapper( List<AbstractInsnNode> blockinstructions, final Integer startId){
-//		this.blockinstructions = blockinstructions;
 	public NodeWrapper( final Integer startId){
 		Analyzer.db("NodeWrapper( startId=" + startId + ")"); // XXX
 		this.Id = startId;
@@ -39,6 +37,7 @@ public class NodeWrapper {
 		}
 
 		if( 0 == this.inheritage.size() ){
+// TODO this may be valid for START
 			Analyzer.echo( "FATAL - inhertiage was empty");
 			return;
 		}
@@ -69,7 +68,6 @@ public class NodeWrapper {
 
 		// find dominator (reset dominator)
 		identifyDominator( parents );
-//Analyzer.echo( "XXX result idom = " + this.idom); // XXX
 	}
 
 	public Integer getIDom(){
@@ -184,11 +182,13 @@ public class NodeWrapper {
 
 	public void dotPrint(){
 // TODO check, another label?
-//*
-		Analyzer.echo( "  node" + Id + " [label = \"block" + Id + "\"]");
-/*/
-		Analyzer.echo( ControlFlowGraphExtractor.dotPrintBlock(Id, blockinstructions));
-//*/
+		if( DiGraph.START == Id ){
+			Analyzer.echo( "  nodeS [label = \"blockS\"]");
+		}else if( DiGraph.END == Id){
+			Analyzer.echo( "  nodeE [label = \"blockE\"]");
+		}else{
+			Analyzer.echo( "  node" + Id + " [label = \"block" + Id + "\"]");
+		}
 	}
 
 	public Integer id(){
