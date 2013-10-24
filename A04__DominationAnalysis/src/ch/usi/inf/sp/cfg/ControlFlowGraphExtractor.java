@@ -93,7 +93,7 @@ public class ControlFlowGraphExtractor {
 
 // TODO is this necessary?
 					// fallthrough edge
-					edgeslistAdd( srcidx-1, dstidx, "label=\"???\"");
+					edgeslistAdd( srcidx-1, dstidx, "label=\"flashback\"");
 					break;
 				}
 				idxLastFirstIns = idxFirstIns;
@@ -184,7 +184,7 @@ public class ControlFlowGraphExtractor {
 				blockList.add( new ArrayList<AbstractInsnNode>() );
 
 				// forward pointing block fallthrough
-				branching( idx-1, idx, "label=\"forward fallthrou\"");
+				branching( idx-1, idx, "label=\"fallthrou\"");
 			}
 			// append instruction at last position
 			blockList.get( blockList.size()-1 ).add( ins );
@@ -260,14 +260,24 @@ public class ControlFlowGraphExtractor {
 	}
 
 
-	public static String dotPrintBlock( int blockId, List<AbstractInsnNode> blockinstructions ){						
+	public static String dotPrintBlock( int blockId, List<AbstractInsnNode> blockinstructions ){
 		String szBlock = "";
 		szBlock += "  node" + blockId;
-		szBlock += " [label = \"block" + blockId + " | { <";
+//		szBlock += " [label = \"block" + blockId + " | { <";
+		szBlock += " [align=left,label=\"block" + blockId + " | { <";
+		int startAddr = instructions.indexOf( blockinstructions.get(0) );
+
 		for( int jdx=0; jdx < blockinstructions.size(); ++jdx){
 			AbstractInsnNode ins = blockinstructions.get(jdx);
 			int opcode = ins.getOpcode();
-			szBlock +=  instructions.indexOf( ins ) + "> ";
+			String addr = String.valueOf(startAddr + jdx);
+			szBlock += addr + "> " + addr + ": ";
+
+
+//			AbstractInsnNode ins = blockinstructions.get(jdx);
+//			int opcode = ins.getOpcode();
+//			szBlock +=  instructions.indexOf( ins ) + "> ";
+
 			switch(ins.getType()){
 			case AbstractInsnNode.LABEL: 
 				// pseudo-instruction (branch or exception target)
