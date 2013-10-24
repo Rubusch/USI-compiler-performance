@@ -65,8 +65,8 @@ public class DiGraph {
 
 		List<Integer> rememberedIds = new ArrayList<Integer>();
 		Stack<Edge> stack = new Stack<Edge>();
-		boolean isFirstRun = true;
 
+		// init inheritage list with START
 		List<List<Integer>> inheritageList = new ArrayList<List<Integer>>();
 		List<Integer> inheritageElement = new ArrayList<Integer>();
 		inheritageElement.add(START);
@@ -77,35 +77,27 @@ public class DiGraph {
 		rememberedIds.add(currCFG.id());
 
 		while( true ){
-//			else{ // TODO no else necessary, before has "continue"?!
-				if( stack.isEmpty()){
-					// stack is empty discover next tier
-					for( Edge peekEdge : CFGEdgeList){
-						if( currCFG.id() == peekEdge.getFromNode().id() ){
-							if( -1 == rememberedIds.indexOf(peekEdge.getToNode().id())){
-								stack.push(peekEdge);
-							}
-//							else{ // TODO not necessary?!
-//								continue; // TODO not necessary?!
-//							}
+			if( stack.isEmpty()){
+				// stack is empty discover next tier
+				for( Edge peekEdge : CFGEdgeList){
+					if( currCFG.id() == peekEdge.getFromNode().id() ){
+						if( -1 == rememberedIds.indexOf(peekEdge.getToNode().id())){
+							stack.push(peekEdge);
 						}
 					}
-
-					if( stack.isEmpty()){
-						// we're done when the stack still can't be filled anymore
-						break;
-					}
-					continue;
 				}
-//				else{ // TODO is this 'else' necessary?
 
-					// stack was NOT empty, candidate was ok
-					Edge followEdge = stack.pop();
-					currCFG = followEdge.getToNode();
-					rememberedIds.add( currCFG.id() );
+				if( stack.isEmpty()){
+					// we're done when the stack still can't be filled anymore
+					break;
+				}
+				continue;
+			}
 
-//				} // TODO refac
-//			} // TODO refac
+			// stack was NOT empty, candidate was ok
+			Edge followEdge = stack.pop();
+			currCFG = followEdge.getToNode();
+			rememberedIds.add( currCFG.id() );
 
 			// find all edges ending at the current block (linking down, but not linking upward, to avoid loop issues)
 			List<Edge> edges = new ArrayList<Edge>();
