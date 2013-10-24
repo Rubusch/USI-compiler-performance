@@ -7,24 +7,63 @@ import java.util.Stack;
 import org.objectweb.asm.tree.AbstractInsnNode;
 
 public class DiGraph {
-	private final List<NodeWrapper> nodeList;
-	private final List<Edge> CFGedgeList;
+	private List<NodeWrapper> CFGBlockList;
+	private List<Edge> CFGEdgeList;
 	private final List<Edge> DAedgelist;
 
 	public final static int START = -1;
 	public final static int END = -2;
 
 
+	private void initCFGBlockList( ControlFlowGraphExtractor controlFlow){
+		this.CFGBlockList = new ArrayList<NodeWrapper>();
+		for( int nodeId = 0; nodeId < controlFlow.getBlocklist().size(); ++nodeId){
+//			nodelist.add(new NodeWrapper( controlFlow.getBlocklist().get(nodeId), nodeId)); // TODO rm
+			CFGBlockList.add(new NodeWrapper( nodeId ));
+		}
+	}
+
+	private void initCFGEdgeList( ControlFlowGraphExtractor controlFlow){
+		this.CFGEdgeList = new ArrayList<Edge>();
+		for( String szEdge : controlFlow.getEdgeslist() ){
+			// populate CFGedgelist
+			int srcId = controlFlow.insId2NodeId( Integer.valueOf( szEdge.split(":")[0]).intValue() );
+			int dstId = controlFlow.insId2NodeId( Integer.valueOf( szEdge.split(":")[1]).intValue() );
+
+			NodeWrapper srcNode;
+			if( 0 > srcId ){
+				srcNode = new NodeWrapper(START);
+			}else{
+				srcNode = CFGBlockList.get(srcId);
+			}
+
+			NodeWrapper dstNode;
+			Analyzer.db("DiGraph::createCFGEdgeList() - dstId " + String.valueOf(dstId)); // TODO rm
+			if( 0 > dstId ){
+				Analyzer.db("XXX create edge for END XXX"); // TODO rm
+				dstNode = new NodeWrapper(END);
+			}else{
+				dstNode = CFGBlockList.get(dstId);
+			}
+
+			CFGEdgeList.add(new Edge( srcNode, dstNode));
+		}
+	}
+	
 
 // FIXME user END 
 	public DiGraph(ControlFlowGraphExtractor controlFlow){
-
-		this.nodeList = new ArrayList<NodeWrapper>();
+		initCFGBlockList( controlFlow );
+/*
+		this.CFGBlockList = new ArrayList<NodeWrapper>();
 		for( int nodeId = 0; nodeId < controlFlow.getBlocklist().size(); ++nodeId){
 //			nodelist.add(new NodeWrapper( controlFlow.getBlocklist().get(nodeId), nodeId)); // TODO rm
-			nodeList.add(new NodeWrapper( nodeId ));
+			CFGBlockList.add(new NodeWrapper( nodeId ));
 		}
+//*/
 
+		initCFGEdgeList( controlFlow );
+/*
 		this.CFGedgeList = new ArrayList<Edge>();
 		for( String szEdge : controlFlow.getEdgeslist() ){
 			// populate CFGedgelist
@@ -51,10 +90,11 @@ public class DiGraph {
 //			CFGedgelist.add(new Edge( nodelist.get(srcId), nodelist.get( dstId ))); // TODO rm
 			CFGedgeList.add(new Edge( srcNode, dstNode));
 		}
+//*/		
 
 /******************************************************************************/
 		// CFG prepared
-		NodeWrapper currCFG = nodeList.get(0); // TODO rn "root"??
+		NodeWrapper currCFG = CFGBlockList.get(0); // TODO rn "root"??
 		List<Integer> passedIds = new ArrayList<Integer>();
 		Stack<Edge> stack = new Stack<Edge>();
 //		int blockId = 0;
@@ -82,7 +122,7 @@ public class DiGraph {
 //			else{ // TODO no else necessary, before has "continue"?!
 				if( stack.isEmpty()){
 					// stack is empty discover next tier
-					for( Edge peekEdge : CFGedgeList){
+					for( Edge peekEdge : CFGEdgeList){
 						if( currCFG.id() == peekEdge.getFromNode().id() ){
 							if( -1 == passedIds.indexOf(peekEdge.getToNode().id())){
 								stack.push(peekEdge);
@@ -111,7 +151,7 @@ public class DiGraph {
 
 			// find all edges ending directed to current (but not upward linking, to avoid loop issues)
 			List<Edge> edges = new ArrayList<Edge>();
-			for( Edge edge: CFGedgeList){
+			for( Edge edge: CFGEdgeList){
 				if( currCFG.id() == edge.getToNode().id()){
 					edges.add(edge);
 				}
@@ -139,9 +179,9 @@ public class DiGraph {
 /******************************************************************************/
 		// map CFG to DA
 		this.DAedgelist = new ArrayList<Edge>();
-		for( int blockId = nodeList.size()-1; blockId > 0; --blockId){
+		for( int blockId = CFGBlockList.size()-1; blockId > 0; --blockId){
 			// find all edges ending at current (and no upward linking, to avoid loop issues)
-			NodeWrapper currDA = nodeList.get(blockId);
+			NodeWrapper currDA = CFGBlockList.get(blockId);
 //			DAedgelist.add( new Edge( nodelist.get( current.getIDom().intValue()), current )); // XXX -1
 			Integer idxidom = currDA.getIDom();
 			final NodeWrapper idom;
@@ -149,7 +189,7 @@ public class DiGraph {
 //				idom = new NodeWrapper(null, START); // TODO rm
 				idom = new NodeWrapper(START);
 			}else{
-				idom = nodeList.get(idxidom);
+				idom = CFGBlockList.get(idxidom);
 			}
 			DAedgelist.add( new Edge(idom, currDA) );
 		}
@@ -158,7 +198,7 @@ public class DiGraph {
 // FIXME: forEver connected to end, this is wrong!
 	public void dotPrintDA(){
 		Analyzer.echo("# ---");
-		if( 0 == this.nodeList.size() ) return;
+		if( 0 == this.CFGBlockList.size() ) return;
 
 		// header
 		Analyzer.echo( "digraph G {" );
@@ -168,7 +208,7 @@ public class DiGraph {
 		// nodes
 		Analyzer.echo( "  nodeS [label = \"start\"];" );
 		Analyzer.echo( "  nodeE [label = \"end\"];" );
-		for( NodeWrapper node : nodeList ){
+		for( NodeWrapper node : CFGBlockList ){
 			node.dotPrint();
 // TODO another label?
 //			Analyzer.echo("  node" + node.id() + "[ label = \""+ node.id() + "\"];");
