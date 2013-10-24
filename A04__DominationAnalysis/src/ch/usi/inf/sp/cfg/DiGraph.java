@@ -26,7 +26,28 @@ public class DiGraph {
 	private void initCFGBlockList( ControlFlowGraphExtractor controlFlow){
 		// populate CFGBlockList
 		this.CFGBlockList = new ArrayList<NodeWrapper>();
-		for( int nodeId = 0; nodeId < controlFlow.getBlocklist().size(); ++nodeId){
+		
+		// check if last element is just a label-trailer
+		List<List<AbstractInsnNode>> blockList = new ArrayList<List<AbstractInsnNode>>();
+//		for( List<AbstractInsnNode> block : controlFlow.getBlocklist()){
+		int lastBlockIdx = controlFlow.getBlocklist().size()-1;
+		for( int blockIdx=0; blockIdx < controlFlow.getBlocklist().size(); ++blockIdx){
+			List<AbstractInsnNode> block = controlFlow.getBlocklist().get(blockIdx);
+			if( blockIdx == lastBlockIdx ){
+				// very last block
+				if( 1 == block.size() ){
+					// ...only has one element
+					if( block.get(0).getType()== AbstractInsnNode.LABEL){
+						// ...and it is just a lable, then don't add, we're done
+						break;
+					}
+				}
+			}
+			blockList.add(new ArrayList<AbstractInsnNode>(block));
+		}
+
+//		for( int nodeId = 0; nodeId < controlFlow.getBlocklist().size(); ++nodeId){
+		for( int nodeId = 0; nodeId < blockList.size(); ++nodeId){
 //			Analyzer.db("AAA initCFGBlockList.add( new '" + String.valueOf(nodeId) + "')"); // TODO rm
 			CFGBlockList.add(new NodeWrapper( nodeId ));
 		}
@@ -40,17 +61,23 @@ public class DiGraph {
 		// populate CFGEdgelist
 		this.CFGEdgeList = new ArrayList<Edge>();
 		for( String szEdge : controlFlow.getEdgeslist() ){
-			Analyzer.db("XXX controlFlow element '" + szEdge + "'" ); // TODO rm
+//			Analyzer.db("XXX controlFlow element '" + szEdge + "'" ); // TODO rm
 
-			int srcId = controlFlow.insId2NodeId( Integer.valueOf( szEdge.split(":")[0]).intValue() );
+			int iSrcId = Integer.valueOf( szEdge.split(":")[0]).intValue();
+//			Analyzer.db("XXX iSrcId " + String.valueOf(iSrcId) ); // TODO rm
+			int srcId = controlFlow.insId2NodeId( iSrcId );
 			if( 0 > srcId ){
 				srcId = START;
 			}
-
-			int dstId = controlFlow.insId2NodeId( Integer.valueOf( szEdge.split(":")[1]).intValue() );
+//			Analyzer.db("XXX srcId " + String.valueOf(srcId) ); // TODO rm
+					
+			int iDstId = Integer.valueOf( szEdge.split(":")[1]).intValue();
+//			Analyzer.db("XXX iDstId " + String.valueOf(iDstId) ); // TODO rm
+			int dstId = controlFlow.insId2NodeId( iDstId );
 			if( 0 > dstId ){
 				dstId = END;
 			}
+//			Analyzer.db("XXX dstId " + String.valueOf(dstId) ); // TODO rm
 
 			// stupid check
 			if( srcId == dstId) continue;
@@ -61,8 +88,7 @@ public class DiGraph {
 			NodeWrapper dstNode;
 			dstNode = getNodeById( CFGBlockList, dstId );
 
-			Analyzer.db("initCFGEdgeList( srcNode " + String.valueOf(srcId) + ", dstNode " + String.valueOf(dstId) + ")"); // TODO rm
-
+//			Analyzer.db("initCFGEdgeList( srcNode " + String.valueOf(srcId) + ", dstNode " + String.valueOf(dstId) + ")"); // TODO rm
 			CFGEdgeList.add(new Edge( srcNode, dstNode));
 		}
 	}
@@ -169,9 +195,9 @@ public class DiGraph {
 				idom = CFGBlockList.get(idxidom);
 			}
 // FIXME
-			if(idom.id() != currDA.id()){
-				DAedgeList.add( new Edge(idom, currDA) ); // idom may be currDA?!!
-			}
+//			if(idom.id() != currDA.id()){
+//				DAedgeList.add( new Edge(idom, currDA) ); // idom may be currDA?!!
+//			}
 		}
 	}
 
