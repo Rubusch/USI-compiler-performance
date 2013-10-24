@@ -15,6 +15,7 @@ public class NodeWrapper {
 //	public NodeWrapper( List<AbstractInsnNode> blockinstructions, final Integer startId){
 //		this.blockinstructions = blockinstructions;
 	public NodeWrapper( final Integer startId){
+		Analyzer.db("NodeWrapper( startId=" + startId + ")"); // XXX
 		this.Id = startId;
 		this.inheritage = new ArrayList<List<Integer>>();
 	}
@@ -191,6 +192,7 @@ public class NodeWrapper {
 	}
 
 	public Integer id(){
+		Analyzer.db("NodeWrapper::getId() - " + String.valueOf(Id) );
 		return Id;
 	}
 }

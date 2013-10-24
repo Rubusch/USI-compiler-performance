@@ -33,14 +33,16 @@ public class DiGraph {
 //			CFGedgelist.add(new Edge( nodelist.get(srcId), nodelist.get( dstId ))); // TODO rm
 
 			NodeWrapper srcNode;
-			if( 0 > srcId ){ 
+			if( 0 > srcId ){
 				srcNode = new NodeWrapper(START);
 			}else{
 				srcNode = nodeList.get(srcId);
 			}
 
 			NodeWrapper dstNode;
+			Analyzer.db("DiGraph::createCFGEdgeList() - dstId " + String.valueOf(dstId)); // TODO rm
 			if( 0 > dstId ){
+				Analyzer.db("XXX create edge for END XXX"); // TODO rm
 				dstNode = new NodeWrapper(END);
 			}else{
 				dstNode = nodeList.get(dstId);

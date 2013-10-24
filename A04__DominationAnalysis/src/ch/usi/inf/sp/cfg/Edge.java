@@ -27,6 +27,7 @@ public class Edge {
 	}
 
 	public void dotPrint(){
+		Analyzer.db("Edge::dotPrint() - fromNode.id() " + String.valueOf(fromNode.id()) + ", toNode.id() " + String.valueOf(toNode.id())); // TODO rm
 		final String srcNode;
 		if( DiGraph.START == fromNode.id() ){
 			srcNode = "nodeS";
@@ -40,6 +41,7 @@ public class Edge {
 		}else{
 			dstNode = "node" + toNode.id();
 		}
+
 		System.out.print( "  " + srcNode + " -> " + dstNode);
 		if( 0 < dotLabel.length() ){
 			System.out.println( "[" + dotLabel +"]" );
