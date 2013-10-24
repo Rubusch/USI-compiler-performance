@@ -81,7 +81,7 @@ public class NodeWrapper {
 	// return false, if was not mergeable (still), needs to be redone later
 	// this means basically a "false" shall provoke the remove from the
 	// "passedIds" list
-	public void identifyDominator( List<NodeWrapper> parents){
+	private void identifyDominator( List<NodeWrapper> parents){
 
 		for( NodeWrapper nd : parents){
 			boolean pending=false; // more ugly quickfixes

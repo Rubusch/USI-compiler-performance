@@ -94,7 +94,9 @@ public class DiGraph {
 
 /******************************************************************************/
 		// CFG prepared
-		NodeWrapper currCFG = CFGBlockList.get(0); // TODO rn "root"??
+		NodeWrapper currCFG = new NodeWrapper(START); // TODO check this as start point
+//		NodeWrapper currCFG = CFGBlockList.get(0); // TODO orig
+
 		List<Integer> passedIds = new ArrayList<Integer>();
 		Stack<Edge> stack = new Stack<Edge>();
 //		int blockId = 0;
@@ -149,7 +151,7 @@ public class DiGraph {
 //				} // TODO refac
 //			} // TODO refac
 
-			// find all edges ending directed to current (but not upward linking, to avoid loop issues)
+			// find all edges ending at the current block (linking down, but not linking upward, to avoid loop issues)
 			List<Edge> edges = new ArrayList<Edge>();
 			for( Edge edge: CFGEdgeList){
 				if( currCFG.id() == edge.getToNode().id()){
@@ -157,7 +159,18 @@ public class DiGraph {
 				}
 			}
 
-			// set heritage to the childs
+			// set heritage to the children
+//*
+			final List<NodeWrapper> parents = new ArrayList<NodeWrapper>();
+			for( Edge edge : edges ){
+				parents.add(edge.getFromNode());
+			}
+			if( 1 == parents.size()){
+				currCFG.inheritageInit( parents.get(0).getInheritage() );
+			}else{
+				currCFG.inheritageMerge(parents);
+			}
+/*/
 			if( 1 == edges.size()){
 				// only one parent
 				NodeWrapper parent = edges.get(0).getFromNode();
@@ -174,26 +187,39 @@ public class DiGraph {
 				}
 				currCFG.inheritageMerge(parents);
 			}
+//*/
 		}
 
 /******************************************************************************/
 		// map CFG to DA
 		this.DAedgelist = new ArrayList<Edge>();
+
+		Analyzer.db("XXX size of CFGBlockList " + String.valueOf(CFGBlockList.size())); // TODO rm
+
 		for( int blockId = CFGBlockList.size()-1; blockId > 0; --blockId){
 			// find all edges ending at current (and no upward linking, to avoid loop issues)
 			NodeWrapper currDA = CFGBlockList.get(blockId);
+			
+			Analyzer.db("XXX mapping CFG to DA: currDA.id() " + String.valueOf(currDA.id()) ); // TODO rm
+			
 //			DAedgelist.add( new Edge( nodelist.get( current.getIDom().intValue()), current )); // XXX -1
 			Integer idxidom = currDA.getIDom();
 			final NodeWrapper idom;
 			if( START == idxidom){
 //				idom = new NodeWrapper(null, START); // TODO rm
 				idom = new NodeWrapper(START);
+			}else if( END == idxidom){
+				idom = new NodeWrapper( END );
 			}else{
 				idom = CFGBlockList.get(idxidom);
 			}
+// FIXME
 			DAedgelist.add( new Edge(idom, currDA) );
 		}
 	}
+
+
+
 
 // FIXME: forEver connected to end, this is wrong!
 	public void dotPrintDA(){
@@ -215,7 +241,7 @@ public class DiGraph {
 		}
 
 		// edges
-		Analyzer.echo( "  nodeS -> node0" );
+		Analyzer.echo( "  nodeS -> node0" ); // TODO replace by automatic detection
 //		for( Edge edge : CFGedgelist ){
 		for( Edge edge : DAedgelist ){
 			edge.dotPrint();
