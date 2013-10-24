@@ -7,8 +7,8 @@ import java.util.Stack;
 import org.objectweb.asm.tree.AbstractInsnNode;
 
 public class DiGraph {
-	private final List<NodeWrapper> nodelist;
-	private final List<Edge> CFGedgelist;
+	private final List<NodeWrapper> nodeList;
+	private final List<Edge> CFGedgeList;
 	private final List<Edge> DAedgelist;
 
 	public final static int START = -1;
@@ -18,14 +18,16 @@ public class DiGraph {
 
 // FIXME user END 
 	public DiGraph(ControlFlowGraphExtractor controlFlow){
-		this.nodelist = new ArrayList<NodeWrapper>();
+
+		this.nodeList = new ArrayList<NodeWrapper>();
 		for( int nodeId = 0; nodeId < controlFlow.getBlocklist().size(); ++nodeId){
 //			nodelist.add(new NodeWrapper( controlFlow.getBlocklist().get(nodeId), nodeId)); // TODO rm
-			nodelist.add(new NodeWrapper( nodeId ));
+			nodeList.add(new NodeWrapper( nodeId ));
 		}
 
-		this.CFGedgelist = new ArrayList<Edge>();
+		this.CFGedgeList = new ArrayList<Edge>();
 		for( String szEdge : controlFlow.getEdgeslist() ){
+			// populate CFGedgelist
 			int srcId = controlFlow.insId2NodeId( Integer.valueOf( szEdge.split(":")[0]).intValue() );
 			int dstId = controlFlow.insId2NodeId( Integer.valueOf( szEdge.split(":")[1]).intValue() );
 //			CFGedgelist.add(new Edge( nodelist.get(srcId), nodelist.get( dstId ))); // TODO rm
@@ -34,23 +36,23 @@ public class DiGraph {
 			if( 0 > srcId ){ 
 				srcNode = new NodeWrapper(START);
 			}else{
-				srcNode = nodelist.get(srcId);
+				srcNode = nodeList.get(srcId);
 			}
 
 			NodeWrapper dstNode;
 			if( 0 > dstId ){
 				dstNode = new NodeWrapper(END);
 			}else{
-				dstNode = nodelist.get(dstId);
+				dstNode = nodeList.get(dstId);
 			}
 
 //			CFGedgelist.add(new Edge( nodelist.get(srcId), nodelist.get( dstId ))); // TODO rm
-			CFGedgelist.add(new Edge( srcNode, dstNode));
+			CFGedgeList.add(new Edge( srcNode, dstNode));
 		}
 
 /******************************************************************************/
 		// CFG prepared
-		NodeWrapper currCFG = nodelist.get(0); // TODO rn "root"??
+		NodeWrapper currCFG = nodeList.get(0); // TODO rn "root"??
 		List<Integer> passedIds = new ArrayList<Integer>();
 		Stack<Edge> stack = new Stack<Edge>();
 //		int blockId = 0;
@@ -78,7 +80,7 @@ public class DiGraph {
 //			else{ // TODO no else necessary, before has "continue"?!
 				if( stack.isEmpty()){
 					// stack is empty discover next tier
-					for( Edge peekEdge : CFGedgelist){
+					for( Edge peekEdge : CFGedgeList){
 						if( currCFG.id() == peekEdge.getFromNode().id() ){
 							if( -1 == passedIds.indexOf(peekEdge.getToNode().id())){
 								stack.push(peekEdge);
@@ -107,7 +109,7 @@ public class DiGraph {
 
 			// find all edges ending directed to current (but not upward linking, to avoid loop issues)
 			List<Edge> edges = new ArrayList<Edge>();
-			for( Edge edge: CFGedgelist){
+			for( Edge edge: CFGedgeList){
 				if( currCFG.id() == edge.getToNode().id()){
 					edges.add(edge);
 				}
@@ -135,9 +137,9 @@ public class DiGraph {
 /******************************************************************************/
 		// map CFG to DA
 		this.DAedgelist = new ArrayList<Edge>();
-		for( int blockId = nodelist.size()-1; blockId > 0; --blockId){
+		for( int blockId = nodeList.size()-1; blockId > 0; --blockId){
 			// find all edges ending at current (and no upward linking, to avoid loop issues)
-			NodeWrapper currDA = nodelist.get(blockId);
+			NodeWrapper currDA = nodeList.get(blockId);
 //			DAedgelist.add( new Edge( nodelist.get( current.getIDom().intValue()), current )); // XXX -1
 			Integer idxidom = currDA.getIDom();
 			final NodeWrapper idom;
@@ -145,7 +147,7 @@ public class DiGraph {
 //				idom = new NodeWrapper(null, START); // TODO rm
 				idom = new NodeWrapper(START);
 			}else{
-				idom = nodelist.get(idxidom);
+				idom = nodeList.get(idxidom);
 			}
 			DAedgelist.add( new Edge(idom, currDA) );
 		}
@@ -154,7 +156,7 @@ public class DiGraph {
 // FIXME: forEver connected to end, this is wrong!
 	public void dotPrintDA(){
 		Analyzer.echo("# ---");
-		if( 0 == this.nodelist.size() ) return;
+		if( 0 == this.nodeList.size() ) return;
 
 		// header
 		Analyzer.echo( "digraph G {" );
@@ -164,7 +166,7 @@ public class DiGraph {
 		// nodes
 		Analyzer.echo( "  nodeS [label = \"start\"];" );
 		Analyzer.echo( "  nodeE [label = \"end\"];" );
-		for( NodeWrapper node : nodelist ){
+		for( NodeWrapper node : nodeList ){
 			node.dotPrint();
 // TODO another label?
 //			Analyzer.echo("  node" + node.id() + "[ label = \""+ node.id() + "\"];");
