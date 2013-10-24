@@ -113,6 +113,8 @@ public class ControlFlowGraphExtractor {
 			// get next INSTRUCTION
 			AbstractInsnNode ins = instructions.get(idx);
 
+			if( 0 == idx) edgeslistAdd( -1, idx);
+
 			// create new block
 			if(true == branchNextIteration){
 				blockList.add(new ArrayList<AbstractInsnNode>());
@@ -222,7 +224,7 @@ public class ControlFlowGraphExtractor {
 		}
 
 		// connections
-		Analyzer.echo("  nodeS:S -> node0:0");
+//		Analyzer.echo("  nodeS:S -> node0:0");
 		for( int idx = 0; idx < this.edgesList.size(); ++idx ){
 			Analyzer.echo(dotEdges( idx ));
 		}
@@ -234,18 +236,23 @@ public class ControlFlowGraphExtractor {
 		String[] szbuf = this.edgesList.get(idx).split(":");
 		int idxSrc = Integer.valueOf( szbuf[0] ).intValue();
 		int idxNodeSrc = insId2NodeId( idxSrc );
-		String str = "  node" +  idxNodeSrc +":" + idxSrc;
-//		try{
-			int idxDst = Integer.valueOf( szbuf[1] ).intValue();
-			int idxNodeDst = insId2NodeId( idxDst );
-			if(0 > idxDst){
-				str += " -> nodeE:E";
-			}else{
-				str += " -> node" + idxNodeDst + ":" + idxDst;
-			}
-//		}catch(NumberFormatException exp){
-//			str += " -> nodeE:E";
-//		}
+		String str = "  ";
+		if(0 > idxSrc){
+			// START
+			str += "nodeS:S";
+		}else{
+			str += "node" +  idxNodeSrc +":" + idxSrc;
+		}
+
+		int idxDst = Integer.valueOf( szbuf[1] ).intValue();
+		int idxNodeDst = insId2NodeId( idxDst );
+		if(0 > idxDst){
+			// RETURN
+			str += " -> nodeE:E";
+		}else{
+			str += " -> node" + idxNodeDst + ":" + idxDst;
+		}
+
 		if( 2 < szbuf.length ){
 			str += "[ " + szbuf[2] + " ]";
 		}
@@ -331,7 +338,6 @@ public class ControlFlowGraphExtractor {
 				break;
 			case AbstractInsnNode.TYPE_INSN:
 				// Opcodes: NEW, ANEWARRAY, CHECKCAST or INSTANCEOF.
-//				szBlock += "NEWorANEWARRAYorCHECKCASTorINSTANCEOF");
 				szBlock +=  Printer.OPCODES[opcode];
 				szBlock += " ";
 				szBlock += ((TypeInsnNode)ins).desc;
@@ -362,7 +368,6 @@ public class ControlFlowGraphExtractor {
 				tmp = tmp.replace('<', '(');
 				tmp = tmp.replace('>', ')');
 				szBlock += tmp;
-//				szBlock += ((MethodInsnNode)ins).name;
 				szBlock += " ";
 				szBlock += ((MethodInsnNode)ins).desc;
 				break;
