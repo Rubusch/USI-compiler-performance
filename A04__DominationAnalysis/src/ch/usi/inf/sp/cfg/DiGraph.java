@@ -63,40 +63,26 @@ public class DiGraph {
 		// CFG prepared
 		NodeWrapper currCFG = getNodeById(CFGBlockList, START);
 
-		List<Integer> passedIds = new ArrayList<Integer>();
+		List<Integer> rememberedIds = new ArrayList<Integer>();
 		Stack<Edge> stack = new Stack<Edge>();
-//		int blockId = 0;
 		boolean isFirstRun = true;
-//		while( true ){
 
-//		for( int blockId = 0; true; ++blockId){ // TODO check, is it really 2x increment?
-			// "traverser"
-//			if(0 == blockId){
-//				++blockId;
+		List<List<Integer>> inheritageList = new ArrayList<List<Integer>>();
+		List<Integer> inheritageElement = new ArrayList<Integer>();
+		inheritageElement.add(START);
+		inheritageList.add(inheritageElement);
+		currCFG.inheritageInit(inheritageList);
 
-//			if(isFirstRun){
-//				isFirstRun = false;
-				// init start link
-				List<List<Integer>> inheritageList = new ArrayList<List<Integer>>();
-				List<Integer> inheritageElement = new ArrayList<Integer>();
-				inheritageElement.add(START);
-				inheritageList.add(inheritageElement);
-//				inheritage.add(new ArrayList<Integer>());
-//				inheritage.get(0).add(new Integer( START ));
-				currCFG.inheritageInit(inheritageList);
+		// longtime memory
+		rememberedIds.add(currCFG.id());
 
-				// keep track of passed nodes
-				passedIds.add(currCFG.id());
-//				continue;
-
-//			}
 		while( true ){
 //			else{ // TODO no else necessary, before has "continue"?!
 				if( stack.isEmpty()){
 					// stack is empty discover next tier
 					for( Edge peekEdge : CFGEdgeList){
 						if( currCFG.id() == peekEdge.getFromNode().id() ){
-							if( -1 == passedIds.indexOf(peekEdge.getToNode().id())){
+							if( -1 == rememberedIds.indexOf(peekEdge.getToNode().id())){
 								stack.push(peekEdge);
 							}
 //							else{ // TODO not necessary?!
@@ -116,7 +102,7 @@ public class DiGraph {
 					// stack was NOT empty, candidate was ok
 					Edge followEdge = stack.pop();
 					currCFG = followEdge.getToNode();
-					passedIds.add( currCFG.id() );
+					rememberedIds.add( currCFG.id() );
 
 //				} // TODO refac
 //			} // TODO refac
