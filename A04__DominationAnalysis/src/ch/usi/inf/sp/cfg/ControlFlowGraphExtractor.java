@@ -224,7 +224,6 @@ public class ControlFlowGraphExtractor {
 		}
 
 		// connections
-//		Analyzer.echo("  nodeS:S -> node0:0");
 		for( int idx = 0; idx < this.edgesList.size(); ++idx ){
 			Analyzer.echo(dotEdges( idx ));
 		}
@@ -272,11 +271,6 @@ public class ControlFlowGraphExtractor {
 			int opcode = ins.getOpcode();
 			String addr = String.valueOf(startAddr + jdx);
 			szBlock += addr + "> " + addr + ": ";
-
-
-//			AbstractInsnNode ins = blockinstructions.get(jdx);
-//			int opcode = ins.getOpcode();
-//			szBlock +=  instructions.indexOf( ins ) + "> ";
 
 			switch(ins.getType()){
 			case AbstractInsnNode.LABEL: 

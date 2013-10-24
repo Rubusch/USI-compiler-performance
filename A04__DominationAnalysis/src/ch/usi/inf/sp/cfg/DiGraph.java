@@ -14,7 +14,7 @@ public class DiGraph {
 	public final static int START = -1;
 	public final static int END = -2;
 
-// FIXME
+// FIXME user END 
 	public DiGraph(ControlFlowGraphExtractor controlFlow){
 		this.nodelist = new ArrayList<Node>();
 		for( int nodeId = 0; nodeId < controlFlow.getBlocklist().size(); ++nodeId){
@@ -151,7 +151,7 @@ public class DiGraph {
 		}
 		
 // FIXME: nodeE should be part of the "common" process
-		Analyzer.echo("  node" + String.valueOf(nodelist.size()-1) + " -> nodeE" );
+//		Analyzer.echo("  node" + String.valueOf(nodelist.size()-1) + " -> nodeE" );
 
 		Analyzer.echo("}");
 	}
