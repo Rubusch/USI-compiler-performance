@@ -30,14 +30,14 @@ public class DiGraph {
 
 /******************************************************************************/
 		// CFG prepared
-		Node currCFG = nodelist.get(0);
+		Node currCFG = nodelist.get(0); // TODO rn "root"??
 		ArrayList<Integer> passedIds = new ArrayList<Integer>();
 		Stack<Edge> stack = new Stack<Edge>();
 		for( int blockId = 0; true; ++blockId){
 
 			// "traverser"
 			if(0 == blockId){
-				++blockId;
+//				++blockId; // TODO check, is it really 2x increment?
 				// init start link
 				List<List<Integer>> inheritage = new ArrayList<List<Integer>>();
 				inheritage.add(new ArrayList<Integer>());
@@ -48,32 +48,36 @@ public class DiGraph {
 				passedIds.add(currCFG.id());
 				continue;
 
-			}else{
-
+			}
+//			else{ // TODO no else necessary, before has "continue"?!
 				if( stack.isEmpty()){
 					// stack is empty discover next tier
 					for( Edge peekEdge : CFGedgelist){
 						if( currCFG.id() == peekEdge.getFromNode().id() ){
 							if( -1 == passedIds.indexOf(peekEdge.getToNode().id())){
 								stack.push(peekEdge);
-							}else{
-								continue;
 							}
+//							else{ // TODO not necessary?!
+//								continue; // TODO not necessary?!
+//							}
 						}
 					}
-					
+
 					if( stack.isEmpty()){
-						// we're done when the stack can't be filled anymore
+						// we're done when the stack still can't be filled anymore
 						break;
 					}
 					continue;
-				}else{
-					// candidate was ok
+				}
+//				else{ // TODO is this 'else' necessary?
+
+					// stack was NOT empty, candidate was ok
 					Edge followEdge = stack.pop();
 					currCFG = followEdge.getToNode();
 					passedIds.add( currCFG.id() );
-				}
-			}
+
+//				} // TODO refac
+//			} // TODO refac
 
 			// find all edges ending directed to current (but not upward linking, to avoid loop issues)
 			List<Edge> edges = new ArrayList<Edge>();
