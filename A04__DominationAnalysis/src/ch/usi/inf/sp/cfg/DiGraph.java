@@ -40,8 +40,16 @@ public class DiGraph {
 		// populate CFGEdgelist
 		this.CFGEdgeList = new ArrayList<Edge>();
 		for( String szEdge : controlFlow.getEdgeslist() ){
+
 			int srcId = controlFlow.insId2NodeId( Integer.valueOf( szEdge.split(":")[0]).intValue() );
+			if( 0 > srcId ){
+				srcId = START;
+			}
+
 			int dstId = controlFlow.insId2NodeId( Integer.valueOf( szEdge.split(":")[1]).intValue() );
+			if( 0 > dstId ){
+				dstId = END;
+			}
 
 			NodeWrapper srcNode;
 			srcNode = getNodeById( CFGBlockList, srcId);
@@ -63,7 +71,7 @@ public class DiGraph {
 		// CFG prepared
 		NodeWrapper currCFG = getNodeById(CFGBlockList, START);
 
-		List<Integer> rememberedIds = new ArrayList<Integer>();
+		List<Integer> passedIds = new ArrayList<Integer>();
 		Stack<Edge> stack = new Stack<Edge>();
 
 		// init inheritage list with START
@@ -74,15 +82,15 @@ public class DiGraph {
 		currCFG.inheritageInit(inheritageList);
 
 		// longtime memory
-		rememberedIds.add(currCFG.id());
+		passedIds.add(currCFG.id());
 
 		while( true ){
 			if( stack.isEmpty()){
-				// stack is empty discover next tier
-				for( Edge peekEdge : CFGEdgeList){
-					if( currCFG.id() == peekEdge.getFromNode().id() ){
-						if( -1 == rememberedIds.indexOf(peekEdge.getToNode().id())){
-							stack.push(peekEdge);
+				// stack is empty, go discover next tier
+				for( Edge nextEdge : CFGEdgeList){
+					if( currCFG.id() == nextEdge.getFromNode().id() ){
+						if( -1 == passedIds.indexOf(nextEdge.getToNode().id())){
+							stack.push(nextEdge);
 						}
 					}
 				}
@@ -97,7 +105,7 @@ public class DiGraph {
 			// stack was NOT empty, candidate was ok
 			Edge followEdge = stack.pop();
 			currCFG = followEdge.getToNode();
-			rememberedIds.add( currCFG.id() );
+			passedIds.add( currCFG.id() );
 
 			// find all edges ending at the current block (linking down, but not linking upward, to avoid loop issues)
 			List<Edge> edges = new ArrayList<Edge>();
@@ -108,7 +116,6 @@ public class DiGraph {
 			}
 
 			// set heritage to the children
-//*
 			final List<NodeWrapper> parents = new ArrayList<NodeWrapper>();
 			for( Edge edge : edges ){
 				parents.add(edge.getFromNode());
@@ -118,24 +125,6 @@ public class DiGraph {
 			}else{
 				currCFG.inheritageMerge(parents);
 			}
-/*/
-			if( 1 == edges.size()){
-				// only one parent
-				NodeWrapper parent = edges.get(0).getFromNode();
-				if( 0 == parent.getInheritage().size()){
-					Analyzer.echo( "FATAL - only 1 parent, but inheritage is empty");
-				}
-				currCFG.inheritageInit( parent.getInheritage() );
-
-			}else if( 1 < edges.size() ){
-				// more than 1 parents - merge inheritage
-				final List<NodeWrapper> parents = new ArrayList<NodeWrapper>();
-				for( Edge edge : edges ){
-					parents.add(edge.getFromNode());
-				}
-				currCFG.inheritageMerge(parents);
-			}
-//*/
 		}
 
 /******************************************************************************/
