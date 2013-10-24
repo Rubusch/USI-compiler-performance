@@ -18,9 +18,13 @@ public class DiGraph {
 	private void initCFGBlockList( ControlFlowGraphExtractor controlFlow){
 		this.CFGBlockList = new ArrayList<NodeWrapper>();
 		for( int nodeId = 0; nodeId < controlFlow.getBlocklist().size(); ++nodeId){
-//			nodelist.add(new NodeWrapper( controlFlow.getBlocklist().get(nodeId), nodeId)); // TODO rm
+//			Analyzer.db("AAA initCFGBlockList.add( new '" + String.valueOf(nodeId) + "'"); // TODO rm
 			CFGBlockList.add(new NodeWrapper( nodeId ));
 		}
+
+		// set up nodes
+		CFGBlockList.add(new NodeWrapper( START ));
+		CFGBlockList.add(new NodeWrapper( END ));
 	}
 
 	private void initCFGEdgeList( ControlFlowGraphExtractor controlFlow){
@@ -38,9 +42,9 @@ public class DiGraph {
 			}
 
 			NodeWrapper dstNode;
-			Analyzer.db("DiGraph::createCFGEdgeList() - dstId " + String.valueOf(dstId)); // TODO rm
+//			Analyzer.db("DiGraph::createCFGEdgeList() - dstId " + String.valueOf(dstId)); // TODO rm
 			if( 0 > dstId ){
-				Analyzer.db("XXX create edge for END XXX"); // TODO rm
+//				Analyzer.db("XXX create edge for END XXX"); // TODO rm
 				dstNode = new NodeWrapper(END);
 			}else{
 				dstNode = CFGBlockList.get(dstId);
@@ -197,13 +201,17 @@ public class DiGraph {
 		Analyzer.db("XXX size of CFGBlockList " + String.valueOf(CFGBlockList.size())); // TODO rm
 
 		for( int blockId = CFGBlockList.size()-1; blockId > 0; --blockId){
+			Analyzer.db("YYY blockId '" + String.valueOf(blockId) + "'"); // TODO rm
+			
 			// find all edges ending at current (and no upward linking, to avoid loop issues)
 			NodeWrapper currDA = CFGBlockList.get(blockId);
-			
-			Analyzer.db("XXX mapping CFG to DA: currDA.id() " + String.valueOf(currDA.id()) ); // TODO rm
-			
+
+			Analyzer.db("YYY mapping CFG to DA: currDA.id() " + String.valueOf(currDA.id()) ); // TODO rm
+
 //			DAedgelist.add( new Edge( nodelist.get( current.getIDom().intValue()), current )); // XXX -1
 			Integer idxidom = currDA.getIDom();
+			
+			Analyzer.db("YYY idxidom '" + String.valueOf(idxidom) + "'"); // TODO rm
 			final NodeWrapper idom;
 			if( START == idxidom){
 //				idom = new NodeWrapper(null, START); // TODO rm

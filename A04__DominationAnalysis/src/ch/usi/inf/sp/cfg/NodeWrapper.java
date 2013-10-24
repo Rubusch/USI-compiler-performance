@@ -192,7 +192,7 @@ public class NodeWrapper {
 	}
 
 	public Integer id(){
-		Analyzer.db("NodeWrapper::getId() - " + String.valueOf(Id) );
+//		Analyzer.db("NodeWrapper::getId() - " + String.valueOf(Id) ); // TODO rm
 		return Id;
 	}
 }
