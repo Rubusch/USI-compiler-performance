@@ -67,26 +67,30 @@ public class DiGraph {
 		Stack<Edge> stack = new Stack<Edge>();
 //		int blockId = 0;
 		boolean isFirstRun = true;
-		while( true ){
+//		while( true ){
 
 //		for( int blockId = 0; true; ++blockId){ // TODO check, is it really 2x increment?
 			// "traverser"
 //			if(0 == blockId){
 //				++blockId;
 
-			if(isFirstRun){
-				isFirstRun = false;
+//			if(isFirstRun){
+//				isFirstRun = false;
 				// init start link
-				List<List<Integer>> inheritage = new ArrayList<List<Integer>>();
-				inheritage.add(new ArrayList<Integer>());
-				inheritage.get(0).add(new Integer( START ));
-				currCFG.inheritageInit(inheritage);
+				List<List<Integer>> inheritageList = new ArrayList<List<Integer>>();
+				List<Integer> inheritageElement = new ArrayList<Integer>();
+				inheritageElement.add(START);
+				inheritageList.add(inheritageElement);
+//				inheritage.add(new ArrayList<Integer>());
+//				inheritage.get(0).add(new Integer( START ));
+				currCFG.inheritageInit(inheritageList);
 
 				// keep track of passed nodes
 				passedIds.add(currCFG.id());
-				continue;
+//				continue;
 
-			}
+//			}
+		while( true ){
 //			else{ // TODO no else necessary, before has "continue"?!
 				if( stack.isEmpty()){
 					// stack is empty discover next tier
