@@ -431,6 +431,9 @@ public class ControlFlowGraphExtractor {
 	}
 
 	public int insId2NodeId( int insId ){
+		Analyzer.db("insId2NodeId( insId=" + insId + ")"); // XXX
+		if( 0 > insId ){ return insId; }
+
 		int nodeId = 1;
 		for( ; nodeId < blockList.size(); ++nodeId ){
 			if( instructions.indexOf( blockList.get( nodeId ).get(0) ) > insId){

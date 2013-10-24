@@ -1,27 +1,28 @@
 package ch.usi.inf.sp.cfg;
 
 public class Edge {
-	private Node fromNode;
-	private Node toNode;
+	private NodeWrapper fromNode;
+	private NodeWrapper toNode;
 	private String dotLabel;
-
+/*
 	public Edge( Node fromNode, Node toNode, String dotLabel){
 		this.fromNode = fromNode;
 		this.toNode = toNode;
 		this.dotLabel = dotLabel;
 	}
-
-	public Edge( Node fromNode, Node toNode){
+*/
+	public Edge( NodeWrapper fromNode, NodeWrapper toNode){
+		Analyzer.db("Edge( fromNode=" + fromNode.id() + ", toNode=" + toNode.id() + ")"); // XXX
 		this.fromNode = fromNode;
 		this.toNode = toNode;
 		this.dotLabel = "";
 	}
 
-	public Node getFromNode() {
+	public NodeWrapper getFromNode() {
 		return fromNode;
 	}
 
-	public Node getToNode() {
+	public NodeWrapper getToNode() {
 		return toNode;
 	}
 

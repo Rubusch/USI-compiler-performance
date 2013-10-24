@@ -7,37 +7,63 @@ import java.util.Stack;
 import org.objectweb.asm.tree.AbstractInsnNode;
 
 public class DiGraph {
-	private final List<Node> nodelist;
+	private final List<NodeWrapper> nodelist;
 	private final List<Edge> CFGedgelist;
 	private final List<Edge> DAedgelist;
 
 	public final static int START = -1;
 	public final static int END = -2;
 
+
+
 // FIXME user END 
 	public DiGraph(ControlFlowGraphExtractor controlFlow){
-		this.nodelist = new ArrayList<Node>();
+		this.nodelist = new ArrayList<NodeWrapper>();
 		for( int nodeId = 0; nodeId < controlFlow.getBlocklist().size(); ++nodeId){
-			nodelist.add(new Node( controlFlow.getBlocklist().get(nodeId), nodeId));
+//			nodelist.add(new NodeWrapper( controlFlow.getBlocklist().get(nodeId), nodeId)); // TODO rm
+			nodelist.add(new NodeWrapper( nodeId ));
 		}
 
 		this.CFGedgelist = new ArrayList<Edge>();
 		for( String szEdge : controlFlow.getEdgeslist() ){
 			int srcId = controlFlow.insId2NodeId( Integer.valueOf( szEdge.split(":")[0]).intValue() );
 			int dstId = controlFlow.insId2NodeId( Integer.valueOf( szEdge.split(":")[1]).intValue() );
-			CFGedgelist.add(new Edge( nodelist.get(srcId), nodelist.get( dstId )));
+//			CFGedgelist.add(new Edge( nodelist.get(srcId), nodelist.get( dstId ))); // TODO rm
+
+			NodeWrapper srcNode;
+			if( 0 > srcId ){ 
+				srcNode = new NodeWrapper(START);
+			}else{
+				srcNode = nodelist.get(srcId);
+			}
+
+			NodeWrapper dstNode;
+			if( 0 > dstId ){
+				dstNode = new NodeWrapper(END);
+			}else{
+				dstNode = nodelist.get(dstId);
+			}
+
+//			CFGedgelist.add(new Edge( nodelist.get(srcId), nodelist.get( dstId ))); // TODO rm
+			CFGedgelist.add(new Edge( srcNode, dstNode));
 		}
 
 /******************************************************************************/
 		// CFG prepared
-		Node currCFG = nodelist.get(0); // TODO rn "root"??
-		ArrayList<Integer> passedIds = new ArrayList<Integer>();
+		NodeWrapper currCFG = nodelist.get(0); // TODO rn "root"??
+		List<Integer> passedIds = new ArrayList<Integer>();
 		Stack<Edge> stack = new Stack<Edge>();
-		for( int blockId = 0; true; ++blockId){
+//		int blockId = 0;
+		boolean isFirstRun = true;
+		while( true ){
 
+//		for( int blockId = 0; true; ++blockId){ // TODO check, is it really 2x increment?
 			// "traverser"
-			if(0 == blockId){
-//				++blockId; // TODO check, is it really 2x increment?
+//			if(0 == blockId){
+//				++blockId;
+
+			if(isFirstRun){
+				isFirstRun = false;
 				// init start link
 				List<List<Integer>> inheritage = new ArrayList<List<Integer>>();
 				inheritage.add(new ArrayList<Integer>());
@@ -90,7 +116,7 @@ public class DiGraph {
 			// set heritage to the childs
 			if( 1 == edges.size()){
 				// only one parent
-				Node parent = edges.get(0).getFromNode();
+				NodeWrapper parent = edges.get(0).getFromNode();
 				if( 0 == parent.getInheritage().size()){
 					Analyzer.echo( "FATAL - only 1 parent, but inheritage is empty");
 				}
@@ -98,7 +124,7 @@ public class DiGraph {
 
 			}else if( 1 < edges.size() ){
 				// more than 1 parents - merge inheritage
-				final List<Node> parents = new ArrayList<Node>();
+				final List<NodeWrapper> parents = new ArrayList<NodeWrapper>();
 				for( Edge edge : edges ){
 					parents.add(edge.getFromNode());
 				}
@@ -111,12 +137,13 @@ public class DiGraph {
 		this.DAedgelist = new ArrayList<Edge>();
 		for( int blockId = nodelist.size()-1; blockId > 0; --blockId){
 			// find all edges ending at current (and no upward linking, to avoid loop issues)
-			Node currDA = nodelist.get(blockId);
+			NodeWrapper currDA = nodelist.get(blockId);
 //			DAedgelist.add( new Edge( nodelist.get( current.getIDom().intValue()), current )); // XXX -1
 			Integer idxidom = currDA.getIDom();
-			final Node idom;
+			final NodeWrapper idom;
 			if( START == idxidom){
-				idom = new Node(null, START);
+//				idom = new NodeWrapper(null, START); // TODO rm
+				idom = new NodeWrapper(START);
 			}else{
 				idom = nodelist.get(idxidom);
 			}
@@ -137,7 +164,7 @@ public class DiGraph {
 		// nodes
 		Analyzer.echo( "  nodeS [label = \"start\"];" );
 		Analyzer.echo( "  nodeE [label = \"end\"];" );
-		for( Node node : nodelist ){
+		for( NodeWrapper node : nodelist ){
 			node.dotPrint();
 // TODO another label?
 //			Analyzer.echo("  node" + node.id() + "[ label = \""+ node.id() + "\"];");
