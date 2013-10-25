@@ -3,7 +3,7 @@ package ch.usi.inf.sp.cfg;
 public class Edge {
 	private NodeWrapper fromNode;
 	private NodeWrapper toNode;
-	private String dotLabel;
+	private String dotLabel; // TODO use?!
 /*
 	public Edge( Node fromNode, Node toNode, String dotLabel){
 		this.fromNode = fromNode;
@@ -16,7 +16,6 @@ public class Edge {
 			// this check should not be necessary
 			return;
 		}
-		Analyzer.db("Edge( fromNode=" + fromNode.id() + ", toNode=" + toNode.id() + ")"); // XXX
 		this.fromNode = fromNode;
 		this.toNode = toNode;
 		this.dotLabel = "";

@@ -47,7 +47,7 @@ public class Analyzer {
 			control.flow( cnode, methodNameAndDescriptor );
 		}catch( Exception exp ){
 			// no specific method provided, do all methods
-			control.flow( cnode );			
+			control.flow( cnode );
 		}
 		echo( "\n# READY.");
 	}
@@ -76,11 +76,12 @@ public class Analyzer {
 	 */
 	private void flowMethod( final MethodNode method ){
 		echo("\n# " + method.name + "()");
+		echo("#");
 		final InsnList instructions = method.instructions;
 		ControlFlowGraphExtractor controlFlow = new ControlFlowGraphExtractor( instructions );
 //*
-//		controlFlow.dotPrintCFG();
-//		echo("# ---");
+		controlFlow.dotPrintCFG();
+		echo("# ---");
 //*/
 		DiGraph dominator = new DiGraph(controlFlow);
 		dominator.dotPrintDA();

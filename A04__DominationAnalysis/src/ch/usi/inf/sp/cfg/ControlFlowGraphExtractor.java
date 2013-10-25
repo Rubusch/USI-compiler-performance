@@ -198,6 +198,7 @@ public class ControlFlowGraphExtractor {
 
 	public void dotPrintCFG(){
 		if( 0 == this.blockList.size() ) return;
+		Analyzer.echo("# control flow graph analysis");
 
 		// header
 		Analyzer.echo( "digraph G {" );

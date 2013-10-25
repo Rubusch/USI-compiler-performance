@@ -167,10 +167,7 @@ public class DiGraph {
 		// map CFG to DA
 		this.DAedgeList = new ArrayList<Edge>();
 
-//		Analyzer.db("YYY size of CFGBlockList " + String.valueOf(CFGBlockList.size())); // TODO rm
-
 		for( int blockId = CFGBlockList.size()-1; blockId > 0; --blockId){
-//			Analyzer.db("YYY blockId '" + String.valueOf(blockId) + "'"); // TODO rm
 
 			// find all edges ending at current (and no upward linking, to avoid loop issues)
 			NodeWrapper currDA = CFGBlockList.get(blockId);
@@ -179,7 +176,7 @@ public class DiGraph {
 				
 				for(Edge edge : CFGEdgeList){
 					if(edge.getToNode().id() == END){
-						Analyzer.db("THIS IS THE END");
+						// the nodes may connect to END
 						isNoReturnConnetcted = false;
 					}
 				}
@@ -188,37 +185,26 @@ public class DiGraph {
 					continue;
 				}
 			}
-
-//			Analyzer.db("YYY mapping CFG to DA: currDA.id() " + String.valueOf(currDA.id()) ); // TODO rm
-
 			Integer idxidom = currDA.getIDom();
-			
-//			Analyzer.db("YYY idxidom '" + String.valueOf(idxidom) + "'"); // TODO rm
 			final NodeWrapper idom;
 			if( START == idxidom){
-//				idom = new NodeWrapper(null, START); // TODO rm
 				idom = new NodeWrapper(START);
-			}
-/*			else if( END == idxidom){
+			}else if( END == idxidom){
 				idom = new NodeWrapper( END );
-			}
-//*/
-			else{
+			}else{
 				idom = CFGBlockList.get(idxidom);
 			}
-// FIXME
+
 			if(idom.id() != currDA.id()){
-				DAedgeList.add( new Edge(idom, currDA) ); // idom may be currDA?!!
+				DAedgeList.add( new Edge(idom, currDA) );
 			}
 		}
 	}
 
 
 
-
-// FIXME: forEver connected to end, this is wrong!
 	public void dotPrintDA(){
-		Analyzer.echo("# ---");
+		Analyzer.echo("# dominator analysis ");
 		if( 0 == this.CFGBlockList.size() ) return;
 
 		// header
@@ -237,13 +223,9 @@ public class DiGraph {
 
 		// edges
 		Analyzer.echo( "  nodeS -> node0" ); // TODO replace by automatic detection
-//		for( Edge edge : CFGedgelist ){
 		for( Edge edge : DAedgeList ){
 			edge.dotPrint();
 		}
-		
-// FIXME: nodeE should be part of the "common" process
-//		Analyzer.echo("  node" + String.valueOf(nodelist.size()-1) + " -> nodeE" );
 
 		Analyzer.echo("}");
 	}
