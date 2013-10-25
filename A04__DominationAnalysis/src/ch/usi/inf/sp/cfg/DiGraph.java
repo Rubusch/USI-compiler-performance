@@ -6,6 +6,12 @@ import java.util.Stack;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 
+/**
+ * unfortunately full of quickfixes and de-composed / unorganized code
+ * 
+ * @author Lothar Rubusch
+ *
+ */
 public class DiGraph {
 	private List<NodeWrapper> CFGBlockList;
 	private List<Edge> CFGEdgeList;
@@ -43,7 +49,6 @@ public class DiGraph {
 		}
 
 		for( int nodeId = 0; nodeId < CFGBlockListSize; ++nodeId){
-//			Analyzer.db("AAA initCFGBlockList.add( new '" + String.valueOf(nodeId) + "')"); // TODO rm
 			CFGBlockList.add(new NodeWrapper( nodeId ));
 		}
 
@@ -56,23 +61,17 @@ public class DiGraph {
 		// populate CFGEdgelist
 		this.CFGEdgeList = new ArrayList<Edge>();
 		for( String szEdge : controlFlow.getEdgeslist() ){
-//			Analyzer.db("XXX controlFlow element '" + szEdge + "'" ); // TODO rm
-
 			int iSrcId = Integer.valueOf( szEdge.split(":")[0]).intValue();
-//			Analyzer.db("XXX iSrcId " + String.valueOf(iSrcId) ); // TODO rm
 			int srcId = controlFlow.insId2NodeId( iSrcId );
 			if( 0 > srcId ){
 				srcId = START;
 			}
-//			Analyzer.db("XXX srcId " + String.valueOf(srcId) ); // TODO rm
 					
 			int iDstId = Integer.valueOf( szEdge.split(":")[1]).intValue();
-//			Analyzer.db("XXX iDstId " + String.valueOf(iDstId) ); // TODO rm
 			int dstId = controlFlow.insId2NodeId( iDstId );
 			if( 0 > dstId ){
 				dstId = END;
 			}
-//			Analyzer.db("XXX dstId " + String.valueOf(dstId) ); // TODO rm
 
 			// stupid check
 			if( srcId == dstId) continue;
@@ -83,13 +82,12 @@ public class DiGraph {
 			NodeWrapper dstNode;
 			dstNode = getNodeById( CFGBlockList, dstId );
 
-//			Analyzer.db("initCFGEdgeList( srcNode " + String.valueOf(srcId) + ", dstNode " + String.valueOf(dstId) + ")"); // TODO rm
 			CFGEdgeList.add(new Edge( srcNode, dstNode));
 		}
 	}
 	
 
-// FIXME user END 
+
 	public DiGraph(ControlFlowGraphExtractor controlFlow){
 		initCFGBlockList( controlFlow );
 		initCFGEdgeList( controlFlow );
@@ -217,8 +215,6 @@ public class DiGraph {
 		Analyzer.echo( "  nodeE [label = \"end\"];" );
 		for( NodeWrapper node : CFGBlockList ){
 			node.dotPrint();
-// TODO another label?
-//			Analyzer.echo("  node" + node.id() + "[ label = \""+ node.id() + "\"];");
 		}
 
 		// edges

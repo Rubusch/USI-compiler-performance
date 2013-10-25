@@ -1,5 +1,10 @@
 package ch.usi.inf.sp.cfg;
 
+/**
+ * 
+ * @author Lothar Rubusch
+ *
+ */
 public class Edge {
 	private NodeWrapper fromNode;
 	private NodeWrapper toNode;
@@ -30,7 +35,6 @@ public class Edge {
 	}
 
 	public void dotPrint(){
-//		Analyzer.db("Edge::dotPrint() - fromNode.id() " + String.valueOf(fromNode.id()) + ", toNode.id() " + String.valueOf(toNode.id())); // TODO rm
 		final String srcNode;
 		if( DiGraph.START == fromNode.id() ){
 			srcNode = "nodeS";

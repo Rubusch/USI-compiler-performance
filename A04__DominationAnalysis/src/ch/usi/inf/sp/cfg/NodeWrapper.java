@@ -5,6 +5,12 @@ import java.util.List;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 
+/**
+ * Welcome to hell!
+ * 
+ * @author Lothar Rubusch
+ * 
+ */
 public class NodeWrapper {
 	private final Integer Id;
 // TODO why is idom a Integer, and not a Node?
@@ -77,6 +83,10 @@ public class NodeWrapper {
 	// return false, if was not mergeable (still), needs to be redone later
 	// this means basically a "false" shall provoke the remove from the
 	// "passedIds" list
+// TODO modularize
+// TODO separate in different methods
+// TODO remove redundant code
+// TODO check algorithm
 	private void identifyDominator( List<NodeWrapper> parents){
 
 		for( NodeWrapper nd : parents){
@@ -190,7 +200,6 @@ public class NodeWrapper {
 	}
 
 	public Integer id(){
-//		Analyzer.db("NodeWrapper::getId() - " + String.valueOf(Id) ); // TODO rm
 		return Id;
 	}
 }

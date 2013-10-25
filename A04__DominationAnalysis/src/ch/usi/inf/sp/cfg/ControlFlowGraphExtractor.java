@@ -21,6 +21,12 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.util.Printer;
 
+/**
+ * Control flow graph extractor is still more stable than the dominator analysis
+ * 
+ * @author Lothar Rubusch
+ *
+ */
 public class ControlFlowGraphExtractor {
 	private final List< List<AbstractInsnNode>> blockList;
 	private static InsnList instructions;

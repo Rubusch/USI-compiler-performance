@@ -12,6 +12,13 @@ import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodNode;
 
 
+/**
+ * prints a controll flow graph (w/o exception handling here) and dominator tree
+ * (rather buggy)
+ * 
+ * @author Lothar Rubusch
+ *
+ */
 public class Analyzer {
 	public static void die( String msg ){
 		System.out.println( msg );
@@ -28,7 +35,7 @@ public class Analyzer {
 
 	public static void main(String[] args) throws FileNotFoundException, IOException {
 		String classFileName = "";
-// TODO arguments
+// TODO method arguments shall be evaluated, too, in order to distinguish polymorphism
 		try{
 			classFileName = args[0];
 		}catch( Exception exp ){
