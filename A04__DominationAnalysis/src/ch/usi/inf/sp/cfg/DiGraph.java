@@ -26,28 +26,23 @@ public class DiGraph {
 	private void initCFGBlockList( ControlFlowGraphExtractor controlFlow){
 		// populate CFGBlockList
 		this.CFGBlockList = new ArrayList<NodeWrapper>();
-		
-		// check if last element is just a label-trailer
-		List<List<AbstractInsnNode>> blockList = new ArrayList<List<AbstractInsnNode>>();
-//		for( List<AbstractInsnNode> block : controlFlow.getBlocklist()){
-		int lastBlockIdx = controlFlow.getBlocklist().size()-1;
-		for( int blockIdx=0; blockIdx < controlFlow.getBlocklist().size(); ++blockIdx){
-			List<AbstractInsnNode> block = controlFlow.getBlocklist().get(blockIdx);
-			if( blockIdx == lastBlockIdx ){
-				// very last block
-				if( 1 == block.size() ){
-					// ...only has one element
-					if( block.get(0).getType()== AbstractInsnNode.LABEL){
-						// ...and it is just a lable, then don't add, we're done
-						break;
-					}
-				}
+
+		// get size of CFG block list, then idx of the blocks will be used as id's here
+		int CFGBlockListSize = controlFlow.getBlocklist().size();
+
+		// check if last block is just a trailing lable
+		int lastBlockIdx = CFGBlockListSize - 1;
+		List<AbstractInsnNode> block = controlFlow.getBlocklist().get(lastBlockIdx);
+		int finalBlockSize = block.size();
+		if( 1 == finalBlockSize ){
+			// ...only has one element
+			if( block.get(0).getType()== AbstractInsnNode.LABEL){
+				// ...and it is just a lable, then don't add, we're done
+				CFGBlockListSize -= 1;
 			}
-			blockList.add(new ArrayList<AbstractInsnNode>(block));
 		}
 
-//		for( int nodeId = 0; nodeId < controlFlow.getBlocklist().size(); ++nodeId){
-		for( int nodeId = 0; nodeId < blockList.size(); ++nodeId){
+		for( int nodeId = 0; nodeId < CFGBlockListSize; ++nodeId){
 //			Analyzer.db("AAA initCFGBlockList.add( new '" + String.valueOf(nodeId) + "')"); // TODO rm
 			CFGBlockList.add(new NodeWrapper( nodeId ));
 		}
@@ -179,6 +174,20 @@ public class DiGraph {
 
 			// find all edges ending at current (and no upward linking, to avoid loop issues)
 			NodeWrapper currDA = CFGBlockList.get(blockId);
+			if(currDA.id() == END){
+				boolean isNoReturnConnetcted = true;
+				
+				for(Edge edge : CFGEdgeList){
+					if(edge.getToNode().id() == END){
+						Analyzer.db("THIS IS THE END");
+						isNoReturnConnetcted = false;
+					}
+				}
+				
+				if(isNoReturnConnetcted){
+					continue;
+				}
+			}
 
 //			Analyzer.db("YYY mapping CFG to DA: currDA.id() " + String.valueOf(currDA.id()) ); // TODO rm
 
@@ -189,15 +198,18 @@ public class DiGraph {
 			if( START == idxidom){
 //				idom = new NodeWrapper(null, START); // TODO rm
 				idom = new NodeWrapper(START);
-			}else if( END == idxidom){
+			}
+/*			else if( END == idxidom){
 				idom = new NodeWrapper( END );
-			}else{
+			}
+//*/
+			else{
 				idom = CFGBlockList.get(idxidom);
 			}
 // FIXME
-//			if(idom.id() != currDA.id()){
-//				DAedgeList.add( new Edge(idom, currDA) ); // idom may be currDA?!!
-//			}
+			if(idom.id() != currDA.id()){
+				DAedgeList.add( new Edge(idom, currDA) ); // idom may be currDA?!!
+			}
 		}
 	}
 
