@@ -104,7 +104,7 @@ public class NodeWrapper {
 // TODO improve this by parse order
 			if( pending ) return;
 		}
-		Analyzer.db("NodeWrapper::identifyDominator() - no pendings"); // XXX
+		Analyzer.db("NodeWrapper::identifyDominator() - no pendings");
 
 		
 		if( 2 > parents.size() ){
