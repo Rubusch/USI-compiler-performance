@@ -65,6 +65,7 @@ public class NodeWrapper {
 	}
 
 	public void inheritageMerge( List<NodeWrapper> parents ){
+		Analyzer.db("inheritMerge()");
 		// add all parent inheritages
 		for( NodeWrapper parent : parents ){
 			inheritageInit( parent.getInheritage() );
@@ -97,11 +98,14 @@ public class NodeWrapper {
 // since it works anyway +/-
 				pending = true;
 			}else{
+				Analyzer.db("NodeWrapper::identifyDominator() - " + String.valueOf( nd.getInheritage().get(0).get( nd.getInheritage().get(0).size()-1 )) ); // XXX
 				this.idom = nd.getInheritage().get(0).get( nd.getInheritage().get(0).size()-1 );
 			}
 // TODO improve this by parse order
 			if( pending ) return;
 		}
+
+		Analyzer.db("NodeWrapper::identifyDominator() - for done");
 
 		
 		if( 2 > parents.size() ){
