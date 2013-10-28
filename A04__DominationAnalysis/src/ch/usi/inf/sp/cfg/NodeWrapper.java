@@ -82,16 +82,17 @@ public class NodeWrapper {
 			// update parent inheritancePaths
 			inheritPath.add(this.id());
 
+			// check wether a new path of inheritance is contained
 			if( !isInheritPathContained(inheritPath) ){
+				// append it, if it is not contained
 				this.inheritage.add(inheritPath);
 			}
 		}
-		
-		
-		
-///////////////////////////////////////////////		
-		
-		
+
+
+
+/* //////////////////////////////////////////////		
+
 		if( DiGraph.START == this.id() ){
 // TODO check inheritage, is NULL here!!!
 			Analyzer.db("NodeWrapper::inheritageInit() - ROOT node\n" ); // XXX
@@ -107,14 +108,6 @@ public class NodeWrapper {
 		// add list as separate new initialized lists
 //		Analyzer.db("\t- inheritage.size() " + String.valueOf( inheritage.size() ) ); // XXX
 		for( int idxGeneration=0; idxGeneration < inheritage.size(); ++idxGeneration){
-//			Analyzer.db("\t- idxGeneration " + String.valueOf(idxGeneration)); // XXX
-/*
-			this.inheritage.add(new ArrayList<Integer>());
-			for( int idxid=0; idxid < inheritage.get(idxInherit).size(); ++idxid){
-				this.inheritage.get(idxInherit).add(inheritage.get(idxInherit).get(idxid));
-			}
-/*/
-// TODO
 			List<Integer> generation = inheritage.get(idxGeneration);
 //			this.inheritage.add( new ArrayList<Integer>() ); // TODO why?!
 
@@ -140,7 +133,7 @@ public class NodeWrapper {
 		List<Integer> generation = this.inheritage.get(0);
 		int parentIdx = generation.size()-1;
 //		Integer latestId = generation.get( latestIdx );
-
+//*/
 
 
 
