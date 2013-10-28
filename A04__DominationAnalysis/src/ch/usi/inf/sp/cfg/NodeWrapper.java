@@ -138,7 +138,52 @@ public class NodeWrapper {
 
 
 		// set dominator
-		this.idom = generation.get( parentIdx );
+//*
+
+//		int minAncestors = getMinInheritPathSize(); // TODO
+
+		
+		List<Integer> smallesPath = getSmallestInheritPath(); // TODO
+		List<Integer> resultingPath = new ArrayList<Integer>();
+		for( int idxAncestor=0; idxAncestor < minAncestors; ++idxAncestor){
+
+// TODO new algo: start from S, then extract a list of "common" nodes of all (is contained?), then after take the last element, which is the final common element			
+			
+			
+			
+// TODO rm
+			// start at 1, the parents, since 0 is the node itself
+			int currAncestor;
+			for( int idxInheritPath=0; idxInheritPath < this.inheritage.size(); ++idxInheritPath){
+				// go through all possible inherit paths starting from S
+
+				// get current inheritPath
+				List<Integer> inheritPath = this.inheritage.get(idxInheritPath);
+
+				if(0 == idxInheritPath){
+					currAncestor = inheritPath.get(idxAncestor);
+					continue;
+				}
+
+
+
+// FIXME: imagine a inheritPaths: S-b0-b2 and S-b1, the common ancestor node is S, the min index is 2: for-loop will fail to find 'S'
+
+
+
+				// stop it when equal ancestor nodes are found
+				if( currAncestor == inheritPath.get(idxAncestor)){
+					break;
+				}
+			}
+
+			// append if it is contained in all inheritPaths
+			resultingPath.add( currAncestor );
+		}
+
+
+
+/*/		this.idom = generation.get( parentIdx );
 // FIXME: characteristic to select which parent inheritage to choose in case of several parent inheritages in the same generation
 
 		// update, and append own Id to all of the inheritage lists
@@ -149,7 +194,7 @@ public class NodeWrapper {
 				parentInheritages.add(Id);
 			}// else: loop (issue with doubled last entries...)
 		}
-
+//*/
 
 
 		Analyzer.db("NodeWrapper::inheritageInit() - END\n" ); // XXX
