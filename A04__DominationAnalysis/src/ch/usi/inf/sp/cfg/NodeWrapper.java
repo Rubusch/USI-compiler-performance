@@ -15,11 +15,11 @@ public class NodeWrapper {
 	private final Integer Id;
 // TODO why is idom a Integer, and not a Node?
 	private Integer idom; // immediate dominator
-	private final List<List<Integer>> inheritage;
+	private List<List<Integer>> inheritage;
 
 	public NodeWrapper( final Integer startId){
 		this.Id = startId;
-		this.inheritage = new ArrayList<List<Integer>>();
+//		this.inheritage = new ArrayList<List<Integer>>();
 	}
 
 	public List<List<Integer>> getInheritage(){
@@ -32,8 +32,27 @@ public class NodeWrapper {
 	 * merge inheritage list of another NodeWrapper with THIS NodeWrapper
 	 */
 	public void inheritageInit( List<List<Integer>> inheritage){
-		Analyzer.db("NodeWrapper::inheritageInit() - START" ); // XXX
+		Analyzer.db("NodeWrapper::inheritageInit() - START, block" + String.valueOf( this.id()) ); // XXX
 		Analyzer.db("\t this.id() block" + String.valueOf(this.id()));
+
+
+		// just call this init function ONCE, for a second time, call the merge
+		if( null != this.inheritage ){
+			Analyzer.db("XXX block" + String.valueOf(this.id()) );
+			return;
+		}
+		this.inheritage = new ArrayList<List<Integer>>();
+
+
+
+		if( DiGraph.START == this.id() ){
+			Analyzer.db("NodeWrapper::inheritageInit() - ROOT node\n" ); // XXX
+			// START / root node
+			List<Integer> currentGeneration = new ArrayList<Integer>();
+			currentGeneration.add(DiGraph.START );
+			this.inheritage.add( currentGeneration );
+			return;
+		}
 /*
 		if( null == inheritage ){
 			Analyzer.echo("FATAL - inheritage was null");
@@ -143,7 +162,9 @@ public class NodeWrapper {
 
 		for( NodeWrapper nd : parents){
 			boolean pending=false; // more ugly quickfixes
-			if( 0 == nd.getInheritage().size()){
+			List<List<Integer>> ndInheritageList = nd.getInheritage();
+			if( 0 == ndInheritageList.size() ){
+//			if( 0 == nd.getInheritage().size()){
 // TODO in case one parent is still not parsed (upward link), just postpone this 
 // node, and generate the merge later (to be implemented), so far, simply omited, 
 // since it works anyway +/-
