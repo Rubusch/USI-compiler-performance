@@ -62,6 +62,26 @@ public class NodeWrapper {
 		}
 		return false;
 	}
+	
+	private List<Integer> getSmallestInheritPath(){
+		// init, if this step fails, this.inheritage was corrupt
+		List<Integer> smallestPath = this.inheritage.get(0);
+
+		// get min in size of all inheritPaths
+		for( List<Integer> inheritPath : this.inheritage){
+			int sizeSmallest = smallestPath.size();
+			int sizeCurrent = inheritPath.size();
+			if( sizeSmallest > sizeCurrent){
+				smallestPath = inheritPath;
+			}
+		}
+		return smallestPath;
+	}
+
+	private boolean inheritPathContains( Integer currAncestor, List<Integer> currentInheritPath){
+TODO
+		return false; // TODO
+	}
 
 	/*
 	 * merge inheritage list of another NodeWrapper with THIS NodeWrapper
@@ -106,53 +126,7 @@ public class NodeWrapper {
 		}
 
 
-/* //////////////////////////////////////////////		
-
-		if( DiGraph.START == this.id() ){
-// TODO check inheritage, is NULL here!!!
-			Analyzer.db("NodeWrapper::inheritageInit() - ROOT node\n" ); // XXX
-			// START / root node
-			List<Integer> currentGeneration = new ArrayList<Integer>();
-			currentGeneration.add(DiGraph.START );
-			this.inheritage.add( currentGeneration );
-			return;
-		}
-
-
-
-		// add list as separate new initialized lists
-//		Analyzer.db("\t- inheritage.size() " + String.valueOf( inheritage.size() ) ); // XXX
-		for( int idxGeneration=0; idxGeneration < inheritage.size(); ++idxGeneration){
-			List<Integer> generation = inheritage.get(idxGeneration);
-//			this.inheritage.add( new ArrayList<Integer>() ); // TODO why?!
-
-// FIXME
-			Analyzer.db("\t\t generation.size() " + String.valueOf( generation.size() ));
-			for( int idxid=0; idxid < generation.size(); ++idxid){
-
-				Analyzer.db("\t\t\t block" + generation.get(idxid)); // XXX
-
-				// new generation element
-				List<Integer> newGeneration = new ArrayList<Integer>();
-
-				// get the new entry, and add a new generation element
-				newGeneration.add( generation.get(idxid) );
-
-				// add new element
-				this.inheritage.add( newGeneration );
-			}
-		}
-
-
-
-		List<Integer> generation = this.inheritage.get(0);
-		int parentIdx = generation.size()-1;
-//		Integer latestId = generation.get( latestIdx );
-//*/
-
-
-
-		// set dominator
+		// figure out current dominator
 		List<Integer> smallestPath = getSmallestInheritPath(); // TODO
 		List<Integer> resultingPath = new ArrayList<Integer>();
 		for( int idxAncestor=0; idxAncestor < smallestPath.size(); ++idxAncestor){
