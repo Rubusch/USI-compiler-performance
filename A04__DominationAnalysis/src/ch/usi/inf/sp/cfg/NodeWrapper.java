@@ -15,7 +15,7 @@ public class NodeWrapper {
 	private final Integer Id;
 // TODO why is idom a Integer, and not a Node?
 	private Integer idom; // immediate dominator
-	private List<List<Integer>> inheritage;
+	private List<List<Integer>> heritage;
 
 	public NodeWrapper( final Integer startId){
 		this.Id = startId;
@@ -23,7 +23,7 @@ public class NodeWrapper {
 	}
 
 	public List<List<Integer>> getInheritage(){
-		return inheritage;
+		return heritage;
 	}
 
 
@@ -54,8 +54,8 @@ public class NodeWrapper {
 
 	private boolean isInheritPathContained(List<Integer> inheritPath){
 // TODO test method
-		if( 0 == this.inheritage.size() ) return false;
-		for( List<Integer> thisInheritPath : this.inheritage){
+		if( 0 == this.heritage.size() ) return false;
+		for( List<Integer> thisInheritPath : this.heritage){
 			if( isEqualInheritPaths(thisInheritPath, inheritPath )){
 				return true;
 			}
@@ -65,10 +65,10 @@ public class NodeWrapper {
 	
 	private List<Integer> getSmallestInheritPath(){
 		// init, if this step fails, this.inheritage was corrupt
-		List<Integer> smallestPath = this.inheritage.get(0);
+		List<Integer> smallestPath = this.heritage.get(0);
 
 		// get min in size of all inheritPaths
-		for( List<Integer> inheritPath : this.inheritage){
+		for( List<Integer> inheritPath : this.heritage){
 			int sizeSmallest = smallestPath.size();
 			int sizeCurrent = inheritPath.size();
 			if( sizeSmallest > sizeCurrent){
@@ -78,8 +78,11 @@ public class NodeWrapper {
 		return smallestPath;
 	}
 
-	private boolean inheritPathContains( Integer currAncestor, List<Integer> currentInheritPath){
-TODO
+	private boolean inheritPathContains( Integer currAncestor, List<Integer> inheritPath){
+// TODO test method
+		for( Integer ancestor : inheritPath){
+			if( currAncestor == ancestor) return true;
+		}
 		return false; // TODO
 	}
 
@@ -88,13 +91,13 @@ TODO
 	 * 
 	 * may be called at each update, so not just once
 	 */
-	public void inheritageInit( List<List<Integer>> inheritage){
+	public void updateHeritage( List<List<Integer>> heritage){
 		Analyzer.db("NodeWrapper::inheritageInit() - START, block" + String.valueOf( this.id()) ); // XXX
 
 		// init inheritage
-		if( null == this.inheritage ){
+		if( null == this.heritage ){
 			// first time called this method, do the initialization
-			this.inheritage = new ArrayList<List<Integer>>();
+			this.heritage = new ArrayList<List<Integer>>();
 
 			if( DiGraph.START == this.id()){
 				// init the absolute first node
@@ -102,7 +105,7 @@ TODO
 				// inheritage only has one path, with one element: START
 				List<Integer> inheritPath = new ArrayList<Integer>();
 				inheritPath.add(this.id());
-				this.inheritage.add(inheritPath);
+				this.heritage.add(inheritPath);
 
 				// there is NO dominator
 				this.idom = null;
@@ -114,14 +117,14 @@ TODO
 
 
 		// append "this.id" to all new inheritPaths and update this.inheritage
-		for( List<Integer> inheritPath : inheritage ){
+		for( List<Integer> inheritPath : heritage ){
 			// update parent inheritancePaths
 			inheritPath.add(this.id());
 
 			// filter out new inheritPaths in foreign inheritage
 			if( !isInheritPathContained(inheritPath) ){
 				// append, if it is not contained
-				this.inheritage.add(inheritPath);
+				this.heritage.add(inheritPath);
 			}
 		}
 
@@ -134,9 +137,9 @@ TODO
 			int currAncestor = smallestPath.get(idxAncestor);
 
 			int idxInheritPath = -1;
-			for( idxInheritPath=0; idxInheritPath < this.inheritage.size(); ++idxInheritPath){
+			for( idxInheritPath=0; idxInheritPath < this.heritage.size(); ++idxInheritPath){
 				// per inherit path check if it is contained (add) or not (discard)
-				List<Integer> currentInheritPath = this.inheritage.get(idxInheritPath);
+				List<Integer> currentInheritPath = this.heritage.get(idxInheritPath);
 
 				if( !inheritPathContains( currAncestor, currentInheritPath) ){
 					// not contained, discard element
@@ -144,7 +147,7 @@ TODO
 				}
 			}
 
-			if( idxInheritPath == this.inheritage.size()){
+			if( idxInheritPath == this.heritage.size()){
 				// all inheritPaths contained currAncestor, so append it
 				resultingPath.add(currAncestor);
 			}
@@ -164,13 +167,13 @@ TODO
 
 		// START node
 		if( null == parents && this.id() == DiGraph.START ){
-			inheritageInit( null );
+			updateHeritage( null );
 			return;
 		}
 		
 		// add all parent inheritages
 		for( NodeWrapper parent : parents ){
-			inheritageInit( parent.getInheritage() );
+			updateHeritage( parent.getInheritage() );
 		}
 
 		// find dominator (reset dominator)
