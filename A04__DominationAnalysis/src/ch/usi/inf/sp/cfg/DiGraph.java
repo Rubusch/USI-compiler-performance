@@ -153,10 +153,12 @@ public class DiGraph {
 				parentNodeList.add(edge.getFromNode());
 			}
 			if( 1 == parentNodeList.size()){
-				// pass heritage from a signle node
+				// pass heritage from a single node
 				currNode.inheritageInit( parentNodeList.get(0).getInheritage() );
 			}else{
 				// merge heritage from several parents together
+				Analyzer.db("going to merge...");
+				Analyzer.db("\t- parentNodeList.size() " + parentNodeList.size());
 				currNode.inheritageMerge(parentNodeList);
 			}
 		}

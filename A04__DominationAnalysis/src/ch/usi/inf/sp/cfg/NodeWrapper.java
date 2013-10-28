@@ -26,31 +26,52 @@ public class NodeWrapper {
 		return inheritage;
 	}
 
-	public void inheritageInit( List<List<Integer>> inheritage){
 
+
+	/*
+	 * merge inheritage list of another NodeWrapper with THIS NodeWrapper
+	 */
+	public void inheritageInit( List<List<Integer>> inheritage){
+		Analyzer.db("NodeWrapper::inheritageInit() - START" ); // XXX
+/*
 		if( null == inheritage ){
 			Analyzer.echo("FATAL - inheritage was null");
 			return;
 		}
-		// add list as separate new initialized lists (does addAll copy thoroughly enough??)
-		for( int idxinherit=0; idxinherit < inheritage.size(); ++idxinherit){
+//*/
+		// add list as separate new initialized lists
+		for( int idxInherit=0; idxInherit < inheritage.size(); ++idxInherit){
+			Analyzer.db("\t- " + String.valueOf(idxInherit)); // XXX
+/*
 			this.inheritage.add(new ArrayList<Integer>());
-			for( int idxid=0; idxid < inheritage.get(idxinherit).size(); ++idxid){
-				this.inheritage.get(idxinherit).add(inheritage.get(idxinherit).get(idxid));
+			for( int idxid=0; idxid < inheritage.get(idxInherit).size(); ++idxid){
+				this.inheritage.get(idxInherit).add(inheritage.get(idxInherit).get(idxid));
 			}
-		}
+/*/
+// TODO
+			List<Integer> inherit = inheritage.get(idxInherit);
 
+			this.inheritage.add( new ArrayList<Integer>() ); // TODO why?!
+
+			for( int idxid=0; idxid < inherit.size(); ++idxid){
+				this.inheritage.get(idxInherit).add(inherit.get(idxid));
+			}
+//*/
+		}
+/*
 		if( 0 == this.inheritage.size() ){
 // TODO this may be valid for START
 			Analyzer.echo( "FATAL - inhertiage was empty");
 			return;
 		}
-
+//*/
 		List<Integer> inherit = this.inheritage.get(0);
+/*
 		if( 0 == inherit.size()){
 			Analyzer.echo( "FATAL - first list in inheritage was empty");
 			return;
 		}
+//*/
 		Integer latestId = inherit.get( inherit.size()-1 );
 
 		// set dominator
@@ -62,25 +83,34 @@ public class NodeWrapper {
 				list.add(Id);
 			}// else: loop (issue with doubled last entries...)
 		}
+
+		Analyzer.db("NodeWrapper::inheritageInit() - END" ); // XXX
 	}
 
+
+
 	public void inheritageMerge( List<NodeWrapper> parents ){
-		Analyzer.db("inheritMerge()");
+		Analyzer.db("NodeWrapper::inheritageMerge() - START");
 		// add all parent inheritages
 		for( NodeWrapper parent : parents ){
+			Analyzer.db("\t- block" + parent.id() + " - inheritageInit()");
 			inheritageInit( parent.getInheritage() );
 		}
 
 		// find dominator (reset dominator)
 		identifyDominator( parents );
+		Analyzer.db("NodeWrapper::inheritageMerge() - END");
 	}
+
+
 
 	public Integer getIDom(){
 		if( null == idom ){ return 0; }
 		return idom;
 	}
 
-	
+
+
 	// return false, if was not mergeable (still), needs to be redone later
 	// this means basically a "false" shall provoke the remove from the
 	// "passedIds" list
@@ -89,6 +119,9 @@ public class NodeWrapper {
 // TODO remove redundant code
 // TODO check algorithm
 	private void identifyDominator( List<NodeWrapper> parents){
+		Analyzer.db("NodeWrapper::identifyDominator() - START");
+
+
 
 		for( NodeWrapper nd : parents){
 			boolean pending=false; // more ugly quickfixes
@@ -98,7 +131,8 @@ public class NodeWrapper {
 // since it works anyway +/-
 				pending = true;
 			}else{
-				Analyzer.db("NodeWrapper::identifyDominator() - " + String.valueOf( nd.getInheritage().get(0).get( nd.getInheritage().get(0).size()-1 )) ); // XXX
+				Analyzer.db("\t- " + String.valueOf( nd.getInheritage().get(0).get( nd.getInheritage().get(0).size()-1 )) ); // XXX
+				Analyzer.db("\t- block" + nd.id() );
 				this.idom = nd.getInheritage().get(0).get( nd.getInheritage().get(0).size()-1 );
 			}
 // TODO improve this by parse order
@@ -106,7 +140,8 @@ public class NodeWrapper {
 		}
 		Analyzer.db("NodeWrapper::identifyDominator() - no pendings");
 
-		
+
+
 		if( 2 > parents.size() ){
 			Analyzer.echo("FATAL - compare at least 2 nodes, passed were " + parents.size());
 		}
