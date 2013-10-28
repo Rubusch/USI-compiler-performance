@@ -28,24 +28,72 @@ public class NodeWrapper {
 
 
 
+
+
+
+
+
+
+
+
+
+	private boolean isEqualInheritPaths( List<Integer> inheritPathA, List<Integer> inheritPathB ){
+		int sizeA = inheritPathA.size();
+		int sizeB = inheritPathB.size();
+
+		if( sizeA != sizeB ) return false;
+ 
+		for(int idx=0; idx<sizeA; ++idx){
+			if(inheritPathA.get(idx) != inheritPathB.get(idx)){
+// TODO test this comparison
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean isInheritPathContained(List<Integer> inheritPath){
+// TODO test method
+		if( 0 == this.inheritage.size() ) return false;
+		for( List<Integer> thisInheritPath : this.inheritage){
+			if( isEqualInheritPaths(thisInheritPath, inheritPath )){
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/*
 	 * merge inheritage list of another NodeWrapper with THIS NodeWrapper
 	 */
 	public void inheritageInit( List<List<Integer>> inheritage){
 		Analyzer.db("NodeWrapper::inheritageInit() - START, block" + String.valueOf( this.id()) ); // XXX
-		Analyzer.db("\t this.id() block" + String.valueOf(this.id()));
 
-
-		// just call this init function ONCE, for a second time, call the merge
+		// just call init ONCE - for a second time, call the merge
 		if( null != this.inheritage ){
-			Analyzer.db("XXX block" + String.valueOf(this.id()) );
 			return;
 		}
+
+		// init inheritage
 		this.inheritage = new ArrayList<List<Integer>>();
 
 
+		for( List<Integer> inheritPath : inheritage ){
+			// update parent inheritancePaths
+			inheritPath.add(this.id());
 
+			if( !isInheritPathContained(inheritPath) ){
+				this.inheritage.add(inheritPath);
+			}
+		}
+		
+		
+		
+///////////////////////////////////////////////		
+		
+		
 		if( DiGraph.START == this.id() ){
+// TODO check inheritage, is NULL here!!!
 			Analyzer.db("NodeWrapper::inheritageInit() - ROOT node\n" ); // XXX
 			// START / root node
 			List<Integer> currentGeneration = new ArrayList<Integer>();
@@ -53,16 +101,13 @@ public class NodeWrapper {
 			this.inheritage.add( currentGeneration );
 			return;
 		}
-/*
-		if( null == inheritage ){
-			Analyzer.echo("FATAL - inheritage was null");
-			return;
-		}
-//*/
+
+
+
 		// add list as separate new initialized lists
-		Analyzer.db("\t- inheritage.size() " + String.valueOf( inheritage.size() ) ); // XXX
+//		Analyzer.db("\t- inheritage.size() " + String.valueOf( inheritage.size() ) ); // XXX
 		for( int idxGeneration=0; idxGeneration < inheritage.size(); ++idxGeneration){
-			Analyzer.db("\t- idxGeneration " + String.valueOf(idxGeneration)); // XXX
+//			Analyzer.db("\t- idxGeneration " + String.valueOf(idxGeneration)); // XXX
 /*
 			this.inheritage.add(new ArrayList<Integer>());
 			for( int idxid=0; idxid < inheritage.get(idxInherit).size(); ++idxid){
@@ -73,6 +118,7 @@ public class NodeWrapper {
 			List<Integer> generation = inheritage.get(idxGeneration);
 //			this.inheritage.add( new ArrayList<Integer>() ); // TODO why?!
 
+// FIXME
 			Analyzer.db("\t\t generation.size() " + String.valueOf( generation.size() ));
 			for( int idxid=0; idxid < generation.size(); ++idxid){
 
@@ -81,34 +127,24 @@ public class NodeWrapper {
 				// new generation element
 				List<Integer> newGeneration = new ArrayList<Integer>();
 
-				// add new element
-				this.inheritage.add( newGeneration );
-
 				// get the new entry, and add a new generation element
 				newGeneration.add( generation.get(idxid) );
+
+				// add new element
+				this.inheritage.add( newGeneration );
 			}
-//*/
 		}
 
-/*
-		if( 0 == this.inheritage.size() ){
-// TODO this may be valid for START
-			Analyzer.echo( "FATAL - inhertiage was empty");
-			return;
-		}
-//*/
+
+
 		List<Integer> generation = this.inheritage.get(0);
-/*
-		if( 0 == inherit.size()){
-			Analyzer.echo( "FATAL - first list in inheritage was empty");
-			return;
-		}
-//*/
 		int parentIdx = generation.size()-1;
 //		Integer latestId = generation.get( latestIdx );
 
+
+
+
 		// set dominator
-//		this.idom = latestId;
 		this.idom = generation.get( parentIdx );
 // FIXME: characteristic to select which parent inheritage to choose in case of several parent inheritages in the same generation
 
@@ -121,6 +157,8 @@ public class NodeWrapper {
 			}// else: loop (issue with doubled last entries...)
 		}
 
+
+
 		Analyzer.db("NodeWrapper::inheritageInit() - END\n" ); // XXX
 	}
 
@@ -128,9 +166,15 @@ public class NodeWrapper {
 
 	public void inheritageMerge( List<NodeWrapper> parents ){
 		Analyzer.db("NodeWrapper::inheritageMerge() - START");
+
+		// START node
+		if( null == parents && this.id() == DiGraph.START ){
+			inheritageInit( null );
+			return;
+		}
+		
 		// add all parent inheritages
 		for( NodeWrapper parent : parents ){
-			Analyzer.db("\t- block" + parent.id() + " - inheritageInit()");
 			inheritageInit( parent.getInheritage() );
 		}
 
@@ -155,10 +199,9 @@ public class NodeWrapper {
 // TODO separate in different methods
 // TODO remove redundant code
 // TODO check algorithm
+	
 	private void identifyDominator( List<NodeWrapper> parents){
 		Analyzer.db("NodeWrapper::identifyDominator() - START");
-
-
 
 		for( NodeWrapper nd : parents){
 			boolean pending=false; // more ugly quickfixes
@@ -180,11 +223,11 @@ public class NodeWrapper {
 		Analyzer.db("NodeWrapper::identifyDominator() - no pendings");
 
 
-
+/*
 		if( 2 > parents.size() ){
 			Analyzer.echo("FATAL - compare at least 2 nodes, passed were " + parents.size());
 		}
-
+//*/
 		// list of parents, each parent lists severan "inheritages", each is a list of Integers
 		ArrayList<ArrayList<ArrayList<Integer>>> data = new ArrayList<ArrayList<ArrayList<Integer>>>();
 

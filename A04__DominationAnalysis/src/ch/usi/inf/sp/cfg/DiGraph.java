@@ -100,11 +100,14 @@ public class DiGraph {
 		Stack<Edge> stack = new Stack<Edge>();
 
 		// init inheritage list with START
-		List<List<Integer>> inheritageList = new ArrayList<List<Integer>>();
-		List<Integer> inheritageElement = new ArrayList<Integer>();
-		inheritageElement.add(START);
-		inheritageList.add(inheritageElement);
-		currNode.inheritageInit(inheritageList);
+// TODO remove implicit initializiation, should be initialized automatically, by already having the information that this.id() == start (for the NodeWrapper)
+//		List<List<Integer>> inheritageList = new ArrayList<List<Integer>>();
+//		List<Integer> inheritageElement = new ArrayList<Integer>();
+//		inheritageElement.add(START);
+//		inheritageList.add(inheritageElement);
+//		currNode.inheritageInit(inheritageList);
+
+		currNode.inheritageMerge( null );
 
 		// longtime memory
 		passedIds.add(currNode.id());
@@ -152,15 +155,18 @@ public class DiGraph {
 			for( Edge edge : edges ){
 				parentNodeList.add(edge.getFromNode());
 			}
-			if( 1 == parentNodeList.size()){
-				// pass heritage from a single node
-				currNode.inheritageInit( parentNodeList.get(0).getInheritage() );
-			}else{
+//			if( 1 == parentNodeList.size()){
+//				// pass heritage from a single node
+//				currNode.inheritageInit( parentNodeList.get(0).getInheritage() );
+//			}else{
 				// merge heritage from several parents together
-				Analyzer.db("going to merge...");
-				Analyzer.db("\t- parentNodeList.size() " + parentNodeList.size());
-				currNode.inheritageMerge(parentNodeList);
-			}
+//				Analyzer.db("going to merge...");
+//				Analyzer.db("\t- parentNodeList.size() " + parentNodeList.size());
+//				currNode.inheritageMerge(parentNodeList);
+//			}
+
+			// update inheritage merge
+			currNode.inheritageMerge(parentNodeList);
 		}
 
 /******************************************************************************/
