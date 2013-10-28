@@ -87,6 +87,11 @@ public class DiGraph {
 	}
 	
 
+	private List<NodeWrapper> getNextNodes( NodeWrapper node ){
+		List<NodeWrapper> followers = new ArrayList<NodeWrapper>();
+		
+		for(edges)
+	}
 
 	public DiGraph(ControlFlowGraphExtractor controlFlow){
 		initCFGBlockList( controlFlow );
@@ -100,13 +105,6 @@ public class DiGraph {
 		Stack<Edge> stack = new Stack<Edge>();
 
 		// init inheritage list with START
-// TODO remove implicit initializiation, should be initialized automatically, by already having the information that this.id() == start (for the NodeWrapper)
-//		List<List<Integer>> inheritageList = new ArrayList<List<Integer>>();
-//		List<Integer> inheritageElement = new ArrayList<Integer>();
-//		inheritageElement.add(START);
-//		inheritageList.add(inheritageElement);
-//		currNode.inheritageInit(inheritageList);
-
 		currNode.inheritageMerge( null );
 
 		// longtime memory
@@ -152,9 +150,14 @@ public class DiGraph {
 			// set heritage to the children
 			// set up another list of the sources (nodes) of those edges, pointing to current
 			final List<NodeWrapper> parentNodeList = new ArrayList<NodeWrapper>();
+			
+/*
+			final List<NodeWrapper> parentNodeList = new ArrayList<NodeWrapper>();
 			for( Edge edge : edges ){
 				parentNodeList.add(edge.getFromNode());
 			}
+//*/
+			
 //			if( 1 == parentNodeList.size()){
 //				// pass heritage from a single node
 //				currNode.inheritageInit( parentNodeList.get(0).getInheritage() );

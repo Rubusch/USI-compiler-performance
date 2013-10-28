@@ -1,7 +1,9 @@
 package ch.usi.inf.sp.cfg;
 
 import java.util.ArrayList;
+import java.util.EmptyStackException;
 import java.util.List;
+import java.util.Stack;
 
 import org.objectweb.asm.tree.AbstractInsnNode;
 
@@ -22,7 +24,7 @@ public class NodeWrapper {
 //		this.inheritage = new ArrayList<List<Integer>>();
 	}
 
-	public List<List<Integer>> getInheritage(){
+	public List<List<Integer>> getHeritage(){
 		return heritage;
 	}
 
@@ -117,6 +119,12 @@ public class NodeWrapper {
 
 
 		// append "this.id" to all new inheritPaths and update this.inheritage
+		if( null == heritage ){
+			Analyzer.die("AAA null");
+		}
+		Analyzer.db("AAA heritage.size " + String.valueOf(heritage.size()));
+
+
 		for( List<Integer> inheritPath : heritage ){
 			// update parent inheritancePaths
 			inheritPath.add(this.id());
@@ -124,6 +132,7 @@ public class NodeWrapper {
 			// filter out new inheritPaths in foreign inheritage
 			if( !isInheritPathContained(inheritPath) ){
 				// append, if it is not contained
+				Analyzer.db("\t\tappend inheritPath");
 				this.heritage.add(inheritPath);
 			}
 		}
@@ -170,14 +179,38 @@ public class NodeWrapper {
 			updateHeritage( null );
 			return;
 		}
+
+
+		// set up a stack for the parents
+		for( NodeWrapper parent : parents){
+//			if( null != parent.getHeritage() ){
+				updateHeritage( parent.getHeritage() );
+//			}
+		}
 		
-		// add all parent inheritages
-		for( NodeWrapper parent : parents ){
+/*
+		Stack<NodeWrapper> parentsStack = new Stack<NodeWrapper>();
+		for( NodeWrapper parent : parents){
+			parentsStack.push(parent);
+		}
+
+		NodeWrapper parent;
+		while( !parentsStack.empty() ){
+			// get element
+			parent = parentsStack.pop();
+
+			// if inheritage still not parsed, put back to stack
+			if( null == parent.getInheritage() ){
+			// pending, reparse later
+//				parentsStack.add( parent );
+				continue;
+			}
 			updateHeritage( parent.getInheritage() );
 		}
 
 		// find dominator (reset dominator)
-		identifyDominator( parents );
+//		identifyDominator( parents );
+//*/
 		Analyzer.db("NodeWrapper::inheritageMerge() - END");
 	}
 
@@ -203,7 +236,7 @@ public class NodeWrapper {
 
 		for( NodeWrapper nd : parents){
 			boolean pending=false; // more ugly quickfixes
-			List<List<Integer>> ndInheritageList = nd.getInheritage();
+			List<List<Integer>> ndInheritageList = nd.getHeritage();
 			if( 0 == ndInheritageList.size() ){
 //			if( 0 == nd.getInheritage().size()){
 // TODO in case one parent is still not parsed (upward link), just postpone this 
@@ -211,9 +244,9 @@ public class NodeWrapper {
 // since it works anyway +/-
 				pending = true;
 			}else{
-				Analyzer.db("\t- " + String.valueOf( nd.getInheritage().get(0).get( nd.getInheritage().get(0).size()-1 )) ); // XXX
+				Analyzer.db("\t- " + String.valueOf( nd.getHeritage().get(0).get( nd.getHeritage().get(0).size()-1 )) ); // XXX
 				Analyzer.db("\t- block" + nd.id() );
-				this.idom = nd.getInheritage().get(0).get( nd.getInheritage().get(0).size()-1 );
+				this.idom = nd.getHeritage().get(0).get( nd.getHeritage().get(0).size()-1 );
 			}
 // TODO improve this by parse order
 			if( pending ) return;
@@ -235,8 +268,8 @@ public class NodeWrapper {
 			NodeWrapper parent = parents.get(idxparent);
 			data.add(new ArrayList<ArrayList<Integer>>());
 
-			for( int idxinherit=0; idxinherit < parent.getInheritage().size(); ++idxinherit){
-				List<Integer> inherit = parent.getInheritage().get(idxinherit);
+			for( int idxinherit=0; idxinherit < parent.getHeritage().size(); ++idxinherit){
+				List<Integer> inherit = parent.getHeritage().get(idxinherit);
 
 				// per descendence lists
 				data.get(idxparent).add(new ArrayList<Integer>());
