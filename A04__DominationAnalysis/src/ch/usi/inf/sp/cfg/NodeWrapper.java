@@ -40,8 +40,9 @@ public class NodeWrapper {
 		}
 //*/
 		// add list as separate new initialized lists
-		for( int idxInherit=0; idxInherit < inheritage.size(); ++idxInherit){
-			Analyzer.db("\t- " + String.valueOf(idxInherit)); // XXX
+		Analyzer.db("\t- inheritage.size() " + String.valueOf( inheritage.size() ) ); // XXX
+		for( int idxGeneration=0; idxGeneration < inheritage.size(); ++idxGeneration){
+			Analyzer.db("\t- idxGeneration " + String.valueOf(idxGeneration)); // XXX
 /*
 			this.inheritage.add(new ArrayList<Integer>());
 			for( int idxid=0; idxid < inheritage.get(idxInherit).size(); ++idxid){
@@ -49,15 +50,26 @@ public class NodeWrapper {
 			}
 /*/
 // TODO
-			List<Integer> inherit = inheritage.get(idxInherit);
+			List<Integer> generation = inheritage.get(idxGeneration);
+//			this.inheritage.add( new ArrayList<Integer>() ); // TODO why?!
 
-			this.inheritage.add( new ArrayList<Integer>() ); // TODO why?!
+			Analyzer.db("\t\t generation.size() " + String.valueOf( generation.size() ));
+			for( int idxid=0; idxid < generation.size(); ++idxid){
 
-			for( int idxid=0; idxid < inherit.size(); ++idxid){
-				this.inheritage.get(idxInherit).add(inherit.get(idxid));
+				Analyzer.db("\t\t\t block" + generation.get(idxid)); // XXX
+
+				// new generation element
+				List<Integer> newGeneration = new ArrayList<Integer>();
+
+				// add new element
+				this.inheritage.add( newGeneration );
+
+				// get the new entry, and add a new generation element
+				newGeneration.add( generation.get(idxid) );
 			}
 //*/
 		}
+
 /*
 		if( 0 == this.inheritage.size() ){
 // TODO this may be valid for START
@@ -84,7 +96,7 @@ public class NodeWrapper {
 			}// else: loop (issue with doubled last entries...)
 		}
 
-		Analyzer.db("NodeWrapper::inheritageInit() - END" ); // XXX
+		Analyzer.db("NodeWrapper::inheritageInit() - END\n" ); // XXX
 	}
 
 
