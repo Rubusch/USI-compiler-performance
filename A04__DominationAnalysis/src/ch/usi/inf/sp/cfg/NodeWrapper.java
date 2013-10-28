@@ -33,6 +33,7 @@ public class NodeWrapper {
 	 */
 	public void inheritageInit( List<List<Integer>> inheritage){
 		Analyzer.db("NodeWrapper::inheritageInit() - START" ); // XXX
+		Analyzer.db("\t this.id() block" + String.valueOf(this.id()));
 /*
 		if( null == inheritage ){
 			Analyzer.echo("FATAL - inheritage was null");
@@ -77,22 +78,27 @@ public class NodeWrapper {
 			return;
 		}
 //*/
-		List<Integer> inherit = this.inheritage.get(0);
+		List<Integer> generation = this.inheritage.get(0);
 /*
 		if( 0 == inherit.size()){
 			Analyzer.echo( "FATAL - first list in inheritage was empty");
 			return;
 		}
 //*/
-		Integer latestId = inherit.get( inherit.size()-1 );
+		int parentIdx = generation.size()-1;
+//		Integer latestId = generation.get( latestIdx );
 
 		// set dominator
-		this.idom = latestId;
+//		this.idom = latestId;
+		this.idom = generation.get( parentIdx );
+// FIXME: characteristic to select which parent inheritage to choose in case of several parent inheritages in the same generation
 
-		// append own Id to all of the inheritage lists
-		for( List<Integer> list : this.inheritage ){
-			if( -1 == list.indexOf(Id)){
-				list.add(Id);
+		// update, and append own Id to all of the inheritage lists
+		for( List<Integer> parentInheritages : this.inheritage ){
+
+			// append if parent inheritage still does not contain this element
+			if( -1 == parentInheritages.indexOf(Id)){
+				parentInheritages.add(Id);
 			}// else: loop (issue with doubled last entries...)
 		}
 
