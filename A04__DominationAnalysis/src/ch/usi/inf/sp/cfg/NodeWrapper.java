@@ -65,30 +65,45 @@ public class NodeWrapper {
 
 	/*
 	 * merge inheritage list of another NodeWrapper with THIS NodeWrapper
+	 * 
+	 * may be called at each update, so not just once
 	 */
 	public void inheritageInit( List<List<Integer>> inheritage){
 		Analyzer.db("NodeWrapper::inheritageInit() - START, block" + String.valueOf( this.id()) ); // XXX
 
-		// just call init ONCE - for a second time, call the merge
-		if( null != this.inheritage ){
-			return;
+		// init inheritage
+		if( null == this.inheritage ){
+			// first time called this method, do the initialization
+			this.inheritage = new ArrayList<List<Integer>>();
+
+			if( DiGraph.START == this.id()){
+				// init the absolute first node
+				
+				// inheritage only has one path, with one element: START
+				List<Integer> inheritPath = new ArrayList<Integer>();
+				inheritPath.add(this.id());
+				this.inheritage.add(inheritPath);
+
+				// there is NO dominator
+				this.idom = null;
+
+				// done
+				return;
+			}
 		}
 
-		// init inheritage
-		this.inheritage = new ArrayList<List<Integer>>();
 
-
+		// append "this.id" to all new inheritPaths and update this.inheritage
 		for( List<Integer> inheritPath : inheritage ){
 			// update parent inheritancePaths
 			inheritPath.add(this.id());
 
-			// check wether a new path of inheritance is contained
+			// filter out new inheritPaths in foreign inheritage
 			if( !isInheritPathContained(inheritPath) ){
-				// append it, if it is not contained
+				// append, if it is not contained
 				this.inheritage.add(inheritPath);
 			}
 		}
-
 
 
 /* //////////////////////////////////////////////		
@@ -138,64 +153,32 @@ public class NodeWrapper {
 
 
 		// set dominator
-//*
-
-//		int minAncestors = getMinInheritPathSize(); // TODO
-
-		
-		List<Integer> smallesPath = getSmallestInheritPath(); // TODO
+		List<Integer> smallestPath = getSmallestInheritPath(); // TODO
 		List<Integer> resultingPath = new ArrayList<Integer>();
-		for( int idxAncestor=0; idxAncestor < minAncestors; ++idxAncestor){
+		for( int idxAncestor=0; idxAncestor < smallestPath.size(); ++idxAncestor){
+			// get element of the smallest list
+			int currAncestor = smallestPath.get(idxAncestor);
 
-// TODO new algo: start from S, then extract a list of "common" nodes of all (is contained?), then after take the last element, which is the final common element			
-			
-			
-			
-// TODO rm
-			// start at 1, the parents, since 0 is the node itself
-			int currAncestor;
-			for( int idxInheritPath=0; idxInheritPath < this.inheritage.size(); ++idxInheritPath){
-				// go through all possible inherit paths starting from S
+			int idxInheritPath = -1;
+			for( idxInheritPath=0; idxInheritPath < this.inheritage.size(); ++idxInheritPath){
+				// per inherit path check if it is contained (add) or not (discard)
+				List<Integer> currentInheritPath = this.inheritage.get(idxInheritPath);
 
-				// get current inheritPath
-				List<Integer> inheritPath = this.inheritage.get(idxInheritPath);
-
-				if(0 == idxInheritPath){
-					currAncestor = inheritPath.get(idxAncestor);
-					continue;
-				}
-
-
-
-// FIXME: imagine a inheritPaths: S-b0-b2 and S-b1, the common ancestor node is S, the min index is 2: for-loop will fail to find 'S'
-
-
-
-				// stop it when equal ancestor nodes are found
-				if( currAncestor == inheritPath.get(idxAncestor)){
+				if( !inheritPathContains( currAncestor, currentInheritPath) ){
+					// not contained, discard element
 					break;
 				}
 			}
 
-			// append if it is contained in all inheritPaths
-			resultingPath.add( currAncestor );
+			if( idxInheritPath == this.inheritage.size()){
+				// all inheritPaths contained currAncestor, so append it
+				resultingPath.add(currAncestor);
+			}
 		}
 
-
-
-/*/		this.idom = generation.get( parentIdx );
-// FIXME: characteristic to select which parent inheritage to choose in case of several parent inheritages in the same generation
-
-		// update, and append own Id to all of the inheritage lists
-		for( List<Integer> parentInheritages : this.inheritage ){
-
-			// append if parent inheritage still does not contain this element
-			if( -1 == parentInheritages.indexOf(Id)){
-				parentInheritages.add(Id);
-			}// else: loop (issue with doubled last entries...)
-		}
-//*/
-
+		// dominator
+		int lastIdx = resultingPath.size() -1;
+		this.idom = resultingPath.get(lastIdx);
 
 		Analyzer.db("NodeWrapper::inheritageInit() - END\n" ); // XXX
 	}
