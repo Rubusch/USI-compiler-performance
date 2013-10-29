@@ -98,6 +98,7 @@ public class NodeWrapper {
 
 		// init inheritage
 		if( null == this.heritage ){
+			Analyzer.db("\tthis.heritage was null"); // XXX
 			// first time called this method, do the initialization
 			this.heritage = new ArrayList<List<Integer>>();
 
@@ -118,11 +119,17 @@ public class NodeWrapper {
 		}
 
 
+
+
+
 		// append "this.id" to all new inheritPaths and update this.inheritage
 		if( null == heritage ){
 			Analyzer.die("AAA null");
 		}
 		Analyzer.db("AAA heritage.size " + String.valueOf(heritage.size()));
+
+
+
 
 
 		for( List<Integer> inheritPath : heritage ){
@@ -171,22 +178,24 @@ public class NodeWrapper {
 
 
 
-	public void inheritageMerge( List<NodeWrapper> parents ){
+//	public void inheritageMerge( List<NodeWrapper> parents ){
+	public void inheritageMerge( NodeWrapper parent ){
 		Analyzer.db("NodeWrapper::inheritageMerge() - START");
 
 		// START node
-		if( null == parents && this.id() == DiGraph.START ){
+		if( null == parent && this.id() == DiGraph.START ){
+			Analyzer.db("\tnull == parent && this.id() == DiGraph.START");
 			updateHeritage( null );
 			return;
 		}
 
 
 		// set up a stack for the parents
-		for( NodeWrapper parent : parents){
+//		for( NodeWrapper parent : parents){
 //			if( null != parent.getHeritage() ){
 				updateHeritage( parent.getHeritage() );
 //			}
-		}
+//		}
 		
 /*
 		Stack<NodeWrapper> parentsStack = new Stack<NodeWrapper>();
@@ -222,7 +231,7 @@ public class NodeWrapper {
 	}
 
 
-
+/*
 	// return false, if was not mergeable (still), needs to be redone later
 	// this means basically a "false" shall provoke the remove from the
 	// "passedIds" list
@@ -254,11 +263,11 @@ public class NodeWrapper {
 		Analyzer.db("NodeWrapper::identifyDominator() - no pendings");
 
 
-/*
+/ *
 		if( 2 > parents.size() ){
 			Analyzer.echo("FATAL - compare at least 2 nodes, passed were " + parents.size());
 		}
-//*/
+// * /
 		// list of parents, each parent lists severan "inheritages", each is a list of Integers
 		ArrayList<ArrayList<ArrayList<Integer>>> data = new ArrayList<ArrayList<ArrayList<Integer>>>();
 
@@ -337,7 +346,7 @@ public class NodeWrapper {
 		}
 		return;
 	}
-
+//*/
 
 	public void dotPrint(){
 // TODO check, another label?

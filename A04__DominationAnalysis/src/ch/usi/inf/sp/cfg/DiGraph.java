@@ -85,28 +85,98 @@ public class DiGraph {
 			CFGEdgeList.add(new Edge( srcNode, dstNode));
 		}
 	}
-	
 
-	private List<NodeWrapper> getNextNodes( NodeWrapper node ){
-		List<NodeWrapper> followers = new ArrayList<NodeWrapper>();
-		
-		for(edges)
+
+
+	private List<NodeWrapper> getNextNodes( NodeWrapper currNode ){
+// TODO test function
+		List<NodeWrapper> nextNodes = new ArrayList<NodeWrapper>();
+
+		// find next node from currNode
+		for( Edge edge : CFGEdgeList){
+			if( currNode == edge.getFromNode() ){
+				nextNodes.add(edge.getToNode());
+			}
+		}
+
+		// return list of following next ndoes
+		return nextNodes;
 	}
 
 	public DiGraph(ControlFlowGraphExtractor controlFlow){
 		initCFGBlockList( controlFlow );
 		initCFGEdgeList( controlFlow );
 
-/******************************************************************************/
 		// CFG prepared
 		NodeWrapper currNode = getNodeById(CFGBlockList, START);
 
 		List<Integer> passedIds = new ArrayList<Integer>();
 		Stack<Edge> stack = new Stack<Edge>();
+//		Stack<NodeWrapper> stack = new Stack<NodeWrapper>();
 
 		// init inheritage list with START
 		currNode.inheritageMerge( null );
 
+
+// TODO rework
+		while( true ){
+			if( stack.isEmpty()){
+
+//				if( !passedIds.contains(node.id())){
+
+
+				// stack is empty, go discover next tier, push on stack
+				List<NodeWrapper> nextNodes = getNextNodes( currNode );
+				for( NodeWrapper node : nextNodes ){
+					stack.push(new Edge(currNode, node));
+				}
+
+				if( stack.isEmpty()){
+// TODO test the break and completeness of the traverser
+					// we're done when the stack can't be filled anymore
+					break;
+				}
+				continue;
+			}
+
+			// stack was NOT empty, fetch first candidate...
+			Edge currEdge = stack.pop();
+			NodeWrapper parentNode = currEdge.getFromNode();
+			currNode = currEdge.getToNode();
+
+			
+			
+			// keep track on where already been (avoid loops)
+			passedIds.add( currNode.id() );
+
+
+
+//			// set up a list of all edges pointing at the current node (linking down, but not linking upward, to avoid loop issues)
+//			List<Edge> edges = new ArrayList<Edge>();
+//			for( Edge edge: CFGEdgeList){
+//				if( null != edge.getToNode()){
+//					if( currNode.id() == edge.getToNode().id()){
+//						edges.add(edge);
+//					}
+//				}
+//			}
+
+			// set heritage to the children
+			// set up another list of the sources (nodes) of those edges, pointing to current
+//			final List<NodeWrapper> parentNodeList = new ArrayList<NodeWrapper>();
+//			for( Edge edge : edges ){
+//				parentNodeList.add(edge.getFromNode());
+//			}
+
+			// update inheritage merge
+//			currNode.inheritageMerge(parentNodeList);
+
+
+
+			currNode.inheritageMerge(parentNode);
+		}
+
+/*		
 		// longtime memory
 		passedIds.add(currNode.id());
 
@@ -151,12 +221,11 @@ public class DiGraph {
 			// set up another list of the sources (nodes) of those edges, pointing to current
 			final List<NodeWrapper> parentNodeList = new ArrayList<NodeWrapper>();
 			
-/*
+
 			final List<NodeWrapper> parentNodeList = new ArrayList<NodeWrapper>();
 			for( Edge edge : edges ){
 				parentNodeList.add(edge.getFromNode());
 			}
-//*/
 			
 //			if( 1 == parentNodeList.size()){
 //				// pass heritage from a single node
@@ -171,6 +240,7 @@ public class DiGraph {
 			// update inheritage merge
 			currNode.inheritageMerge(parentNodeList);
 		}
+//*/
 
 /******************************************************************************/
 		// map CFG to DA
