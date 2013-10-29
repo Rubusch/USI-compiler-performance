@@ -64,8 +64,11 @@ public class NodeWrapper {
 		}
 		return false;
 	}
-	
+
 	private List<Integer> getSmallestInheritPath(){
+		
+FIXME: which one is the smallest list, just a "curr element list" (size = 1)??
+
 		// init, if this step fails, this.inheritage was corrupt
 		List<Integer> smallestPath = this.heritage.get(0);
 
