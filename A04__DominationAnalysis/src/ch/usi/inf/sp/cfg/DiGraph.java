@@ -138,7 +138,6 @@ public class DiGraph {
 				}
 
 				if( stack.isEmpty()){
-// TODO test the break and completeness of the traverser
 					// we're done when the stack can't be filled anymore
 					break;
 				}
@@ -154,9 +153,6 @@ public class DiGraph {
 			currNode = currEdge.getToNode();
 
 			// update dominator information
-Analyzer.db("DiGraph currNode block" + String.valueOf(currNode.id())); // XXX
-Analyzer.db("DiGraph parentNode block" + String.valueOf(parentNode.id())); // XXX
-Analyzer.db(String.valueOf(parentNode.getHeritage())); // XXX
 			currNode.inheritageMerge(parentNode);
 		}
 

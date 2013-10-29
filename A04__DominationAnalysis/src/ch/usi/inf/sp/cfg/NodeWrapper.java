@@ -120,7 +120,7 @@ public class NodeWrapper {
 
 		// init inheritage
 		if( null == this.heritage ){
-			Analyzer.db("\tthis.heritage was null"); // XXX
+//			Analyzer.db("\tthis.heritage was null"); // XXX
 			// first time called this method, do the initialization
 			this.heritage = new ArrayList<List<Integer>>();
 
@@ -141,58 +141,30 @@ public class NodeWrapper {
 		}
 
 
-
-
-/*
-		// append "this.id" to all new inheritPaths and update this.inheritage
-		if( null == heritage ){
-			Analyzer.die("AAA null");
-		}
-//		Analyzer.db("AAA heritage.size " + String.valueOf(heritage.size()));
-//*/
-
-
-
-
 		for( List<Integer> inheritPath : heritage ){
-Analyzer.db("DDD passed heritage::inheritPath: ");
-Analyzer.db(String.valueOf(inheritPath));
-
 			List<Integer> inheritPathClone = cloneInheritPath( inheritPath );
 
-
 			// update parent inheritancePaths
-//			inheritPath.add(this.id());
 			inheritPathClone.add(this.id());
 
 			// filter out new inheritPaths in foreign inheritage
-//			if( !isInheritPathContained(inheritPath) ){
 			if( !isInheritPathContained(inheritPathClone) ){
 				// append, if it is not contained
-//				Analyzer.db("\t\tappend inheritPathClone");
-//				this.heritage.add(inheritPath);
 				this.heritage.add(inheritPathClone);
 			}
 		}
 
 
-
 //*		// DEBUG
-		Analyzer.db("DDD /");
-		for( List<Integer> inheritPath : this.heritage){
-			Analyzer.db("DDD this.heritage::inheritPath");
-			Analyzer.db(String.valueOf(inheritPath));
-		}
-		Analyzer.db("/ DDD");
+Analyzer.db("XXX / this.heritage =");
+Analyzer.db(String.valueOf(this.heritage));
+Analyzer.db("/ XXX");
 //*/		// /DEBUG
-
 
 
 		// figure out current dominator
 		List<Integer> smallestPath = getSmallestInheritPath();
 		List<Integer> resultingPath = new ArrayList<Integer>();
-
-//Analyzer.db(String.valueOf(smallestPath)); // XXX
 
 		// last valid element is smallestPath.size() -2 (-1 is this.id())
 		for( int idxAncestor=0; idxAncestor < smallestPath.size()-1; ++idxAncestor){
@@ -210,7 +182,6 @@ Analyzer.db(String.valueOf(inheritPath));
 			}
 
 			if( idxInheritPath == this.heritage.size()){
-Analyzer.db("XXX resultingPath.add( " + String.valueOf(currAncestor) + ")"); // XXX
 				// all inheritPaths contained currAncestor, so append it
 				resultingPath.add(currAncestor);
 			}
