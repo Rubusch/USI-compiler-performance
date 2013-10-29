@@ -214,8 +214,8 @@ public class DiGraph {
 		Analyzer.echo( "  node [shape=record,width=.1,height=.1]" );
 
 		// nodes
-		Analyzer.echo( "  nodeS [label = \"start\"];" );
-		Analyzer.echo( "  nodeE [label = \"end\"];" );
+//		Analyzer.echo( "  nodeS [label = \"start\"];" );
+//		Analyzer.echo( "  nodeE [label = \"end\"];" );
 		for( NodeWrapper node : CFGBlockList ){
 			node.dotPrint();
 		}

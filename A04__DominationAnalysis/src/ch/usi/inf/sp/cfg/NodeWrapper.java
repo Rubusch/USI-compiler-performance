@@ -190,9 +190,9 @@ Analyzer.db("/ XXX");
 
 	public void dotPrint(){
 		if( DiGraph.START == Id ){
-			Analyzer.echo( "  nodeS [label = \"blockS\"]");
+			Analyzer.echo( "  nodeS [label = \"Start\"]");
 		}else if( DiGraph.END == Id){
-			Analyzer.echo( "  nodeE [label = \"blockE\"]");
+			Analyzer.echo( "  nodeE [label = \"End\"]");
 		}else{
 			Analyzer.echo( "  node" + Id + " [label = \"block" + Id + "\"]");
 		}
