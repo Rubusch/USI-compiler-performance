@@ -89,8 +89,8 @@ Analyzer.db("XXX backward jump - there seems to be a minor bug"); // XXX
 //			for( int listIdx = 0; listIdx < this.blockList.size(); ++listIdx ){ // XXX
 				AbstractInsnNode firstIns = this.blockList.get(listIdx).get(0);
 				int idxFirstIns = this.blockList.indexOf( firstIns );
-Analyzer.db( "XXX dstidx " + String.valueOf(dstidx)); // XXX
-Analyzer.db( "XXX idxFirstIns " + String.valueOf(idxFirstIns)); // XXX
+//Analyzer.db( "XXX dstidx " + String.valueOf(dstidx)); // XXX
+//Analyzer.db( "XXX idxFirstIns " + String.valueOf(idxFirstIns)); // XXX
 				if( dstidx < idxFirstIns ){
 					// we ultrapassed one, so the last one is it: go back
 					int start = idxLastFirstIns;
@@ -170,6 +170,11 @@ Analyzer.db( "XXX idxFirstIns " + String.valueOf(idxFirstIns)); // XXX
 
 				// provoke a new basic block
 				branchNextIteration = true;
+				
+			}else if( ins.getType() == AbstractInsnNode.TABLESWITCH_INSN){
+				// table switch
+Analyzer.die("TODO");
+				
 			}else if( ins.getType() == AbstractInsnNode.INSN){
 				switch (ins.getOpcode()){
 				case Opcodes.IRETURN:

@@ -9,13 +9,7 @@ public class Edge {
 	private NodeWrapper fromNode;
 	private NodeWrapper toNode;
 	private String dotLabel; // TODO use?!
-/*
-	public Edge( Node fromNode, Node toNode, String dotLabel){
-		this.fromNode = fromNode;
-		this.toNode = toNode;
-		this.dotLabel = dotLabel;
-	}
-*/
+
 	public Edge( NodeWrapper fromNode, NodeWrapper toNode){
 		if( fromNode.id() == toNode.id() ){
 			// this check should not be necessary
