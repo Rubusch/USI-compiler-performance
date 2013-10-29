@@ -88,11 +88,13 @@ public class DiGraph {
 
 
 	private List<Edge> getNextEdges( NodeWrapper currNode ){
+// TODO check the content of lists
 		List<Edge> nextEdges = new ArrayList<Edge>();
 
 		// find next node from currNode
 		for( Edge edge : CFGEdgeList){
 			if( currNode == edge.getFromNode() ){
+				Analyzer.db("getNextEdges.add");
 				nextEdges.add(edge);
 			}
 		}
@@ -126,21 +128,31 @@ public class DiGraph {
 		currNode.inheritageMerge( null );
 
 		while( true ){
-			if( stack.isEmpty()){
+//			if( stack.isEmpty()){
 				// stack is empty, go discover next tier, push on stack
 				List<Edge> nextEdges = getNextEdges( currNode );
 				for( Edge nextEdge : nextEdges ){
+// TODO may also be added while stack is NOT empty
 					if( !isPassedEdge( passedEdges, nextEdge )){
+						Analyzer.db("XXX push on stack"); // XXX
+						nextEdge.dotPrint(); // XXX
+
 						stack.push(nextEdge);
 					}
+/*
+// DEBUG
+					else{
+						Analyzer.die("BLOCKED");
+					}
+//*/
 				}
 
 				if( stack.isEmpty()){
 					// we're done when the stack can't be filled anymore
 					break;
 				}
-				continue;
-			}
+//				continue;
+//			}
 
 			// stack was NOT empty, fetch first candidate...
 			Edge currEdge = stack.pop();
