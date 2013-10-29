@@ -178,12 +178,10 @@ Analyzer.db("XXX backward jump - there seems to be a minor bug"); // XXX
 					final LabelNode targetInstruction = (LabelNode)labels.get(t);
 					final int targetIdx = instructions.indexOf(targetInstruction);
 					branching( idx, targetIdx);
-//					szBlock += key+": "+targetId+", "; // TODO rm
 				}
 				final LabelNode defaultTargetInstruction = ((TableSwitchInsnNode)ins).dflt;
 				final int targetIdx = instructions.indexOf(defaultTargetInstruction);
 				branching( idx, targetIdx );
-//				szBlock += "default: "+defaultTargetId; // TODO rm
 
 				// provoke a new basic block
 				branchNextIteration = true;

@@ -173,7 +173,45 @@ public class ControlFlowGraphExtractor {
 
 				// provoke a new basic block
 				branchNextIteration = true;
+
+			}else if( ins.getType() == AbstractInsnNode.TABLESWITCH_INSN){
+				// table switch
+				final int minKey = ((TableSwitchInsnNode)ins).min;
+				final List<?> labels = ((TableSwitchInsnNode)ins).labels;
+				for (int t=0; t<labels.size(); t++) {
+					final int key = minKey+t;
+					final LabelNode targetInstruction = (LabelNode)labels.get(t);
+					final int targetIdx = instructions.indexOf(targetInstruction);
+					branching( idx, targetIdx);
+				}
+				final LabelNode defaultTargetInstruction = ((TableSwitchInsnNode)ins).dflt;
+				final int targetIdx = instructions.indexOf(defaultTargetInstruction);
+				branching( idx, targetIdx );
+
+				// provoke a new basic block
+				branchNextIteration = true;
+
+				
+			}else if( ins.getType() == AbstractInsnNode.INSN){
+				switch (ins.getOpcode()){
+				case Opcodes.IRETURN:
+				case Opcodes.LRETURN:
+				case Opcodes.FRETURN:
+				case Opcodes.DRETURN:
+				case Opcodes.ARETURN:
+				case Opcodes.RETURN:
+					if(1 >= instructions.size() - idx + 1){
+						// RETURN at the end - before last instruction or last 
+						// instruction, don't split, just connect to E
+						edgeslistAdd( idx, -1, "label=\"return\"");
+					}else{
+						// RETURN within running code, branch
+						branching( idx, -1, "label=\"return\"" );
+					}
+					break;
+				}
 			}
+
 
 			if( EState.TRYING == exceptionTable.state(idx) ){
 				// types of instructions of PEIs are:
