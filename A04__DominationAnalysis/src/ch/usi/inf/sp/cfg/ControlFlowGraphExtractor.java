@@ -80,11 +80,17 @@ public class ControlFlowGraphExtractor {
 		edgeslistAdd( srcidx, dstidx, opt);
 
 		if( dstidx < srcidx ){
+Analyzer.db("XXX backward jump - there seems to be a minor bug"); // XXX
 			// backward jump
 			int idxLastFirstIns = 0;
 			for( int listIdx = 1; listIdx < this.blockList.size()-1; ++listIdx ){
+
+// FIXME forEver, does not split b0
+//			for( int listIdx = 0; listIdx < this.blockList.size(); ++listIdx ){ // XXX
 				AbstractInsnNode firstIns = this.blockList.get(listIdx).get(0);
 				int idxFirstIns = this.blockList.indexOf( firstIns );
+Analyzer.db( "XXX dstidx " + String.valueOf(dstidx)); // XXX
+Analyzer.db( "XXX idxFirstIns " + String.valueOf(idxFirstIns)); // XXX
 				if( dstidx < idxFirstIns ){
 					// we ultrapassed one, so the last one is it: go back
 					int start = idxLastFirstIns;

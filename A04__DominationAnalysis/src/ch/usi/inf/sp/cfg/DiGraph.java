@@ -150,12 +150,10 @@ public class DiGraph {
 			NodeWrapper parentNode = currEdge.getFromNode();
 			currNode = currEdge.getToNode();
 
+// FIXME: nestedFor() - b2, b3 and b4 fall out somewhere (e.g. stack?)
 			// update dominator information
 			currNode.inheritageMerge(parentNode);
 		}
-
-
-
 
 
 		// map CFG to DA
