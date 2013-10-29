@@ -230,33 +230,38 @@ public class DiGraph {
 		for( int blockId = CFGBlockList.size()-1; blockId > 0; --blockId){
 
 			// find all edges ending at current (and no upward linking, to avoid loop issues)
-			NodeWrapper currDA = CFGBlockList.get(blockId);
-			if(currDA.id() == END){
+			currNode = CFGBlockList.get(blockId);
+
+			// check for END connections
+			if(currNode.id() == END){
 				boolean isNoReturnConnetcted = true;
-				
 				for(Edge edge : CFGEdgeList){
 					if(edge.getToNode().id() == END){
 						// the nodes may connect to END
 						isNoReturnConnetcted = false;
 					}
 				}
-				
 				if(isNoReturnConnetcted){
+					// no connection to END - just continue
 					continue;
 				}
 			}
-			Integer idxidom = currDA.getIDom();
-			final NodeWrapper idom;
-			if( START == idxidom){
-				idom = new NodeWrapper(START);
-			}else if( END == idxidom){
-				idom = new NodeWrapper( END );
+
+
+			Integer idom = currNode.getIDom();
+			final NodeWrapper idomNode;
+			if( START == idom){
+				idomNode = new NodeWrapper(START);
+			}else if( END == idom){
+				idomNode = new NodeWrapper( END );
 			}else{
-				idom = CFGBlockList.get(idxidom);
+				idomNode = CFGBlockList.get(idom);
 			}
 
-			if(idom.id() != currDA.id()){
-				DAedgeList.add( new Edge(idom, currDA) );
+			if(idomNode.id() != currNode.id() && START != currNode.id()){
+				// no links to same node
+				// no START as to-link destination
+				DAedgeList.add( new Edge(idomNode, currNode) );
 			}
 		}
 	}

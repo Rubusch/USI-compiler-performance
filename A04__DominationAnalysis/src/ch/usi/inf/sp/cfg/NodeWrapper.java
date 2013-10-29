@@ -54,6 +54,9 @@ public class NodeWrapper {
 		return true;
 	}
 
+
+
+
 	private boolean isInheritPathContained(List<Integer> inheritPath){
 // TODO test method
 		if( 0 == this.heritage.size() ) return false;
@@ -65,9 +68,12 @@ public class NodeWrapper {
 		return false;
 	}
 
+
+
+
 	private List<Integer> getSmallestInheritPath(){
 		
-FIXME: which one is the smallest list, just a "curr element list" (size = 1)??
+//FIXME: which one is the smallest list, just a "curr element list" (size = 1)??
 
 		// init, if this step fails, this.inheritage was corrupt
 		List<Integer> smallestPath = this.heritage.get(0);
@@ -76,12 +82,15 @@ FIXME: which one is the smallest list, just a "curr element list" (size = 1)??
 		for( List<Integer> inheritPath : this.heritage){
 			int sizeSmallest = smallestPath.size();
 			int sizeCurrent = inheritPath.size();
+//Analyzer.db("XXX sizeCurrent " + String.valueOf(sizeCurrent)); // XXX
 			if( sizeSmallest > sizeCurrent){
 				smallestPath = inheritPath;
 			}
 		}
 		return smallestPath;
 	}
+
+
 
 	private boolean inheritPathContains( Integer currAncestor, List<Integer> inheritPath){
 // TODO test method
@@ -90,6 +99,8 @@ FIXME: which one is the smallest list, just a "curr element list" (size = 1)??
 		}
 		return false; // TODO
 	}
+
+
 
 	/*
 	 * merge inheritage list of another NodeWrapper with THIS NodeWrapper
@@ -149,9 +160,13 @@ FIXME: which one is the smallest list, just a "curr element list" (size = 1)??
 
 
 		// figure out current dominator
-		List<Integer> smallestPath = getSmallestInheritPath(); // TODO
+		List<Integer> smallestPath = getSmallestInheritPath();
 		List<Integer> resultingPath = new ArrayList<Integer>();
-		for( int idxAncestor=0; idxAncestor < smallestPath.size(); ++idxAncestor){
+		
+		Analyzer.db(String.valueOf(smallestPath)); // XXX
+
+		// last valid element is smallestPath.size() -2 (-1 is this.id())
+		for( int idxAncestor=0; idxAncestor < smallestPath.size()-1; ++idxAncestor){
 			// get element of the smallest list
 			int currAncestor = smallestPath.get(idxAncestor);
 
@@ -159,7 +174,6 @@ FIXME: which one is the smallest list, just a "curr element list" (size = 1)??
 			for( idxInheritPath=0; idxInheritPath < this.heritage.size(); ++idxInheritPath){
 				// per inherit path check if it is contained (add) or not (discard)
 				List<Integer> currentInheritPath = this.heritage.get(idxInheritPath);
-
 				if( !inheritPathContains( currAncestor, currentInheritPath) ){
 					// not contained, discard element
 					break;
@@ -167,6 +181,7 @@ FIXME: which one is the smallest list, just a "curr element list" (size = 1)??
 			}
 
 			if( idxInheritPath == this.heritage.size()){
+Analyzer.db("XXX resultingPath.add( " + String.valueOf(currAncestor) + ")"); // XXX
 				// all inheritPaths contained currAncestor, so append it
 				resultingPath.add(currAncestor);
 			}
