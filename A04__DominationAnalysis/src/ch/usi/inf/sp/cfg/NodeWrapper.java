@@ -72,9 +72,6 @@ public class NodeWrapper {
 
 
 	private List<Integer> getSmallestInheritPath(){
-		
-//FIXME: which one is the smallest list, just a "curr element list" (size = 1)??
-
 		// init, if this step fails, this.inheritage was corrupt
 		List<Integer> smallestPath = this.heritage.get(0);
 
@@ -98,6 +95,17 @@ public class NodeWrapper {
 			if( currAncestor == ancestor) return true;
 		}
 		return false; // TODO
+	}
+
+
+
+
+	private List<Integer> cloneInheritPath( List<Integer> inheritPath ){
+		List<Integer> clonedInheritPath = new ArrayList<Integer>();
+		for(Integer id: inheritPath){
+			clonedInheritPath.add(id);
+		}
+		return clonedInheritPath;
 	}
 
 
@@ -135,7 +143,7 @@ public class NodeWrapper {
 
 
 
-//*
+/*
 		// append "this.id" to all new inheritPaths and update this.inheritage
 		if( null == heritage ){
 			Analyzer.die("AAA null");
@@ -147,23 +155,44 @@ public class NodeWrapper {
 
 
 		for( List<Integer> inheritPath : heritage ){
+Analyzer.db("DDD passed heritage::inheritPath: ");
+Analyzer.db(String.valueOf(inheritPath));
+
+			List<Integer> inheritPathClone = cloneInheritPath( inheritPath );
+
+
 			// update parent inheritancePaths
-			inheritPath.add(this.id());
+//			inheritPath.add(this.id());
+			inheritPathClone.add(this.id());
 
 			// filter out new inheritPaths in foreign inheritage
-			if( !isInheritPathContained(inheritPath) ){
+//			if( !isInheritPathContained(inheritPath) ){
+			if( !isInheritPathContained(inheritPathClone) ){
 				// append, if it is not contained
-				Analyzer.db("\t\tappend inheritPath");
-				this.heritage.add(inheritPath);
+//				Analyzer.db("\t\tappend inheritPathClone");
+//				this.heritage.add(inheritPath);
+				this.heritage.add(inheritPathClone);
 			}
 		}
+
+
+
+//*		// DEBUG
+		Analyzer.db("DDD /");
+		for( List<Integer> inheritPath : this.heritage){
+			Analyzer.db("DDD this.heritage::inheritPath");
+			Analyzer.db(String.valueOf(inheritPath));
+		}
+		Analyzer.db("/ DDD");
+//*/		// /DEBUG
+
 
 
 		// figure out current dominator
 		List<Integer> smallestPath = getSmallestInheritPath();
 		List<Integer> resultingPath = new ArrayList<Integer>();
-		
-		Analyzer.db(String.valueOf(smallestPath)); // XXX
+
+//Analyzer.db(String.valueOf(smallestPath)); // XXX
 
 		// last valid element is smallestPath.size() -2 (-1 is this.id())
 		for( int idxAncestor=0; idxAncestor < smallestPath.size()-1; ++idxAncestor){
@@ -196,50 +225,22 @@ Analyzer.db("XXX resultingPath.add( " + String.valueOf(currAncestor) + ")"); // 
 
 
 
-//	public void inheritageMerge( List<NodeWrapper> parents ){
 	public void inheritageMerge( NodeWrapper parent ){
-		Analyzer.db("NodeWrapper::inheritageMerge() - START");
+//		Analyzer.db("NodeWrapper::inheritageMerge() - START");
 
 		// START node
 		if( null == parent && this.id() == DiGraph.START ){
-			Analyzer.db("\tnull == parent && this.id() == DiGraph.START");
+//			Analyzer.db("\tnull == parent && this.id() == DiGraph.START");
 			updateHeritage( null );
 			return;
 		}
 
-
 		// set up a stack for the parents
-//		for( NodeWrapper parent : parents){
-//			if( null != parent.getHeritage() ){
-				updateHeritage( parent.getHeritage() );
-//			}
-//		}
-		
-/*
-		Stack<NodeWrapper> parentsStack = new Stack<NodeWrapper>();
-		for( NodeWrapper parent : parents){
-			parentsStack.push(parent);
-		}
+		updateHeritage( parent.getHeritage() );
 
-		NodeWrapper parent;
-		while( !parentsStack.empty() ){
-			// get element
-			parent = parentsStack.pop();
-
-			// if inheritage still not parsed, put back to stack
-			if( null == parent.getInheritage() ){
-			// pending, reparse later
-//				parentsStack.add( parent );
-				continue;
-			}
-			updateHeritage( parent.getInheritage() );
-		}
-
-		// find dominator (reset dominator)
-//		identifyDominator( parents );
-//*/
-		Analyzer.db("NodeWrapper::inheritageMerge() - END");
+//		Analyzer.db("NodeWrapper::inheritageMerge() - END");
 	}
+
 
 
 
@@ -247,6 +248,8 @@ Analyzer.db("XXX resultingPath.add( " + String.valueOf(currAncestor) + ")"); // 
 		if( null == idom ){ return 0; }
 		return idom;
 	}
+
+
 
 
 /*

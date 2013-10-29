@@ -154,76 +154,16 @@ public class DiGraph {
 			currNode = currEdge.getToNode();
 
 			// update dominator information
+Analyzer.db("DiGraph currNode block" + String.valueOf(currNode.id())); // XXX
+Analyzer.db("DiGraph parentNode block" + String.valueOf(parentNode.id())); // XXX
+Analyzer.db(String.valueOf(parentNode.getHeritage())); // XXX
 			currNode.inheritageMerge(parentNode);
 		}
 
-/*		
-		// longtime memory
-		passedIds.add(currNode.id());
 
-		while( true ){
-			if( stack.isEmpty()){
-				// stack is empty, go discover next tier
-				for( Edge probeEdge : CFGEdgeList){
-					if( null != probeEdge.getFromNode()){
-						if( currNode.id() == probeEdge.getFromNode().id() ){
-							// next node points to current node
-							if( -1 == passedIds.indexOf(probeEdge.getToNode().id())){
-								// this node is unknown, store for later
-								stack.push(probeEdge);
-							}
-						}
-					}
-				}
 
-				if( stack.isEmpty()){
-					// we're done when the stack can't be filled anymore
-					break;
-				}
-				continue;
-			}
 
-			// stack was NOT empty, fetch first candidate...
-			Edge nextEdge = stack.pop();
-			currNode = nextEdge.getToNode();
-			passedIds.add( currNode.id() );
 
-			// set up a list of all edges pointing at the current node (linking down, but not linking upward, to avoid loop issues)
-			List<Edge> edges = new ArrayList<Edge>();
-			for( Edge edge: CFGEdgeList){
-				if( null != edge.getToNode()){
-					if( currNode.id() == edge.getToNode().id()){
-						edges.add(edge);
-					}
-				}
-			}
-
-			// set heritage to the children
-			// set up another list of the sources (nodes) of those edges, pointing to current
-			final List<NodeWrapper> parentNodeList = new ArrayList<NodeWrapper>();
-			
-
-			final List<NodeWrapper> parentNodeList = new ArrayList<NodeWrapper>();
-			for( Edge edge : edges ){
-				parentNodeList.add(edge.getFromNode());
-			}
-			
-//			if( 1 == parentNodeList.size()){
-//				// pass heritage from a single node
-//				currNode.inheritageInit( parentNodeList.get(0).getInheritage() );
-//			}else{
-				// merge heritage from several parents together
-//				Analyzer.db("going to merge...");
-//				Analyzer.db("\t- parentNodeList.size() " + parentNodeList.size());
-//				currNode.inheritageMerge(parentNodeList);
-//			}
-
-			// update inheritage merge
-			currNode.inheritageMerge(parentNodeList);
-		}
-//*/
-
-/******************************************************************************/
 		// map CFG to DA
 		this.DAedgeList = new ArrayList<Edge>();
 
