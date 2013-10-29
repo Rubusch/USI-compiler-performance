@@ -20,7 +20,6 @@ public class DiGraph {
 	public final static int START = -1;
 	public final static int END = -2;
 
-
 	private NodeWrapper getNodeById( List<NodeWrapper> list, int id ){
 		for( NodeWrapper node : list ){
 			if( node.id() == id) return node;
@@ -88,7 +87,6 @@ public class DiGraph {
 
 
 	private List<Edge> getNextEdges( NodeWrapper currNode ){
-// TODO check the content of lists
 		List<Edge> nextEdges = new ArrayList<Edge>();
 
 		// find next node from currNode
