@@ -128,30 +128,22 @@ public class DiGraph {
 		currNode.inheritageMerge( null );
 
 		while( true ){
-//			if( stack.isEmpty()){
+//			if( stack.isEmpty()){ // TODO rm
 				// stack is empty, go discover next tier, push on stack
-				List<Edge> nextEdges = getNextEdges( currNode );
-				for( Edge nextEdge : nextEdges ){
+			List<Edge> nextEdges = getNextEdges( currNode );
+			for( Edge nextEdge : nextEdges ){
 // TODO may also be added while stack is NOT empty
-					if( !isPassedEdge( passedEdges, nextEdge )){
-						Analyzer.db("XXX push on stack"); // XXX
-						nextEdge.dotPrint(); // XXX
-
-						stack.push(nextEdge);
-					}
-/*
-// DEBUG
-					else{
-						Analyzer.die("BLOCKED");
-					}
-//*/
+				if( !isPassedEdge( passedEdges, nextEdge )){
+					stack.push(nextEdge);
 				}
+			}
 
-				if( stack.isEmpty()){
-					// we're done when the stack can't be filled anymore
-					break;
-				}
-//				continue;
+			if( stack.isEmpty()){
+				// we're done when the stack can't be filled anymore
+				break;
+			}
+
+//				continue; // TODO rm
 //			}
 
 			// stack was NOT empty, fetch first candidate...
