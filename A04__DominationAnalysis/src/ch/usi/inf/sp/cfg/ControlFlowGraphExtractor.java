@@ -34,25 +34,7 @@ public class ControlFlowGraphExtractor {
 	private final List<String> edgesList;
 	private final List<Integer> omitFallthruList;
 
-	public List<List<AbstractInsnNode>> getBlocklist() {
-		return blockList;
-	}
-
-	public List<String> getEdgeslist() {
-		return edgesList;
-	}
-
-	private void edgeslistAdd(int srcidx, int dstidx){
-		edgeslistAdd( srcidx, dstidx, "");
-	}
-
-	private void edgeslistAdd(int srcidx, int dstidx, String opt){
-		String str = String.valueOf( srcidx );
-		str += ":" + String.valueOf( dstidx );
-		if( 0 < opt.length() ){ str += ":" + opt; }
-		edgesList.add(str);
-	}
-
+	// ctor
 	public ControlFlowGraphExtractor( final InsnList instructions ){
 		blockList = new ArrayList< List<AbstractInsnNode>>();
 		blockList.add(new ArrayList<AbstractInsnNode>());
@@ -72,6 +54,34 @@ public class ControlFlowGraphExtractor {
 		initInstructions();
 	}
 
+	/*
+	 * getter/setter
+	 */
+
+	public List<List<AbstractInsnNode>> getBlocklist() {
+		return blockList;
+	}
+
+	public List<String> getEdgeslist() {
+		return edgesList;
+	}
+
+
+	/*
+	 * tool methods
+	 */
+
+	private void edgeslistAdd(int srcidx, int dstidx){
+		edgeslistAdd( srcidx, dstidx, "");
+	}
+
+	private void edgeslistAdd(int srcidx, int dstidx, String opt){
+		String str = String.valueOf( srcidx );
+		str += ":" + String.valueOf( dstidx );
+		if( 0 < opt.length() ){ str += ":" + opt; }
+		edgesList.add(str);
+	}
+
 	private void branching( int srcidx, int dstidx ){
 		branching( srcidx, dstidx, "");
 	}
@@ -82,16 +92,27 @@ public class ControlFlowGraphExtractor {
 		if( dstidx < srcidx ){
 Analyzer.db("XXX backward jump - there seems to be a minor bug"); // XXX
 			// backward jump
+//*
+			// TODO split backward
+
+
+/*/
 			int idxLastFirstIns = 0;
-			for( int listIdx = 1; listIdx < this.blockList.size()-1; ++listIdx ){
+//			for( int listIdx = 1; listIdx < this.blockList.size()-1; ++listIdx ){
+				// orig
 
 // FIXME forEver, does not split b0
-//			for( int listIdx = 0; listIdx < this.blockList.size(); ++listIdx ){ // XXX
+Analyzer.db( "XXX this.blockList.size() " + String.valueOf(this.blockList.size())); // XXX
+			for( int listIdx = 1; listIdx <= this.blockList.size()-1; ++listIdx ){ // XXX
+				// start index 1 -> for breaking a block we start with the second element
+				// end index size-1 -> ???
+
 				AbstractInsnNode firstIns = this.blockList.get(listIdx).get(0);
 				int idxFirstIns = this.blockList.indexOf( firstIns );
-//Analyzer.db( "XXX dstidx " + String.valueOf(dstidx)); // XXX
-//Analyzer.db( "XXX idxFirstIns " + String.valueOf(idxFirstIns)); // XXX
-				if( dstidx < idxFirstIns ){
+Analyzer.db( "XXX dstidx " + String.valueOf(dstidx)); // XXX
+Analyzer.db( "XXX idxFirstIns " + String.valueOf(idxFirstIns)); // XXX
+//				if( dstidx < idxFirstIns ){
+				if( dstidx < idxFirstIns ){ // XXX
 					// we ultrapassed one, so the last one is it: go back
 					int start = idxLastFirstIns;
 					int diff = dstidx - start;
@@ -110,6 +131,7 @@ Analyzer.db("XXX backward jump - there seems to be a minor bug"); // XXX
 				}
 				idxLastFirstIns = idxFirstIns;
 			}
+//*/
 		}else if( dstidx > srcidx){
 			// forward jump
 			this.forwardJump.add(new Integer(dstidx));
@@ -222,7 +244,7 @@ Analyzer.db("XXX backward jump - there seems to be a minor bug"); // XXX
 
 
 /*
- * dot painting
+ * dot printing
  */
 
 	public void dotPrintCFG(){
