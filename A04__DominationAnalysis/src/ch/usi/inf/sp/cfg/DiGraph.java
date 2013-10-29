@@ -87,9 +87,7 @@ public class DiGraph {
 	}
 
 
-
 	private List<Edge> getNextEdges( NodeWrapper currNode ){
-// TODO test function
 		List<Edge> nextEdges = new ArrayList<Edge>();
 
 		// find next node from currNode

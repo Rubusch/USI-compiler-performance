@@ -21,33 +21,20 @@ public class NodeWrapper {
 
 	public NodeWrapper( final Integer startId){
 		this.Id = startId;
-//		this.inheritage = new ArrayList<List<Integer>>();
 	}
+
 
 	public List<List<Integer>> getHeritage(){
 		return heritage;
 	}
 
 
-
-
-
-
-
-
-
-
-
-
 	private boolean isEqualInheritPaths( List<Integer> inheritPathA, List<Integer> inheritPathB ){
 		int sizeA = inheritPathA.size();
 		int sizeB = inheritPathB.size();
-
 		if( sizeA != sizeB ) return false;
- 
 		for(int idx=0; idx<sizeA; ++idx){
 			if(inheritPathA.get(idx) != inheritPathB.get(idx)){
-// TODO test this comparison
 				return false;
 			}
 		}
@@ -55,10 +42,7 @@ public class NodeWrapper {
 	}
 
 
-
-
 	private boolean isInheritPathContained(List<Integer> inheritPath){
-// TODO test method
 		if( 0 == this.heritage.size() ) return false;
 		for( List<Integer> thisInheritPath : this.heritage){
 			if( isEqualInheritPaths(thisInheritPath, inheritPath )){
@@ -69,8 +53,6 @@ public class NodeWrapper {
 	}
 
 
-
-
 	private List<Integer> getSmallestInheritPath(){
 		// init, if this step fails, this.inheritage was corrupt
 		List<Integer> smallestPath = this.heritage.get(0);
@@ -79,7 +61,6 @@ public class NodeWrapper {
 		for( List<Integer> inheritPath : this.heritage){
 			int sizeSmallest = smallestPath.size();
 			int sizeCurrent = inheritPath.size();
-//Analyzer.db("XXX sizeCurrent " + String.valueOf(sizeCurrent)); // XXX
 			if( sizeSmallest > sizeCurrent){
 				smallestPath = inheritPath;
 			}
@@ -88,16 +69,12 @@ public class NodeWrapper {
 	}
 
 
-
 	private boolean inheritPathContains( Integer currAncestor, List<Integer> inheritPath){
-// TODO test method
 		for( Integer ancestor : inheritPath){
 			if( currAncestor == ancestor) return true;
 		}
-		return false; // TODO
+		return false;
 	}
-
-
 
 
 	private List<Integer> cloneInheritPath( List<Integer> inheritPath ){
@@ -107,7 +84,6 @@ public class NodeWrapper {
 		}
 		return clonedInheritPath;
 	}
-
 
 
 	/*
@@ -120,7 +96,6 @@ public class NodeWrapper {
 
 		// init inheritage
 		if( null == this.heritage ){
-//			Analyzer.db("\tthis.heritage was null"); // XXX
 			// first time called this method, do the initialization
 			this.heritage = new ArrayList<List<Integer>>();
 
@@ -191,28 +166,20 @@ Analyzer.db("/ XXX");
 		int lastIdx = resultingPath.size() -1;
 		this.idom = resultingPath.get(lastIdx);
 
-		Analyzer.db("NodeWrapper::inheritageInit(), idom "+String.valueOf(this.idom)+" - END\n" ); // XXX
+//		Analyzer.db("NodeWrapper::inheritageInit(), idom "+String.valueOf(this.idom)+" - END\n" ); // XXX
 	}
 
 
-
 	public void inheritageMerge( NodeWrapper parent ){
-//		Analyzer.db("NodeWrapper::inheritageMerge() - START");
-
 		// START node
 		if( null == parent && this.id() == DiGraph.START ){
-//			Analyzer.db("\tnull == parent && this.id() == DiGraph.START");
 			updateHeritage( null );
 			return;
 		}
 
 		// set up a stack for the parents
 		updateHeritage( parent.getHeritage() );
-
-//		Analyzer.db("NodeWrapper::inheritageMerge() - END");
 	}
-
-
 
 
 	public Integer getIDom(){
@@ -221,127 +188,7 @@ Analyzer.db("/ XXX");
 	}
 
 
-
-
-/*
-	// return false, if was not mergeable (still), needs to be redone later
-	// this means basically a "false" shall provoke the remove from the
-	// "passedIds" list
-// TODO modularize
-// TODO separate in different methods
-// TODO remove redundant code
-// TODO check algorithm
-	
-	private void identifyDominator( List<NodeWrapper> parents){
-		Analyzer.db("NodeWrapper::identifyDominator() - START");
-
-		for( NodeWrapper nd : parents){
-			boolean pending=false; // more ugly quickfixes
-			List<List<Integer>> ndInheritageList = nd.getHeritage();
-			if( 0 == ndInheritageList.size() ){
-//			if( 0 == nd.getInheritage().size()){
-// TODO in case one parent is still not parsed (upward link), just postpone this 
-// node, and generate the merge later (to be implemented), so far, simply omited, 
-// since it works anyway +/-
-				pending = true;
-			}else{
-				Analyzer.db("\t- " + String.valueOf( nd.getHeritage().get(0).get( nd.getHeritage().get(0).size()-1 )) ); // XXX
-				Analyzer.db("\t- block" + nd.id() );
-				this.idom = nd.getHeritage().get(0).get( nd.getHeritage().get(0).size()-1 );
-			}
-// TODO improve this by parse order
-			if( pending ) return;
-		}
-		Analyzer.db("NodeWrapper::identifyDominator() - no pendings");
-
-
-/ *
-		if( 2 > parents.size() ){
-			Analyzer.echo("FATAL - compare at least 2 nodes, passed were " + parents.size());
-		}
-// * /
-		// list of parents, each parent lists severan "inheritages", each is a list of Integers
-		ArrayList<ArrayList<ArrayList<Integer>>> data = new ArrayList<ArrayList<ArrayList<Integer>>>();
-
-		// init
-		for( int idxparent=0; idxparent < parents.size(); ++idxparent){
-			// per parent
-			NodeWrapper parent = parents.get(idxparent);
-			data.add(new ArrayList<ArrayList<Integer>>());
-
-			for( int idxinherit=0; idxinherit < parent.getHeritage().size(); ++idxinherit){
-				List<Integer> inherit = parent.getHeritage().get(idxinherit);
-
-				// per descendence lists
-				data.get(idxparent).add(new ArrayList<Integer>());
-				for( int idxid=0; idxid < inherit.size(); ++idxid){
-
-					// per item in particular descendence list
-					data.get(idxparent).get(idxinherit).add( inherit.get(idxid) );
-				}
-			}
-		}
-
-		// operate
-		ArrayList<ArrayList<Integer>> parent = data.get(0);
-		for( int pos=1; 0 < parent.size(); ++pos ){ // don't enter here if parent - index == 0 - is empty
-			for( int idxinherit = parent.size()-1; 0 <= idxinherit; --idxinherit){
-				ArrayList<Integer> inherit = parent.get(idxinherit);
-				if(pos >= inherit.size()){
-					if(1 == parent.size()){
-						// this parent has played its last inherit list, last element is dominator
-						if(0 < pos){
-							this.idom = inherit.get(pos -1);
-						}else{
-							// list was empty - an ERROR
-							Analyzer.echo( "FIXME: a node had just one inherit list, which was empty");
-						}
-					return;
-					}else{
-						parent.remove(idxinherit);
-						continue;
-					}
-				}
-
-				// now get an id and check with other parents
-				Integer id = inherit.get(pos);
-
-				// check now if id is containent in other parent at this position or not ( = discard whole vector)
-				for( int jdxparent = 1; jdxparent < data.size(); ++jdxparent){
-					ArrayList<ArrayList<Integer>> cmpParent = data.get(jdxparent);
-
-					ArrayList<Integer> cmpParentIds = new ArrayList<Integer>();
-					for( int jdxinherit = 0; jdxinherit < cmpParent.size(); ++jdxinherit){
-						ArrayList<Integer> cmpInherit = cmpParent.get(jdxinherit);
-						cmpParentIds.add( cmpInherit.get(pos) );
-					}
-					if( -1 == cmpParentIds.indexOf(id)){
-						// not contained in entire set of this parent
-						// this means, remove the list from parent, and take next item
-						// if this was the last inherit list of parent, then we have idom
-						if(1 == parent.size()){
-							// this parent has played its last inherit list, last element is dominator
-							if(0 < pos){
-								this.idom = inherit.get(pos -1);
-							}else{
-								// list was empty - an ERROR
-								Analyzer.echo( "FIXME: a node had just one inherit list, which was empty");
-							}
-							return;
-						}else{
-							parent.remove(idxinherit);
-							continue;
-						}
-					}
-				}
-			}
-		}
-		return;
-	}
-//*/
-
 	public void dotPrint(){
-// TODO check, another label?
 		if( DiGraph.START == Id ){
 			Analyzer.echo( "  nodeS [label = \"blockS\"]");
 		}else if( DiGraph.END == Id){
@@ -350,6 +197,7 @@ Analyzer.db("/ XXX");
 			Analyzer.echo( "  node" + Id + " [label = \"block" + Id + "\"]");
 		}
 	}
+
 
 	public Integer id(){
 		return Id;
