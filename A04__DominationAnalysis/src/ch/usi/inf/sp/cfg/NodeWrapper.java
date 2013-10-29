@@ -92,7 +92,7 @@ public class NodeWrapper {
 	 * may be called at each update, so not just once
 	 */
 	public void updateHeritage( List<List<Integer>> heritage){
-		Analyzer.db("NodeWrapper::inheritageInit() - START, block" + String.valueOf( this.id()) ); // XXX
+// Analyzer.db("NodeWrapper::inheritageInit() - START, block" + String.valueOf( this.id()) ); // XXX
 
 		// init inheritage
 		if( null == this.heritage ){
@@ -130,7 +130,7 @@ public class NodeWrapper {
 		}
 
 
-//*		// DEBUG
+/*		// DEBUG
 Analyzer.db("XXX / this.heritage =");
 Analyzer.db(String.valueOf(this.heritage));
 Analyzer.db("/ XXX");
@@ -166,7 +166,7 @@ Analyzer.db("/ XXX");
 		int lastIdx = resultingPath.size() -1;
 		this.idom = resultingPath.get(lastIdx);
 
-//		Analyzer.db("NodeWrapper::inheritageInit(), idom "+String.valueOf(this.idom)+" - END\n" ); // XXX
+// Analyzer.db("NodeWrapper::inheritageInit(), idom "+String.valueOf(this.idom)+" - END\n" ); // XXX
 	}
 
 
