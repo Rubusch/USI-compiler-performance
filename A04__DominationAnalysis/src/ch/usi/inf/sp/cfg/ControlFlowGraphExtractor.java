@@ -235,8 +235,8 @@ Analyzer.db("XXX backward jump - there seems to be a minor bug"); // XXX
 		Analyzer.echo( "  node [shape=record,width=.1,height=.1]" );
 
 		// start node
-		Analyzer.echo( "  nodeS [label = \"{ <S> start }\"];" );
-		Analyzer.echo( "  nodeE [label = \"{ <E> end }\"];" );
+		Analyzer.echo( "  nodeS [label = \"{ <S> Start }\"];" );
+		Analyzer.echo( "  nodeE [label = \"{ <E> End }\"];" );
 
 		// block nodes
 		int lastidx = blockList.size() -1;
