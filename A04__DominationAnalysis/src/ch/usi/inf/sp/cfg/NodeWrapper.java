@@ -121,13 +121,13 @@ public class NodeWrapper {
 
 
 
-
+//*
 		// append "this.id" to all new inheritPaths and update this.inheritage
 		if( null == heritage ){
 			Analyzer.die("AAA null");
 		}
-		Analyzer.db("AAA heritage.size " + String.valueOf(heritage.size()));
-
+//		Analyzer.db("AAA heritage.size " + String.valueOf(heritage.size()));
+//*/
 
 
 
@@ -173,7 +173,7 @@ public class NodeWrapper {
 		int lastIdx = resultingPath.size() -1;
 		this.idom = resultingPath.get(lastIdx);
 
-		Analyzer.db("NodeWrapper::inheritageInit() - END\n" ); // XXX
+		Analyzer.db("NodeWrapper::inheritageInit(), idom "+String.valueOf(this.idom)+" - END\n" ); // XXX
 	}
 
 
