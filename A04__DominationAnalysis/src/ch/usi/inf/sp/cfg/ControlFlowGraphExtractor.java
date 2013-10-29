@@ -162,18 +162,32 @@ Analyzer.db("XXX backward jump - there seems to be a minor bug"); // XXX
 					final int targetIdx = instructions.indexOf(targetInstruction);
 					branching( idx, targetIdx );
 				}
-
 				final LabelNode defaultTargetInstruction = ((LookupSwitchInsnNode)ins).dflt;
 				final int targetIdx = instructions.indexOf(defaultTargetInstruction);
-
 				branching( idx, targetIdx );
 
 				// provoke a new basic block
 				branchNextIteration = true;
-				
+
 			}else if( ins.getType() == AbstractInsnNode.TABLESWITCH_INSN){
 				// table switch
-Analyzer.die("TODO");
+				final int minKey = ((TableSwitchInsnNode)ins).min;
+				final List<?> labels = ((TableSwitchInsnNode)ins).labels;
+				for (int t=0; t<labels.size(); t++) {
+					final int key = minKey+t;
+					final LabelNode targetInstruction = (LabelNode)labels.get(t);
+					final int targetIdx = instructions.indexOf(targetInstruction);
+					branching( idx, targetIdx);
+//					szBlock += key+": "+targetId+", "; // TODO rm
+				}
+				final LabelNode defaultTargetInstruction = ((TableSwitchInsnNode)ins).dflt;
+				final int targetIdx = instructions.indexOf(defaultTargetInstruction);
+				branching( idx, targetIdx );
+//				szBlock += "default: "+defaultTargetId; // TODO rm
+
+				// provoke a new basic block
+				branchNextIteration = true;
+
 				
 			}else if( ins.getType() == AbstractInsnNode.INSN){
 				switch (ins.getOpcode()){
@@ -404,10 +418,10 @@ Analyzer.die("TODO");
 			case AbstractInsnNode.LOOKUPSWITCH_INSN:
 				// Opcodes: LOOKUPSWITCH.
 			{
-				final List<?> keys = ((LookupSwitchInsnNode)ins).keys;
-				final List<?> labels = ((LookupSwitchInsnNode)ins).labels;
 				szBlock += Printer.OPCODES[ins.getOpcode()];
 				szBlock += " ";
+				final List<?> keys = ((LookupSwitchInsnNode)ins).keys;
+				final List<?> labels = ((LookupSwitchInsnNode)ins).labels;
 				for (int t=0; t<keys.size(); t++) {
 					final int key = (Integer)keys.get(t);
 					final LabelNode targetInstruction = (LabelNode)labels.get(t);
@@ -421,9 +435,9 @@ Analyzer.die("TODO");
 			}
 			case AbstractInsnNode.TABLESWITCH_INSN:
 				// Opcodes: TABLESWITCH.
+			{
 				szBlock += Printer.OPCODES[ins.getOpcode()];
 				szBlock += " ";
-			{
 				final int minKey = ((TableSwitchInsnNode)ins).min;
 				final List<?> labels = ((TableSwitchInsnNode)ins).labels;
 				for (int t=0; t<labels.size(); t++) {
