@@ -68,7 +68,7 @@ public class ControlFlowGraphExtractor {
 
 
 	/*
-	 * tool methods
+	 * util methods
 	 */
 
 	private void edgeslistAdd(int srcidx, int dstidx){
@@ -82,6 +82,19 @@ public class ControlFlowGraphExtractor {
 		edgesList.add(str);
 	}
 
+	public int getBlockbyInsId( int insId ){
+		if( 0 > insId ){ return insId; }
+
+		int nodeId = 1;
+		for( ; nodeId < blockList.size(); ++nodeId ){
+			if( instructions.indexOf( blockList.get( nodeId ).get(0) ) > insId){
+				break;
+			}
+		}
+		--nodeId;
+		return nodeId;
+	}
+
 	private void branching( int srcidx, int dstidx ){
 		branching( srcidx, dstidx, "");
 	}
@@ -92,27 +105,19 @@ public class ControlFlowGraphExtractor {
 		if( dstidx < srcidx ){
 Analyzer.db("XXX backward jump - there seems to be a minor bug"); // XXX
 			// backward jump
-//*
+/*
 			// TODO split backward
 
 
 /*/
 			int idxLastFirstIns = 0;
-//			for( int listIdx = 1; listIdx < this.blockList.size()-1; ++listIdx ){
-				// orig
-
-// FIXME forEver, does not split b0
-Analyzer.db( "XXX this.blockList.size() " + String.valueOf(this.blockList.size())); // XXX
-			for( int listIdx = 1; listIdx <= this.blockList.size()-1; ++listIdx ){ // XXX
+			for( int listIdx = 1; listIdx < this.blockList.size()-1; ++listIdx ){
 				// start index 1 -> for breaking a block we start with the second element
 				// end index size-1 -> ???
 
 				AbstractInsnNode firstIns = this.blockList.get(listIdx).get(0);
 				int idxFirstIns = this.blockList.indexOf( firstIns );
-Analyzer.db( "XXX dstidx " + String.valueOf(dstidx)); // XXX
-Analyzer.db( "XXX idxFirstIns " + String.valueOf(idxFirstIns)); // XXX
-//				if( dstidx < idxFirstIns ){
-				if( dstidx < idxFirstIns ){ // XXX
+				if( dstidx < idxFirstIns ){
 					// we ultrapassed one, so the last one is it: go back
 					int start = idxLastFirstIns;
 					int diff = dstidx - start;
@@ -286,7 +291,7 @@ Analyzer.db( "XXX idxFirstIns " + String.valueOf(idxFirstIns)); // XXX
 	private String dotEdges( int idx ){
 		String[] szbuf = this.edgesList.get(idx).split(":");
 		int idxSrc = Integer.valueOf( szbuf[0] ).intValue();
-		int idxNodeSrc = insId2NodeId( idxSrc );
+		int idxNodeSrc = getBlockbyInsId( idxSrc );
 		String str = "  ";
 		if(0 > idxSrc){
 			// START
@@ -296,7 +301,7 @@ Analyzer.db( "XXX idxFirstIns " + String.valueOf(idxFirstIns)); // XXX
 		}
 
 		int idxDst = Integer.valueOf( szbuf[1] ).intValue();
-		int idxNodeDst = insId2NodeId( idxDst );
+		int idxNodeDst = getBlockbyInsId( idxDst );
 		if(0 > idxDst){
 			// RETURN
 			str += " -> nodeE:E";
@@ -480,19 +485,5 @@ Analyzer.db( "XXX idxFirstIns " + String.valueOf(idxFirstIns)); // XXX
 		szBlock += "\\l }\"];\n";
 
 		return szBlock;
-	}
-
-	public int insId2NodeId( int insId ){
-//		Analyzer.db("insId2NodeId( insId=" + insId + ")"); // TODO rm
-		if( 0 > insId ){ return insId; }
-
-		int nodeId = 1;
-		for( ; nodeId < blockList.size(); ++nodeId ){
-			if( instructions.indexOf( blockList.get( nodeId ).get(0) ) > insId){
-				break;
-			}
-		}
-		--nodeId;
-		return nodeId;
 	}
 }
