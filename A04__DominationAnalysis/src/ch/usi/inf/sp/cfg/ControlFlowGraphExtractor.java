@@ -145,8 +145,8 @@ Analyzer.db("XXX block.size() [before]: " + String.valueOf(block.size())); // XX
 			// split block at idxDst
 			int start = instructions.indexOf(block.get(0));
 // TODO check start and end
-			int startSplit = idxDst - start -1;
-			int endSplit = block.size()-1;
+			int startSplit = idxDst - start;
+			int endSplit = block.size(); //-1;
 
 Analyzer.db("XXX start " + String.valueOf(start));
 Analyzer.db("XXX startSplit " + String.valueOf(startSplit));
@@ -187,8 +187,9 @@ for(int i=0; i<blockList.size(); ++i){
 
 			// fallthrou link
 // TODO check start and end
-			edgeslistAdd( idxSrc, idxDst, "label=\"fallthrou\"");
-			
+//			edgeslistAdd( idxSrc, idxDst, "label=\"fallthrou\"");
+			edgeslistAdd( idxDst-1, idxDst, "label=\"fallthrou\"");
+
 // FIXME instruction indexes wrong
 // FIXME fallthrough connects wrong
 // FIXME start connects to block1 now
@@ -205,10 +206,10 @@ for(int i=0; i<blockList.size(); ++i){
 				AbstractInsnNode firstIns = this.blockList.get(listIdx).get(0);
 //				int idxFirstIns = this.blockList.indexOf( firstIns );
 				int idxFirstIns = this.instructions.indexOf( firstIns );
-				if( dstidx < idxFirstIns ){
+				if( idxDst < idxFirstIns ){
 					// we ultrapassed one, so the last one is it: go back
 					int start = idxLastFirstIns;
-					int diff = dstidx - start;
+					int diff = idxDst - start;
 
 					// break sublist, and insert new sublist
 					List<AbstractInsnNode> sublist = this.blockList.get(listIdx-1).subList( diff, this.blockList.get(listIdx-1).size());
@@ -219,7 +220,7 @@ for(int i=0; i<blockList.size(); ++i){
 
 // TODO is this necessary?
 					// fallthrough edge
-					edgeslistAdd( srcidx-1, dstidx, "label=\"flashback\"");
+					edgeslistAdd( idxSrc-1, idxDst, "label=\"flashback\"");
 					break;
 				}
 				idxLastFirstIns = idxFirstIns;
