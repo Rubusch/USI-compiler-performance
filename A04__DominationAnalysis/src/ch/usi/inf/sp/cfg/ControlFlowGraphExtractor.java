@@ -83,7 +83,7 @@ public class ControlFlowGraphExtractor {
 	}
 
 	public int getBlockIdContainingInsId( int idxIns ){
-/*
+/* // XXX
 // TODO rm
 		if( 0 > idxIns ){ return idxIns; }
 
@@ -95,7 +95,7 @@ public class ControlFlowGraphExtractor {
 		}
 		--blockId;
 		return blockId;
-/*/
+/*/ // XXX
 		int blockId = -1;
 		int idxBlock = -1;
 		for( idxBlock=0; idxBlock < blockList.size(); ++idxBlock ){
@@ -123,7 +123,7 @@ public class ControlFlowGraphExtractor {
 		}
 
 		return blockId;
-//*/
+//*/ // XXX
 	}
 
 	private void branching( int idxSrc, int idxDst ){
@@ -143,10 +143,6 @@ public class ControlFlowGraphExtractor {
 			int start = instructions.indexOf(block.get(0));
 			int startSplit = idxDst - start;
 			int endSplit = block.size(); //-1;
-
-Analyzer.db("XXX start " + String.valueOf(start));
-Analyzer.db("XXX startSplit " + String.valueOf(startSplit));
-Analyzer.db("XXX endSplit " + String.valueOf(endSplit));
 
 			if( 0 == startSplit){
 				// don't split if this is a backjump to the 0th element of block
@@ -172,14 +168,8 @@ Analyzer.db("XXX endSplit " + String.valueOf(endSplit));
 			// remove sublist elements from old location block
 			block.removeAll( blockNew );
 
-Analyzer.db("XXX block.size() " + String.valueOf(block.size()));
-Analyzer.db("XXX blockNew.size() " + String.valueOf(blockNew.size()));
-
 			// fallthrou link, before cut to after cut
 			edgeslistAdd( idxDst-1, idxDst, "label=\"fallthrou\"");
-			
-//Analyzer.die("STOP");
-
 /*/ // XXX
 // TODO rm
 			int idxLastFirstIns = 0;
