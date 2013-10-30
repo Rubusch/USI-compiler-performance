@@ -166,7 +166,7 @@ Analyzer.db("/ XXX");
 		int lastIdx = resultingPath.size() -1;
 		this.idom = resultingPath.get(lastIdx);
 
-// Analyzer.db("NodeWrapper::inheritageInit(), idom "+String.valueOf(this.idom)+" - END\n" ); // XXX
+//Analyzer.db("NodeWrapper::inheritageInit(), idom "+String.valueOf(this.idom)+" - END\n" ); // XXX
 	}
 
 

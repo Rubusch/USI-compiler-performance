@@ -27,8 +27,6 @@ import org.objectweb.asm.util.Printer;
  * @author Lothar Rubusch
  *
  */
-// FIXME DA end is disconnected
-// FIXME DA hierarchy corrupted, main candidate getBlockIdContainingInsId() and in case branching() changes
 public class ControlFlowGraphExtractor {
 	private final List< List<AbstractInsnNode>> blockList;
 	private static InsnList instructions;
