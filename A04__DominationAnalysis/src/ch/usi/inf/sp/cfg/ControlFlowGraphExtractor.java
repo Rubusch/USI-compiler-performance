@@ -239,6 +239,7 @@ public class ControlFlowGraphExtractor {
 				case Opcodes.DRETURN:
 				case Opcodes.ARETURN:
 				case Opcodes.RETURN:
+// FIXME some issues with for-method, linking back additionallly
 					if(1 >= instructions.size() - idx + 1){
 						// RETURN at the end - before last instruction or last 
 						// instruction, don't split, just connect to E
