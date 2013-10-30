@@ -84,6 +84,7 @@ public class ControlFlowGraphExtractor {
 
 	public int getBlockIdContainingInsId( int idxIns ){
 /*
+// TODO rm
 		if( 0 > idxIns ){ return idxIns; }
 
 		int blockId = 1;
@@ -133,24 +134,15 @@ public class ControlFlowGraphExtractor {
 		edgeslistAdd( idxSrc, idxDst, opt);
 
 		if( idxDst < idxSrc && idxDst > 0 ){
-			// idxDst < idxSrc, and idxDst is not END (= -1 )
-Analyzer.db("XXX backward jump - there seems to be a minor bug"); // XXX
-Analyzer.db("XXX idxDst " + String.valueOf(idxDst) + "< idxSrc " + String.valueOf(idxSrc));
-			// backward jump
+			// jump back, idxDst < idxSrc, and idxDst is not END (= -1 )
 //*
 			int idxBlock = getBlockIdContainingInsId( idxDst );
 			List<AbstractInsnNode> block = blockList.get(idxBlock);
-Analyzer.db("XXX block.size() [before]: " + String.valueOf(block.size())); // XXX
 
 			// split block at idxDst
 			int start = instructions.indexOf(block.get(0));
-// TODO check start and end
 			int startSplit = idxDst - start;
 			int endSplit = block.size(); //-1;
-
-Analyzer.db("XXX start " + String.valueOf(start));
-Analyzer.db("XXX startSplit " + String.valueOf(startSplit));
-Analyzer.db("XXX endSplit " + String.valueOf(endSplit));
 
 			// break sublist, and insert new sublist
 			List<AbstractInsnNode> blockBottomHalf = block.subList( startSplit, endSplit);
@@ -169,35 +161,13 @@ Analyzer.db("XXX endSplit " + String.valueOf(endSplit));
 			}
 
 			// remove sublist elements from old location block
-//			block.removeAll( blockList.get( idxBlock+1 ) );
 			block.removeAll( blockNew );
 
-// TODO test insert blockNew BEFORE
-Analyzer.db("XXX block.size() [after]: " + String.valueOf(block.size())); // XXX
-Analyzer.db("XXX blockNew.size() " + String.valueOf(blockNew.size())); // XXX
-
-for(int i=0; i<blockList.size(); ++i){
-	List<AbstractInsnNode> dbBlox = blockList.get(i);
-	for( int j=0; j<dbBlox.size(); ++j){
-		Analyzer.db("ZZZ " + String.valueOf(i) + ": " + String.valueOf(dbBlox.get(j).getType()  )); // XXX
-	}
-}
-
-
-
-			// fallthrou link
-// TODO check start and end
-//			edgeslistAdd( idxSrc, idxDst, "label=\"fallthrou\"");
+			// fallthrou link, before cut to after cut
 			edgeslistAdd( idxDst-1, idxDst, "label=\"fallthrou\"");
 
-// FIXME instruction indexes wrong
-// FIXME fallthrough connects wrong
-// FIXME start connects to block1 now
-
-//Analyzer.die("STOP"); // XXX
-
-
 /*/
+// TODO rm
 			int idxLastFirstIns = 0;
 			for( int listIdx = 1; listIdx < this.blockList.size()-1; ++listIdx ){
 				// start index 1 -> for breaking a block we start with the second element
@@ -231,7 +201,6 @@ for(int i=0; i<blockList.size(); ++i){
 			this.forwardJump.add(new Integer(idxDst));
 		} // no else: jump to next element
 	}
-
 
 
 	private void initInstructions(){
