@@ -83,19 +83,6 @@ public class ControlFlowGraphExtractor {
 	}
 
 	public int getBlockIdContainingInsId( int idxIns ){
-/* // XXX
-// TODO rm
-		if( 0 > idxIns ){ return idxIns; }
-
-		int blockId = 1;
-		for( ; blockId < blockList.size(); ++blockId ){
-			if( instructions.indexOf( blockList.get( blockId ).get(0) ) > idxIns){
-				break;
-			}
-		}
-		--blockId;
-		return blockId;
-/*/ // XXX
 		int blockId = -1;
 		int idxBlock = -1;
 		for( idxBlock=0; idxBlock < blockList.size(); ++idxBlock ){
@@ -123,7 +110,6 @@ public class ControlFlowGraphExtractor {
 		}
 
 		return blockId;
-//*/ // XXX
 	}
 
 	private void branching( int idxSrc, int idxDst ){
@@ -135,7 +121,6 @@ public class ControlFlowGraphExtractor {
 
 		if( idxDst < idxSrc && idxDst > 0 ){
 			// jump back, idxDst < idxSrc, and idxDst is not END (= -1 )
-//* // XXX
 			int idxBlock = getBlockIdContainingInsId( idxDst );
 			List<AbstractInsnNode> block = blockList.get(idxBlock);
 
@@ -170,36 +155,7 @@ public class ControlFlowGraphExtractor {
 
 			// fallthrou link, before cut to after cut
 			edgeslistAdd( idxDst-1, idxDst, "label=\"fallthrou\"");
-/*/ // XXX
-// TODO rm
-			int idxLastFirstIns = 0;
-			for( int listIdx = 1; listIdx < this.blockList.size()-1; ++listIdx ){
-				// start index 1 -> for breaking a block we start with the second element
-				// end index size-1 -> ???
 
-				AbstractInsnNode firstIns = this.blockList.get(listIdx).get(0);
-//				int idxFirstIns = this.blockList.indexOf( firstIns );
-				int idxFirstIns = this.instructions.indexOf( firstIns );
-				if( idxDst < idxFirstIns ){
-					// we ultrapassed one, so the last one is it: go back
-					int start = idxLastFirstIns;
-					int diff = idxDst - start;
-
-					// break sublist, and insert new sublist
-					List<AbstractInsnNode> sublist = this.blockList.get(listIdx-1).subList( diff, this.blockList.get(listIdx-1).size());
-					this.blockList.add( listIdx, new ArrayList<AbstractInsnNode>( sublist ));
-
-					// now remove sublist from old location
-					this.blockList.get( listIdx-1 ).removeAll( this.blockList.get( listIdx ) );
-
-// TODO is this necessary?
-					// fallthrough edge
-					edgeslistAdd( idxSrc-1, idxDst, "label=\"flashback\"");
-					break;
-				}
-				idxLastFirstIns = idxFirstIns;
-			}
-//*/ // XXX
 		}else if( idxDst > idxSrc){
 			// forward jump
 			this.forwardJump.add(new Integer(idxDst));

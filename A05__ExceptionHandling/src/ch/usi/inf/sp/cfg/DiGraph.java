@@ -22,8 +22,8 @@ public class DiGraph {
 
 		this.CFGedgelist = new ArrayList<Edge>();
 		for( String szEdge : controlFlow.getEdgeslist() ){
-			int srcId = controlFlow.insId2NodeId( Integer.valueOf( szEdge.split(":")[0]).intValue() );
-			int dstId = controlFlow.insId2NodeId( Integer.valueOf( szEdge.split(":")[1]).intValue() );
+			int srcId = controlFlow.getBlockIdContainingInsId( Integer.valueOf( szEdge.split(":")[0]).intValue() );
+			int dstId = controlFlow.getBlockIdContainingInsId( Integer.valueOf( szEdge.split(":")[1]).intValue() );
 			CFGedgelist.add(new Edge( nodelist.get(srcId), nodelist.get( dstId )));
 		}
 

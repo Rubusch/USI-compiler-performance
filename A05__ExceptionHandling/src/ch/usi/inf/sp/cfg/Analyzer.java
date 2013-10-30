@@ -38,12 +38,16 @@ public class Analyzer {
 		Analyzer control = new Analyzer();
 
 		String methodNameAndDescriptor = "";
-		if(1 < args.length){
-			methodNameAndDescriptor = args[1];
-			control.flow( cnode, methodNameAndDescriptor );
-		}else{
+		try{
+			if(1 < args.length){
+				methodNameAndDescriptor = args[1];
+				control.flow( cnode, methodNameAndDescriptor );
+			}else{
+				control.flow( cnode );
+			}
+		}catch( Exception exp ){
 			// no specific method provided, do all methods
-			control.flow( cnode );			
+			exp.printStackTrace();
 		}
 		echo( "# READY." );
 	}
