@@ -27,7 +27,6 @@ import org.objectweb.asm.util.Printer;
  * @author Lothar Rubusch
  *
  */
-// FIXME CFG Return fallthrough
 // FIXME DA end is disconnected
 // FIXME DA hierarchy corrupted, main candidate getBlockIdContainingInsId() and in case branching() changes
 public class ControlFlowGraphExtractor {
@@ -169,6 +168,10 @@ public class ControlFlowGraphExtractor {
 	private void initInstructions(){
 // FOR
 		boolean branchNextIteration = false;
+
+		// avoid return fallthrou instructions
+		int lastReturn = -1;
+
 		for( int idx = 0; idx < instructions.size(); ++idx ){
 			// get next INSTRUCTION
 			AbstractInsnNode ins = instructions.get(idx);
@@ -242,7 +245,6 @@ public class ControlFlowGraphExtractor {
 				case Opcodes.DRETURN:
 				case Opcodes.ARETURN:
 				case Opcodes.RETURN:
-// FIXME some issues with for-method, linking back additionallly
 					if(1 >= instructions.size() - idx + 1){
 						// RETURN at the end - before last instruction or last 
 						// instruction, don't split, just connect to E
@@ -251,6 +253,7 @@ public class ControlFlowGraphExtractor {
 						// RETURN within running code, branch
 						branching( idx, -1, "label=\"return\"" );
 					}
+					lastReturn = idx;
 					break;
 				}
 			}
@@ -261,8 +264,12 @@ public class ControlFlowGraphExtractor {
 				blockList.add( new ArrayList<AbstractInsnNode>() );
 
 				// forward pointing block fallthrough
-				branching( idx-1, idx, "label=\"fallthrou\"");
+				if( (idx-1) != lastReturn){
+					// don't fallthrough after last ins was a RETURN
+					branching( idx-1, idx, "label=\"fallthrou\"");
+				}
 			}
+
 			// append instruction at last position
 			blockList.get( blockList.size()-1 ).add( ins );
 		}
