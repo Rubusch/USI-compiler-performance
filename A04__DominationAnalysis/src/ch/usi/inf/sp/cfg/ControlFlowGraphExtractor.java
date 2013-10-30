@@ -377,7 +377,6 @@ public class ControlFlowGraphExtractor {
 	public static String dotPrintBlock( int blockId, List<AbstractInsnNode> blockinstructions ){
 		String szBlock = "";
 		szBlock += "  node" + blockId;
-//		szBlock += " [label = \"block" + blockId + " | { <";
 		szBlock += " [align=left,label=\"block" + blockId + " | { <";
 		int startAddr = instructions.indexOf( blockinstructions.get(0) );
 

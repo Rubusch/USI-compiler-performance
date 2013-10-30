@@ -50,13 +50,15 @@ public class Analyzer {
 
 		String methodNameAndDescriptor = "";
 		try{
-			methodNameAndDescriptor = args[1];
-			control.flow( cnode, methodNameAndDescriptor );
+			if(1 < args.length){
+				methodNameAndDescriptor = args[1];
+				control.flow( cnode, methodNameAndDescriptor );
+			}else{
+				control.flow( cnode );
+			}
 		}catch( Exception exp ){
 			// no specific method provided, do all methods
-			control.flow( cnode );
-//			db("EXCEPTION thrown"); // DEBUG, falling back to for loop
-//			exp.printStackTrace(); // DEBUG
+			exp.printStackTrace();
 		}
 		echo( "\n# READY.");
 	}
