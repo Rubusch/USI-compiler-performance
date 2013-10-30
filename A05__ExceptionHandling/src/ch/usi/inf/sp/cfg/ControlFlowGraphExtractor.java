@@ -180,6 +180,9 @@ public class ControlFlowGraphExtractor {
 			// get next INSTRUCTION
 			AbstractInsnNode ins = ControlFlowGraphExtractor.instructions.get(idx);
 
+			// avoid return fallthrou instructions
+			int lastReturn = -1;
+
 			// create new block
 			if(true == branchNextIteration){
 				blockList.add(new ArrayList<AbstractInsnNode>());
@@ -258,6 +261,7 @@ public class ControlFlowGraphExtractor {
 						// RETURN within running code, branch
 						branching( idx, -1, "label=\"return\"" );
 					}
+					lastReturn = idx;
 					break;
 				}
 			}
@@ -315,8 +319,10 @@ public class ControlFlowGraphExtractor {
 				if( Opcodes.ATHROW == lastIns.getOpcode()){
 					branching( idx-1, instructions.size(), "label=\"ATHROW\"" );
 				}else{
-					// forward pointing block fallthrough
-					branching( idx-1, idx, "label=\"forward fallthrou\"");
+					if( (idx-1) != lastReturn){
+						// forward pointing block fallthrough
+						branching( idx-1, idx, "label=\"forward fallthrou\"");
+					}
 				}
 			}
 			// append instruction at last position
