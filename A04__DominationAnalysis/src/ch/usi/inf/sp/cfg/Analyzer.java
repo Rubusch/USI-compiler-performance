@@ -90,10 +90,10 @@ public class Analyzer {
 		echo("#");
 		final InsnList instructions = method.instructions;
 		ControlFlowGraphExtractor controlFlow = new ControlFlowGraphExtractor( instructions );
-//*
+/*
 		controlFlow.dotPrintCFG();
 		echo("# ---");
-//*/
+/*/
 		DiGraph dominator = new DiGraph(controlFlow);
 		dominator.dotPrintDA();
 //*/
