@@ -231,7 +231,6 @@ public class ControlFlowGraphExtractor {
 				// provoke a new basic block
 				branchNextIteration = true;
 
-				
 			}else if( ins.getType() == AbstractInsnNode.INSN){
 				switch (ins.getOpcode()){
 				case Opcodes.IRETURN:
