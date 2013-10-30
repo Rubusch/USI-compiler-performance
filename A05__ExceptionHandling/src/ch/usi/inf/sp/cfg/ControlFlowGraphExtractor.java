@@ -32,30 +32,9 @@ public class ControlFlowGraphExtractor {
 	
 	private final ExceptionTable exceptionTable	;
 
-	public List<List<AbstractInsnNode>> getBlocklist() {
-		return blocklist;
-	}
-
-	public List<String> getEdgeslist() {
-		return edgesList;
-	}
-
-	private void edgeslistAdd(int srcidx, int dstidx){
-		edgeslistAdd( srcidx, dstidx, "");
-	}
-
-	private void edgeslistAdd(int srcidx, int dstidx, String opt){
-		String str = String.valueOf( srcidx );
-		if( instructions.size() == dstidx){
-			// until end
-			str += ":E";
-		}else{
-			str += ":" + String.valueOf( dstidx );
-		}
-		if( 0 < opt.length() ){ str += ":" + opt; }
-		this.edgesList.add(str);
-	}
-
+	/*
+	 * ctor
+	 */
 	public ControlFlowGraphExtractor( final MethodNode method){
 		blocklist = new ArrayList< List<AbstractInsnNode>>();
 		blocklist.add(new ArrayList<AbstractInsnNode>());
@@ -72,12 +51,53 @@ public class ControlFlowGraphExtractor {
 				omitFallthruList.add(new Integer(iOpcode));
 			}
 		}
-		
 		// exception handling
 		exceptionTable = new ExceptionTable(); // TODO LinkedList?
 		initInstructions();
 	}
 
+
+	/*
+	 * getter / setter
+	 */
+	public List<List<AbstractInsnNode>> getBlocklist() {
+		return blocklist;
+	}
+
+	public List<String> getEdgeslist() {
+		return edgesList;
+	}
+
+
+	/*
+	 * utilities
+	 */
+	private void edgeslistAdd(int idxSrc, int idxDst){
+		edgeslistAdd( idxSrc, idxDst, "");
+	}
+
+	private void edgeslistAdd(int idxSrc, int idxDst, String opt){
+		String str = String.valueOf( idxSrc );
+		if( instructions.size() == idxDst){
+			// until end
+			str += ":E";
+		}else{
+			str += ":" + String.valueOf( idxDst );
+		}
+		if( 0 < opt.length() ){ str += ":" + opt; }
+		this.edgesList.add(str);
+	}
+
+	public int insId2NodeId( int idxIns ){
+		int nodeId = 1;
+		for( ; nodeId < blocklist.size(); ++nodeId ){
+			if( instructions.indexOf( blocklist.get( nodeId ).get(0) ) > idxIns){
+				break;
+			}
+		}
+		--nodeId;
+		return nodeId;
+	}
 
 	private void branching( int srcidx, int dstidx ){
 		branching( srcidx, dstidx, "");
@@ -548,16 +568,5 @@ public class ControlFlowGraphExtractor {
 		szBlock += "\\l }\"];";
 
 		return szBlock;
-	}
-
-	public int insId2NodeId( int insId ){
-		int nodeId = 1;
-		for( ; nodeId < blocklist.size(); ++nodeId ){
-			if( instructions.indexOf( blocklist.get( nodeId ).get(0) ) > insId){
-				break;
-			}
-		}
-		--nodeId;
-		return nodeId;
 	}
 }

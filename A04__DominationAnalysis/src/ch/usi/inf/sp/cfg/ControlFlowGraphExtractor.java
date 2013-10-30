@@ -71,13 +71,13 @@ public class ControlFlowGraphExtractor {
 	 * util methods
 	 */
 
-	private void edgeslistAdd(int srcidx, int dstidx){
-		edgeslistAdd( srcidx, dstidx, "");
+	private void edgeslistAdd(int idxSrc, int idxDst){
+		edgeslistAdd( idxSrc, idxDst, "");
 	}
 
-	private void edgeslistAdd(int srcidx, int dstidx, String opt){
-		String str = String.valueOf( srcidx );
-		str += ":" + String.valueOf( dstidx );
+	private void edgeslistAdd(int idxSrc, int idxDst, String opt){
+		String str = String.valueOf( idxSrc );
+		str += ":" + String.valueOf( idxDst );
 		if( 0 < opt.length() ){ str += ":" + opt; }
 		edgesList.add(str);
 	}
