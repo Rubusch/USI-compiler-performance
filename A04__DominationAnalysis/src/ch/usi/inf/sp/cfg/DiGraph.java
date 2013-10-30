@@ -60,36 +60,19 @@ public class DiGraph {
 		// populate CFGEdgelist
 		this.CFGEdgeList = new ArrayList<Edge>();
 		for( String szEdge : controlFlow.getEdgeslist() ){
-//Analyzer.db("initCFGEdgeList() - szEdge " + szEdge ); // XXX
 			int iSrcId = Integer.valueOf( szEdge.split(":")[0]).intValue();
 
-//Analyzer.db("initCFGEdgeList() - iSrcId " + String.valueOf(iSrcId) ); // XXX
-/*
-			int srcId = controlFlow.getBlockIdContainingInsId( iSrcId );
-			if( 0 > srcId ){
-				srcId = START;
-			}
-/*/
 			int srcId = START;
 			if( 0 <= iSrcId ){
 				srcId = controlFlow.getBlockIdContainingInsId( iSrcId );
 			}
-//Analyzer.db("initCFGEdgeList() - srcId block" + String.valueOf(srcId) ); // XXX
-//*/
+
 			int iDstId = Integer.valueOf( szEdge.split(":")[1]).intValue();
 
-//Analyzer.db("initCFGEdgeList() - iDstId " + String.valueOf(iDstId) ); // XXX
-/*
-			int dstId = controlFlow.getBlockIdContainingInsId( iDstId );
-			if( 0 > dstId ){
-				dstId = END;
-			}
-/*/
 			int dstId = END;
 			if( 0 <= iDstId ){
 				dstId = controlFlow.getBlockIdContainingInsId( iDstId );
 			}
-//Analyzer.db("initCFGEdgeList() - dstId block" + String.valueOf(dstId) ); // XXX
 
 			// stupid check
 			if( srcId == dstId) continue;
@@ -99,7 +82,7 @@ public class DiGraph {
 
 			NodeWrapper dstNode;
 			dstNode = getNodeById( CFGBlockList, dstId );
-// FIXME
+
 			CFGEdgeList.add(new Edge( srcNode, dstNode));
 		}
 	}
@@ -164,11 +147,9 @@ public class DiGraph {
 			NodeWrapper parentNode = currEdge.getFromNode();
 			currNode = currEdge.getToNode();
 
-// FIXME: nestedFor() - b2, b3 and b4 fall out somewhere (e.g. stack?)
 			// update dominator information
 			currNode.inheritageMerge(parentNode);
 		}
-
 
 		// map CFG to DA
 		this.DAedgeList = new ArrayList<Edge>();
@@ -177,7 +158,7 @@ public class DiGraph {
 
 			// find all edges ending at current (and no upward linking, to avoid loop issues)
 			currNode = CFGBlockList.get(blockId);
-//*
+
 			// check for END connections
 			if(currNode.id() == END){
 				boolean isNoReturnConnected = true;
@@ -190,10 +171,9 @@ public class DiGraph {
 				
 				if(isNoReturnConnected){
 					// no connection to END - just continue
-					continue; // FIXME, something's wrong with END here
+					continue;
 				}
 			}
-//*/
 
 			Integer idom = currNode.getIDom();
 			final NodeWrapper idomNode;

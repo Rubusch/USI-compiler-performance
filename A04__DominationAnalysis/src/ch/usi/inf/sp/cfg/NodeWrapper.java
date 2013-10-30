@@ -15,7 +15,6 @@ import org.objectweb.asm.tree.AbstractInsnNode;
  */
 public class NodeWrapper {
 	private final Integer Id;
-// TODO why is idom a Integer, and not a Node?
 	private Integer idom; // immediate dominator
 	private List<List<Integer>> heritage;
 
