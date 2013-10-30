@@ -22,6 +22,13 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.util.Printer;
 
+/**
+ * 
+ * @author Lothar Rubusch
+ *
+ */
+// FIXME INVOKE calls may throw exceptions - test
+// FIXME NEWARRAYs may throw exceptions - test
 public class ControlFlowGraphExtractor {
 	private List< List<AbstractInsnNode>> blockList;
 	private static InsnList instructions;
@@ -51,8 +58,10 @@ public class ControlFlowGraphExtractor {
 				omitFallthruList.add(new Integer(iOpcode));
 			}
 		}
+		
 		// exception handling
 		exceptionTable = new ExceptionTable(); // TODO LinkedList?
+
 		initInstructions();
 	}
 
@@ -78,14 +87,9 @@ public class ControlFlowGraphExtractor {
 
 	private void edgeslistAdd(int idxSrc, int idxDst, String opt){
 		String str = String.valueOf( idxSrc );
-		if( instructions.size() == idxDst){
-			// until end
-			str += ":E";
-		}else{
-			str += ":" + String.valueOf( idxDst );
-		}
+		str += ":" + String.valueOf( idxDst );
 		if( 0 < opt.length() ){ str += ":" + opt; }
-		this.edgesList.add(str);
+		edgesList.add(str);
 	}
 
 	public int getBlockIdContainingInsId( int idxIns ){
@@ -133,7 +137,7 @@ public class ControlFlowGraphExtractor {
 			// split block at idxDst
 			int start = instructions.indexOf(block.get(0));
 			int startSplit = idxDst - start;
-			int endSplit = block.size(); //-1;
+			int endSplit = block.size();
 
 			if( 0 == startSplit){
 				// don't split if this is a backjump to the 0th element of block
@@ -174,14 +178,17 @@ public class ControlFlowGraphExtractor {
 //		exceptionTable.printExceptionTable(); // debugging
 //		exceptionTable.printStateTable(); // debugging
 
-// FOR
 		boolean branchNextIteration = false;
-		for( int idx = 0; idx < ControlFlowGraphExtractor.instructions.size(); ++idx ){
-			// get next INSTRUCTION
-			AbstractInsnNode ins = ControlFlowGraphExtractor.instructions.get(idx);
 
-			// avoid return fallthrou instructions
-			int lastReturn = -1;
+		// avoid return fallthrou instructions
+		int lastReturn = -1;
+
+// FOR
+		for( int idx = 0; idx < instructions.size(); ++idx ){
+			// get next INSTRUCTION
+			AbstractInsnNode ins = instructions.get(idx);
+
+			if( 0 == idx) edgeslistAdd( -1, idx);
 
 			// create new block
 			if(true == branchNextIteration){
@@ -221,7 +228,6 @@ public class ControlFlowGraphExtractor {
 
 				final LabelNode defaultTargetInstruction = ((LookupSwitchInsnNode)ins).dflt;
 				final int targetIdx = instructions.indexOf(defaultTargetInstruction);
-
 				branching( idx, targetIdx );
 
 				// provoke a new basic block
@@ -244,7 +250,6 @@ public class ControlFlowGraphExtractor {
 				// provoke a new basic block
 				branchNextIteration = true;
 
-				
 			}else if( ins.getType() == AbstractInsnNode.INSN){
 				switch (ins.getOpcode()){
 				case Opcodes.IRETURN:
@@ -310,7 +315,7 @@ public class ControlFlowGraphExtractor {
 			if( -1 < forwardJump.indexOf( idx ) && blockList.get( blockList.size()-1 ).size() > 1 ){
 
 				// there was a forward jump to this address
-				this.blockList.add( new ArrayList<AbstractInsnNode>() );
+				blockList.add( new ArrayList<AbstractInsnNode>() );
 
 				// fallthrou edge
 				AbstractInsnNode lastIns = instructions.get(idx-1);
@@ -319,6 +324,7 @@ public class ControlFlowGraphExtractor {
 				if( Opcodes.ATHROW == lastIns.getOpcode()){
 					branching( idx-1, instructions.size(), "label=\"ATHROW\"" );
 				}else{
+					// forward pointing block fallthrough
 					if( (idx-1) != lastReturn){
 						// forward pointing block fallthrough
 						branching( idx-1, idx, "label=\"forward fallthrou\"");
@@ -389,6 +395,7 @@ public class ControlFlowGraphExtractor {
 
 	public void dotPrintCFG(){
 		if( 0 == this.blockList.size() ) return;
+		Analyzer.echo("# control flow graph analysis");
 
 		// header
 		Analyzer.echo("digraph G {");
@@ -399,6 +406,17 @@ public class ControlFlowGraphExtractor {
 		Analyzer.echo("  nodeS [label = \"{ <S> start }\"];");
 		Analyzer.echo("  nodeE [label = \"{ <E> end }\"];");
 
+		// block nodes
+		int lastidx = blockList.size() -1;
+		if( 1 == blockList.get(lastidx).size()){
+			// final block consists of a single element
+			List<AbstractInsnNode> finalblock = blockList.get(lastidx);
+			if( finalblock.get(0).getType()== AbstractInsnNode.LABEL){
+				// this single element was just a label, so remove it
+				// in case this was an infinite loop w/o return
+				blockList.remove(lastidx);
+			}
+		}
 		for( int idxBlock=0; idxBlock < this.blockList.size(); ++idxBlock){
 			Analyzer.echo(dotPrintBlock( idxBlock, blockList.get(idxBlock)));
 		}
@@ -410,10 +428,6 @@ public class ControlFlowGraphExtractor {
 		}
 
 		// trailer
-// TODO back from RETURN, here just the forelast instruction
-		Analyzer.echo("  node" + String.valueOf(blockList.size()-1)
-				+ ":" + String.valueOf(instructions.size()-2)
-				+ " -> nodeE:E");
 		Analyzer.echo("}");
 	}
 
@@ -421,20 +435,29 @@ public class ControlFlowGraphExtractor {
 		String[] szbuf = this.edgesList.get(idx).split(":");
 		int idxSrc = Integer.valueOf( szbuf[0] ).intValue();
 		int idxNodeSrc = getBlockIdContainingInsId( idxSrc );
-		String str = "  node" +  idxNodeSrc +":" + idxSrc;
-		try{
-			int idxDst = Integer.valueOf( szbuf[1] ).intValue();
-			int idxNodeDst = getBlockIdContainingInsId( idxDst );
-			str += " -> node" + idxNodeDst + ":" + idxDst;
-		}catch(NumberFormatException exp){
-			str += " -> nodeE:E";
+		String str = "  ";
+		if(0 > idxSrc){
+			// START
+			str += "nodeS:S";
+		}else{
+			str += "node" +  idxNodeSrc +":" + idxSrc;
 		}
+
+		int idxDst = Integer.valueOf( szbuf[1] ).intValue();
+		int idxNodeDst = getBlockIdContainingInsId( idxDst );
+		if(0 > idxDst){
+			// RETURN
+			str += " -> nodeE:E";
+		}else{
+			str += " -> node" + idxNodeDst + ":" + idxDst;
+		}
+
 		if( 2 < szbuf.length ){
 			str += "[ " + szbuf[2] + " ]";
 		}
 		return str;
 	}
-
+//*/
 
 	public static String dotPrintBlock( int blockId, List<AbstractInsnNode> blockinstructions ){
 		String szBlock = "";

@@ -127,7 +127,7 @@ public class ControlFlowGraphExtractor {
 			// split block at idxDst
 			int start = instructions.indexOf(block.get(0));
 			int startSplit = idxDst - start;
-			int endSplit = block.size(); //-1;
+			int endSplit = block.size();
 
 			if( 0 == startSplit){
 				// don't split if this is a backjump to the 0th element of block
@@ -170,6 +170,7 @@ public class ControlFlowGraphExtractor {
 		// avoid return fallthrou instructions
 		int lastReturn = -1;
 
+// FOR
 		for( int idx = 0; idx < instructions.size(); ++idx ){
 			// get next INSTRUCTION
 			AbstractInsnNode ins = instructions.get(idx);
@@ -303,7 +304,8 @@ public class ControlFlowGraphExtractor {
 			}
 		}
 		for( int idx=0; idx < blockList.size(); ++idx){
-			System.out.print( dotPrintBlock( idx, blockList.get(idx)) );
+//			System.out.print( dotPrintBlock( idx, blockList.get(idx)) );
+			Analyzer.echo( dotPrintBlock( idx, blockList.get(idx)) );
 		}
 
 		// connections
