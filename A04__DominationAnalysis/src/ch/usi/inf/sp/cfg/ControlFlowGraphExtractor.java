@@ -135,7 +135,7 @@ public class ControlFlowGraphExtractor {
 
 		if( idxDst < idxSrc && idxDst > 0 ){
 			// jump back, idxDst < idxSrc, and idxDst is not END (= -1 )
-//*
+//* // XXX
 			int idxBlock = getBlockIdContainingInsId( idxDst );
 			List<AbstractInsnNode> block = blockList.get(idxBlock);
 
@@ -144,7 +144,16 @@ public class ControlFlowGraphExtractor {
 			int startSplit = idxDst - start;
 			int endSplit = block.size(); //-1;
 
-			// break sublist, and insert new sublist
+Analyzer.db("XXX start " + String.valueOf(start));
+Analyzer.db("XXX startSplit " + String.valueOf(startSplit));
+Analyzer.db("XXX endSplit " + String.valueOf(endSplit));
+
+			if( 0 == startSplit){
+				// don't split if this is a backjump to the 0th element of block
+				return;
+			}
+
+			// split into sublist, and insert new sublist
 			List<AbstractInsnNode> blockBottomHalf = block.subList( startSplit, endSplit);
 
 			// clone sublist and append it
@@ -163,10 +172,15 @@ public class ControlFlowGraphExtractor {
 			// remove sublist elements from old location block
 			block.removeAll( blockNew );
 
+Analyzer.db("XXX block.size() " + String.valueOf(block.size()));
+Analyzer.db("XXX blockNew.size() " + String.valueOf(blockNew.size()));
+
 			// fallthrou link, before cut to after cut
 			edgeslistAdd( idxDst-1, idxDst, "label=\"fallthrou\"");
+			
+//Analyzer.die("STOP");
 
-/*/
+/*/ // XXX
 // TODO rm
 			int idxLastFirstIns = 0;
 			for( int listIdx = 1; listIdx < this.blockList.size()-1; ++listIdx ){
@@ -195,7 +209,7 @@ public class ControlFlowGraphExtractor {
 				}
 				idxLastFirstIns = idxFirstIns;
 			}
-//*/
+//*/ // XXX
 		}else if( idxDst > idxSrc){
 			// forward jump
 			this.forwardJump.add(new Integer(idxDst));
