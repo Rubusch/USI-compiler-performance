@@ -82,31 +82,118 @@ public class ControlFlowGraphExtractor {
 		edgesList.add(str);
 	}
 
-	public int getBlockbyInsId( int insId ){
-		if( 0 > insId ){ return insId; }
+	public int getBlockIdContainingInsId( int idxIns ){
+/*
+		if( 0 > idxIns ){ return idxIns; }
 
-		int nodeId = 1;
-		for( ; nodeId < blockList.size(); ++nodeId ){
-			if( instructions.indexOf( blockList.get( nodeId ).get(0) ) > insId){
+		int blockId = 1;
+		for( ; blockId < blockList.size(); ++blockId ){
+			if( instructions.indexOf( blockList.get( blockId ).get(0) ) > idxIns){
 				break;
 			}
 		}
-		--nodeId;
-		return nodeId;
+		--blockId;
+		return blockId;
+/*/
+		int blockId = -1;
+		int idxBlock = -1;
+		for( idxBlock=0; idxBlock < blockList.size(); ++idxBlock ){
+
+			// get first ins id from block
+			AbstractInsnNode firstIns = blockList.get(idxBlock).get(0);
+			int idxFirstIns = instructions.indexOf( firstIns );
+
+			// if we overrun, pick last or block0
+			if( idxIns < idxFirstIns){ // overrun, pick last
+				if( idxBlock > 0 ){
+					// case 1: idxIns is in block0
+					idxBlock--;
+				}
+
+				// case 2: idxIns is within elements
+				blockId = idxBlock;
+				break;
+			}
+		}
+
+		// case 3: idxIns is in last block
+		if( blockList.size() == idxBlock){
+			blockId = idxBlock -1;
+		}
+
+		return blockId;
+//*/
 	}
 
-	private void branching( int srcidx, int dstidx ){
-		branching( srcidx, dstidx, "");
+	private void branching( int idxSrc, int idxDst ){
+		branching( idxSrc, idxDst, "");
 	}
 
-	private void branching( int srcidx, int dstidx, String opt ){
-		edgeslistAdd( srcidx, dstidx, opt);
+	private void branching( int idxSrc, int idxDst, String opt ){
+		edgeslistAdd( idxSrc, idxDst, opt);
 
-		if( dstidx < srcidx ){
+		if( idxDst < idxSrc && idxDst > 0 ){
+			// idxDst < idxSrc, and idxDst is not END (= -1 )
 Analyzer.db("XXX backward jump - there seems to be a minor bug"); // XXX
+Analyzer.db("XXX idxDst " + String.valueOf(idxDst) + "< idxSrc " + String.valueOf(idxSrc));
 			// backward jump
-/*
-			// TODO split backward
+//*
+			int idxBlock = getBlockIdContainingInsId( idxDst );
+			List<AbstractInsnNode> block = blockList.get(idxBlock);
+Analyzer.db("XXX block.size() [before]: " + String.valueOf(block.size())); // XXX
+
+			// split block at idxDst
+			int start = instructions.indexOf(block.get(0));
+// TODO check start and end
+			int startSplit = idxDst - start -1;
+			int endSplit = block.size()-1;
+
+Analyzer.db("XXX start " + String.valueOf(start));
+Analyzer.db("XXX startSplit " + String.valueOf(startSplit));
+Analyzer.db("XXX endSplit " + String.valueOf(endSplit));
+
+			// break sublist, and insert new sublist
+			List<AbstractInsnNode> blockBottomHalf = block.subList( startSplit, endSplit);
+
+			// clone sublist and append it
+			List<AbstractInsnNode> blockNew = new ArrayList<AbstractInsnNode>();
+			for( AbstractInsnNode ins : blockBottomHalf){ blockNew.add(ins); }
+
+			// insert newBlock after block
+			if(blockList.size() > idxBlock+1){
+				// insert
+				blockList.add( idxBlock+1, blockNew );
+			}else{
+				// append, block was currently last block
+				blockList.add( blockNew );
+			}
+
+			// remove sublist elements from old location block
+//			block.removeAll( blockList.get( idxBlock+1 ) );
+			block.removeAll( blockNew );
+
+// TODO test insert blockNew BEFORE
+Analyzer.db("XXX block.size() [after]: " + String.valueOf(block.size())); // XXX
+Analyzer.db("XXX blockNew.size() " + String.valueOf(blockNew.size())); // XXX
+
+for(int i=0; i<blockList.size(); ++i){
+	List<AbstractInsnNode> dbBlox = blockList.get(i);
+	for( int j=0; j<dbBlox.size(); ++j){
+		Analyzer.db("ZZZ " + String.valueOf(i) + ": " + String.valueOf(dbBlox.get(j).getType()  )); // XXX
+	}
+}
+
+
+
+			// fallthrou link
+// TODO check start and end
+			edgeslistAdd( idxSrc, idxDst, "label=\"fallthrou\"");
+			
+// FIXME instruction indexes wrong
+// FIXME fallthrough connects wrong
+// FIXME start connects to block1 now
+
+//Analyzer.die("STOP"); // XXX
 
 
 /*/
@@ -116,7 +203,8 @@ Analyzer.db("XXX backward jump - there seems to be a minor bug"); // XXX
 				// end index size-1 -> ???
 
 				AbstractInsnNode firstIns = this.blockList.get(listIdx).get(0);
-				int idxFirstIns = this.blockList.indexOf( firstIns );
+//				int idxFirstIns = this.blockList.indexOf( firstIns );
+				int idxFirstIns = this.instructions.indexOf( firstIns );
 				if( dstidx < idxFirstIns ){
 					// we ultrapassed one, so the last one is it: go back
 					int start = idxLastFirstIns;
@@ -137,9 +225,9 @@ Analyzer.db("XXX backward jump - there seems to be a minor bug"); // XXX
 				idxLastFirstIns = idxFirstIns;
 			}
 //*/
-		}else if( dstidx > srcidx){
+		}else if( idxDst > idxSrc){
 			// forward jump
-			this.forwardJump.add(new Integer(dstidx));
+			this.forwardJump.add(new Integer(idxDst));
 		} // no else: jump to next element
 	}
 
@@ -291,7 +379,7 @@ Analyzer.db("XXX backward jump - there seems to be a minor bug"); // XXX
 	private String dotEdges( int idx ){
 		String[] szbuf = this.edgesList.get(idx).split(":");
 		int idxSrc = Integer.valueOf( szbuf[0] ).intValue();
-		int idxNodeSrc = getBlockbyInsId( idxSrc );
+		int idxNodeSrc = getBlockIdContainingInsId( idxSrc );
 		String str = "  ";
 		if(0 > idxSrc){
 			// START
@@ -301,7 +389,7 @@ Analyzer.db("XXX backward jump - there seems to be a minor bug"); // XXX
 		}
 
 		int idxDst = Integer.valueOf( szbuf[1] ).intValue();
-		int idxNodeDst = getBlockbyInsId( idxDst );
+		int idxNodeDst = getBlockIdContainingInsId( idxDst );
 		if(0 > idxDst){
 			// RETURN
 			str += " -> nodeE:E";

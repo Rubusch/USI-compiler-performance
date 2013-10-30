@@ -54,7 +54,10 @@ public class Analyzer {
 			control.flow( cnode, methodNameAndDescriptor );
 		}catch( Exception exp ){
 			// no specific method provided, do all methods
-			control.flow( cnode );
+// TODO turned off, for DEBUGGING
+//			control.flow( cnode );
+			db("EXCEPTION thrown");
+			exp.printStackTrace();
 		}
 		echo( "\n# READY.");
 	}

@@ -61,13 +61,13 @@ public class DiGraph {
 		this.CFGEdgeList = new ArrayList<Edge>();
 		for( String szEdge : controlFlow.getEdgeslist() ){
 			int iSrcId = Integer.valueOf( szEdge.split(":")[0]).intValue();
-			int srcId = controlFlow.getBlockbyInsId( iSrcId );
+			int srcId = controlFlow.getBlockIdContainingInsId( iSrcId );
 			if( 0 > srcId ){
 				srcId = START;
 			}
 					
 			int iDstId = Integer.valueOf( szEdge.split(":")[1]).intValue();
-			int dstId = controlFlow.getBlockbyInsId( iDstId );
+			int dstId = controlFlow.getBlockIdContainingInsId( iDstId );
 			if( 0 > dstId ){
 				dstId = END;
 			}
