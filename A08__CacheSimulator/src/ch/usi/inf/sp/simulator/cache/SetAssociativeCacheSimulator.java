@@ -7,6 +7,7 @@ package ch.usi.inf.sp.simulator.cache;
  */
 // TODO Note that in a freshly instantiated SetAssociativeCacheSimulator, all cache lines are invalid.
 // TODO After you implement your class, run the existing JUnit tests (SetAssociativeCacheSimulatorTest) and make sure your simulator passes all the test cases.
+// TODO Then add some additional test cases. You get a bonus point for each submitted SetAssociativeCacheSimulator implementation (except yours) that the existing test cases don't break but that your additional test cases manage to break.
 public class SetAssociativeCacheSimulator implements
 		ISetAssociativeCacheSimulator {
 
