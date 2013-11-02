@@ -56,10 +56,25 @@ public final class DirectMappedCacheSimulator implements IDirectMappedCacheSimul
 	
 	public void handleMemoryAccess(final int address) {
 		System.out.printf("address: 0x%08x (%d)\n", address, address);
+
+		Tester.db("\taddress\t>> bitsForByteInLine"); // XXX
+		Tester.db("\t" + String.valueOf(address) + "\t>> " + String.valueOf(bitsForByteInLine) + "\t\t\t\t\t\t\t" + String.valueOf(address>>bitsForByteInLine)); // XXX
+
+		Tester.db("\t1<< bitsForLine"); // XXX
+		Tester.db("\t1<< "+ String.valueOf(bitsForLine) + "\t\t\t\t\t\t\t\t" + String.valueOf(1<<bitsForLine)); // XXX
+
 		final int line = (address>>bitsForByteInLine)&((1<<bitsForLine)-1);
+
+		Tester.db("\t(address>>bitsForByteInLine)\t& ((1<<bitsForLine)-1)");
+		Tester.db("\t" + String.valueOf(address>>bitsForByteInLine) + "\t\t\t\t& ((" + String.valueOf(1<<bitsForLine) + ")-1)\t\t\t" + String.valueOf(line)); // XXX
+
 		System.out.printf("line:    0x%08x (%d)\n", line, line);
+
+//		Tester.die(); // XXX
+
 		final int tag = address>>>(bitsForLine+bitsForByteInLine);
 		System.out.printf("tag:     0x%08x (%d)\n", tag, tag);
+
 		if (tags[line]==tag && validBits[line]) {
 			hitCount++;
 		} else {
@@ -67,6 +82,8 @@ public final class DirectMappedCacheSimulator implements IDirectMappedCacheSimul
 			validBits[line] = true;
 			missCount++;
 		}
+
+		System.out.println("-");
 	}
 	
 	public long getHitCount() {
