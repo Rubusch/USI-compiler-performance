@@ -23,12 +23,12 @@ public class SetAssociativeCacheSimulator implements
 
 	/**
 	 * 
-	 * @param i
+	 * @param bitsForSet
 	 * @param j
 	 * @param k
 	 */
-	public SetAssociativeCacheSimulator(int i, int j, int k) {
-		this.bitsForTag = i; // TODO check
+	public SetAssociativeCacheSimulator(int bitsForSet, int j, int k) {
+		this.bitsForTag = bitsForSet; // TODO check
 		this.bitsForSet = j; // TODO check
 		this.bitsForByteInLine = k; // TODO check
 
@@ -55,8 +55,7 @@ public class SetAssociativeCacheSimulator implements
 
 	@Override
 	public int getNumberOfSets() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 1<<bitsForSet;
 	}
 
 	@Override
@@ -67,8 +66,7 @@ public class SetAssociativeCacheSimulator implements
 
 	@Override
 	public int getNumberOfBytesInLine() {
-		// TODO Auto-generated method stub
-		return 0;
+		return 1<<bitsForByteInLine;
 	}
 
 	@Override
