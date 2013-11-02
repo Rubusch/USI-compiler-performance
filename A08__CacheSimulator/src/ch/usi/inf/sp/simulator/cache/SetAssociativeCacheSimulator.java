@@ -10,28 +10,47 @@ package ch.usi.inf.sp.simulator.cache;
 // TODO Then add some additional test cases. You get a bonus point for each submitted SetAssociativeCacheSimulator implementation (except yours) that the existing test cases don't break but that your additional test cases manage to break.
 public class SetAssociativeCacheSimulator implements
 		ISetAssociativeCacheSimulator {
+	
+	private int bitsForTag;
+	private int bitsForSet;
+	private int bitsForByteInLine;
 
+	private int[] tags; // XXX
+	private boolean[] validBits; // XXX
+	
+	private long hitCount; // XXX
+	private long missCount; // XXX
+
+	/**
+	 * 
+	 * @param i
+	 * @param j
+	 * @param k
+	 */
 	public SetAssociativeCacheSimulator(int i, int j, int k) {
-		// TODO Auto-generated constructor stub
+		this.bitsForTag = i; // TODO check
+		this.bitsForSet = j; // TODO check
+		this.bitsForByteInLine = k; // TODO check
+
+		final int numberOfLines = 1<<bitsForByteInLine; // TODO check
+		tags = new int[numberOfLines]; // TODO check
+		validBits = new boolean[numberOfLines]; // TODO check
 	}
 
 
 	@Override
 	public int getNumberOfBitsForTag() {
-		// TODO Auto-generated method stub
-		return 0;
+		return bitsForTag;
 	}
 
 	@Override
 	public int getNumberOfBitsForSet() {
-		// TODO Auto-generated method stub
-		return 0;
+		return bitsForSet;
 	}
 
 	@Override
 	public int getNumberOfBitsForByteInLine() {
-		// TODO Auto-generated method stub
-		return 0;
+		return bitsForByteInLine;
 	}
 
 	@Override
@@ -66,14 +85,12 @@ public class SetAssociativeCacheSimulator implements
 
 	@Override
 	public long getHitCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.hitCount;
 	}
 
 	@Override
 	public long getMissCount() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.missCount;
 	}
 
 }
