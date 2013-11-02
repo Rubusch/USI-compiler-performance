@@ -7,10 +7,6 @@ package ch.usi.inf.sp.simulator.cache;
  */
 public class Tester {
 
-	public Tester(){
-		runTests();
-	}
-
 	/**
 	 * @param args
 	 */
@@ -24,21 +20,67 @@ public class Tester {
 	 */
 
 	private void db(String msg){
-		System.out.println("DEBUG: " + msg);
+		System.out.println("DEBUG: " + msg );
 	}
 
 	private void runTests(){
-		//*
-				DirectMappedCacheSimulatorTest cache = new DirectMappedCacheSimulatorTest();
-				cache.testInit();
-				cache.testOneLineOnce();
-				cache.testAccessOneLineTwice();
-				cache.testAccessAllBytesInOneLine();
-				cache.testAccessEachLineOnce();
-				cache.testAccessSameLineThroughAliases();
+/*
+		DirectMappedCacheSimulatorTest cache = new DirectMappedCacheSimulatorTest();
+
+		db("testInit()");
+		cache.testInit();
+		db("");
+
+		db("testOneLineOnce()");
+		cache.testOneLineOnce();
+		db("");
+
+//		db("testAccessOneLineTwice()");
+//		cache.testAccessOneLineTwice();
+//		db("");
+
+//		db("testAccessAllBytesInOneLine()");
+//		cache.testAccessAllBytesInOneLine();
+//		db("");
+
+//		db("testAccessEachLineOnce()");
+//		cache.testAccessEachLineOnce();
+//		db("");
+
+//		db("testAccessSameLineThroughAliases()");
+//		cache.testAccessSameLineThroughAliases();
+//		db("");
 		/*/
-				
-		//*/
-				db("READY.\n");
+		SetAssociativeCacheSimulatorTest cache = new SetAssociativeCacheSimulatorTest();
+
+		db("testInit()");
+		cache.testInit();
+		db("");
+
+//		db("testOneLineOnce()");
+//		cache.testOneLineOnce();
+//		db("");
+
+//		db("testAccessOneLineTwice()");
+//		cache.testAccessOneLineTwice();
+//		db("");
+
+//		db("testAccessAllBytesInOneLine()");
+//		cache.testAccessAllBytesInOneLine();
+//		db("");
+
+//		db("testAccessEachSetOnce()");
+//		cache.testAccessEachSetOnce();
+//		db("");
+
+//		db("testAccessEachSlotInOneSetOnce()");
+//		cache.testAccessEachSlotInOneSetOnce();
+//		db("");
+
+//		db("testAccessAllBytesInOneSet()");
+//		cache.testAccessAllBytesInOneSet();
+//		db("");
+//*/
+		db("READY.\n");
 	}
 }
