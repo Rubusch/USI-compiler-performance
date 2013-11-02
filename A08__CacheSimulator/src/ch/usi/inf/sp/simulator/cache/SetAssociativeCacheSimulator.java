@@ -15,6 +15,10 @@ public class SetAssociativeCacheSimulator implements
 	private int bitsForSet;
 	private int bitsForByteInLine;
 
+	private int numberOfWays;
+
+	private int cacheSizeInBytes;
+
 	private int[] tags; // XXX
 	private boolean[] validBits; // XXX
 	
@@ -24,15 +28,15 @@ public class SetAssociativeCacheSimulator implements
 	/**
 	 * 
 	 * @param bitsForSet
-	 * @param j
-	 * @param k
+	 * @param bitsForByteInLine
+	 * @param numberOfWays
 	 */
-	public SetAssociativeCacheSimulator(int bitsForSet, int j, int k) {
-		this.bitsForTag = bitsForSet; // TODO check
-		this.bitsForSet = j; // TODO check
-		this.bitsForByteInLine = k; // TODO check
+	public SetAssociativeCacheSimulator(int bitsForSet, int bitsForByteInLine, int numberOfWays) {
+		this.bitsForSet= bitsForSet;
+		this.bitsForByteInLine = bitsForByteInLine;
+		this.numberOfWays = numberOfWays;
 
-		final int numberOfLines = 1<<bitsForByteInLine; // TODO check
+		final int numberOfLines = this.getNumberOfBytesInLine(); // TODO check
 		tags = new int[numberOfLines]; // TODO check
 		validBits = new boolean[numberOfLines]; // TODO check
 	}
@@ -60,8 +64,7 @@ public class SetAssociativeCacheSimulator implements
 
 	@Override
 	public int getNumberOfWays() {
-		// TODO Auto-generated method stub
-		return 0;
+		return numberOfWays;
 	}
 
 	@Override
@@ -71,8 +74,7 @@ public class SetAssociativeCacheSimulator implements
 
 	@Override
 	public int getCacheSizeInBytes() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.getNumberOfWays() * this.getNumberOfBitsForByteInLine() * this.getNumberOfSets();
 	}
 
 	@Override
@@ -90,5 +92,4 @@ public class SetAssociativeCacheSimulator implements
 	public long getMissCount() {
 		return this.missCount;
 	}
-
 }
