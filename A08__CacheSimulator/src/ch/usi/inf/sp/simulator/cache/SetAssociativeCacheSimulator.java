@@ -88,7 +88,10 @@ public class SetAssociativeCacheSimulator implements
 
 	@Override
 	public int getCacheSizeInBytes() {
-		return this.getNumberOfWays() * this.getNumberOfBitsForByteInLine() * this.getNumberOfSets();
+		Tester.db("getNumberOfWays() " + String.valueOf(this.getNumberOfWays()) ); // XXX
+		Tester.db("getNumberOfBitsForByteInLine() " + String.valueOf(this.getNumberOfBitsForByteInLine()) ); // XXX
+		Tester.db("getNumberOfSets() " + String.valueOf(this.getNumberOfSets()) ); // XXX
+		return this.getNumberOfWays() * (1<<this.getNumberOfBitsForByteInLine()) * this.getNumberOfSets();
 	}
 
 	@Override

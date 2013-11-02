@@ -19,7 +19,7 @@ public class Tester {
 	 * utils
 	 */
 
-	private void db(String msg){
+	public static void db(String msg){
 		System.out.println("DEBUG: " + msg );
 	}
 
