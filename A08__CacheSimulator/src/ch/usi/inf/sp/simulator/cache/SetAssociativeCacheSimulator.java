@@ -98,8 +98,25 @@ public class SetAssociativeCacheSimulator implements
 
 	@Override
 	public boolean handleMemoryAccess(int address) {
-		// TODO Auto-generated method stub
-		this.missCount++;
+		System.out.printf("address: 0x%08x (%d)\n", address, address);
+		final int 
+/*
+		final int line = (address>>bitsForByteInLine)&((1<<bitsForLine)-1);
+		System.out.printf("line:    0x%08x (%d)\n", line, line);
+
+		final int tag = address>>>(bitsForLine+bitsForByteInLine);
+		System.out.printf("tag:     0x%08x (%d)\n", tag, tag);
+
+		if (tags[line]==tag && validBits[line]) {
+			hitCount++;
+		} else {
+			tags[line] = tag;
+			validBits[line] = true;
+			missCount++;
+		}
+//*/
+		this.missCount++; // TODO
+		
 		return false;
 	}
 
