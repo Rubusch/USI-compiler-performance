@@ -57,9 +57,9 @@ public class Tester {
 		cache.testInit();
 		db("");
 
-//		db("testOneLineOnce()");
-//		cache.testOneLineOnce();
-//		db("");
+		db("testOneLineOnce()");
+		cache.testOneLineOnce();
+		db("");
 
 //		db("testAccessOneLineTwice()");
 //		cache.testAccessOneLineTwice();
