@@ -36,9 +36,23 @@ public class SetAssociativeCacheSimulator implements
 		this.bitsForByteInLine = bitsForByteInLine;
 		this.numberOfWays = numberOfWays;
 
+		this.initHitCounts();
+		this.initMissCount();
+
 		final int numberOfLines = this.getNumberOfBytesInLine(); // TODO check
 		tags = new int[numberOfLines]; // TODO check
 		validBits = new boolean[numberOfLines]; // TODO check
+	}
+
+	/*
+	 * init counts
+	 */
+	private void initHitCounts(){
+		this.hitCount = 0;
+	}
+
+	private void initMissCount(){
+		this.missCount = 0;
 	}
 
 
