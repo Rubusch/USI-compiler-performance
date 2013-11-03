@@ -25,16 +25,16 @@ public class Tester {
 			return;
 		}else{
 			// Intel Core 2 L1 data cache
-//			tester.runDataSet(args[0], 6, 6, 8, 32); // TODO 32kb Cache - how!?
+			tester.runDataSet(args[0], 6, 6, 8, 32); // TODO 32kb Cache - how!?
 
 			// Twice as many ways
 			tester.runDataSet(args[0], 6, 6, 16, 64); // TODO 32kb Cache - how!?
 
 			// Twice as many sets
-//			tester.runDataSet(args[0], 7, 6, 8, 64); // TODO 32kb Cache - how!?
+			tester.runDataSet(args[0], 7, 6, 8, 64); // TODO 32kb Cache - how!?
 
 			// Twice as large cache lines
-//			tester.runDataSet(args[0], 6, 7, 8, 64); // TODO 32kb Cache - how!?
+			tester.runDataSet(args[0], 6, 7, 8, 64); // TODO 32kb Cache - how!?
 		}
 		db("READY.\n");
 	}
@@ -139,7 +139,7 @@ public class Tester {
 		System.out.println("numberOfBitsForSet\t\t" + bitsForSet);
 		System.out.println("numberOfBitsForByteInLine\t" + bitsForByteInLine);
 		System.out.println("numberOfWays\t\t\t" + numberOfWays);
-		System.out.println("memory_size\t\t\t" + memory_size);
+		System.out.println("memory_size\t\t\t\t" + memory_size);
 		System.out.println("---");
 		System.out.println("hit count: " + cache.getHitCount() + ", miss count: " + cache.getMissCount() );
 		System.out.println("---");
@@ -147,7 +147,7 @@ public class Tester {
 		double hitRate = ((double) cache.getHitCount()) / totalAccess;
 		double missRate = ((double) cache.getMissCount()) / totalAccess;
 		System.out.println("hit rate: " + String.valueOf(hitRate) + ", miss rate " + String.valueOf(missRate) );
-		System.out.println("===");
+		System.out.println("===\n\n");
 	}
 
 

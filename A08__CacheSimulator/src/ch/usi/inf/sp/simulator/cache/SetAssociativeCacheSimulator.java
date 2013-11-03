@@ -144,7 +144,7 @@ public class SetAssociativeCacheSimulator implements
 
 	@Override
 	public boolean handleMemoryAccess(int address) {
-		System.out.printf("address: 0x%08x (%d)\n", address, address);
+//		System.out.printf("address: 0x%08x (%d)\n", address, address);
 
 // TODO check
 //		final int set = (address>>bitsForByteInLine) & ((1<<bitsForByteInLine)-1); // TODO
@@ -154,7 +154,7 @@ public class SetAssociativeCacheSimulator implements
 		final int set = (address>>bitsForByteInLine) & ((1<<bitsForSet)-1); // TODO
 		Tester.db("\t(address>>bitsForByteInLine) & ((1<<bitsForSet)-1)");
 		Tester.db("\t(" + String.valueOf(address) + " >> " + String.valueOf(bitsForByteInLine) + ") & ((1 << " + String.valueOf(bitsForSet) + ")-1) = " + String.valueOf(set));
-		System.out.printf("set:    0x%08x (%d)\n", set, set);
+//		System.out.printf("set:    0x%08x (%d)\n", set, set);
 
 // TODO check
 //		final int way = (address>>>(bitsForByteInLine + bitsForSet) ) & ((1<<bitsForSet)-1);
@@ -164,12 +164,12 @@ public class SetAssociativeCacheSimulator implements
 		final int way = (address >>> (bitsForByteInLine + bitsForSet) ) & ((1 << bitsForWay)-1);
 		Tester.db("\taddress>>>(bitsForByteInLine + bitsForSet) & ((1<<bitsForWay)-1)");
 		Tester.db("\t" + String.valueOf(address) + " >>>( " + String.valueOf(bitsForByteInLine) + " + " + String.valueOf(bitsForSet) + " ) & ((1<< " + String.valueOf( bitsForWay ) + ")-1) = " + String.valueOf(way) );
-		System.out.printf("way:     0x%08x (%d)\n", way, way);
+//		System.out.printf("way:     0x%08x (%d)\n", way, way);
 
 		final int tag = address>>>(bitsForByteInLine + bitsForSet + bitsForWay); // TODO check
 		Tester.db("\taddress>>>(bitsForByteInLine + bitsForSet + bitsForWay)");
 		Tester.db("\t" + String.valueOf(address) + " >>>( " + String.valueOf( bitsForByteInLine) + " + " + String.valueOf(bitsForSet) + " + " + String.valueOf(bitsForWay) + ") = " + String.valueOf(tag));
-		System.out.printf("tag:     0x%08x (%d)\n", tag, tag);
+//		System.out.printf("tag:     0x%08x (%d)\n", tag, tag);
 
 		boolean ret = false;
 
@@ -180,7 +180,6 @@ public class SetAssociativeCacheSimulator implements
 			tags[set][way] = tag; // TODO 2d array
 			validBits[set][way] = true; // 2d array
 			missCount++;
-
 			lru_update(set, way);
 		}
 
