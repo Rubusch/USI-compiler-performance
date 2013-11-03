@@ -34,7 +34,7 @@ public class Tester {
 
 	
 	private void runTests(){
-//*
+/*
 		DirectMappedCacheSimulatorTest cache = new DirectMappedCacheSimulatorTest();
 
 		db("testInit()");
@@ -49,17 +49,17 @@ public class Tester {
 //		cache.testAccessOneLineTwice();
 //		db("");
 
-//		db("testAccessAllBytesInOneLine()");
-//		cache.testAccessAllBytesInOneLine();
-//		db("");
+		db("testAccessAllBytesInOneLine()");
+		cache.testAccessAllBytesInOneLine();
+		db("");
 
 //		db("testAccessEachLineOnce()");
 //		cache.testAccessEachLineOnce();
 //		db("");
 
-		db("testAccessSameLineThroughAliases()");
-		cache.testAccessSameLineThroughAliases();
-		db("");
+//		db("testAccessSameLineThroughAliases()");
+//		cache.testAccessSameLineThroughAliases();
+//		db("");
 		/*/
 		SetAssociativeCacheSimulatorTest cache = new SetAssociativeCacheSimulatorTest();
 

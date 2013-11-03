@@ -65,8 +65,8 @@ public final class DirectMappedCacheSimulator implements IDirectMappedCacheSimul
 
 		final int line = (address>>bitsForByteInLine)&((1<<bitsForLine)-1);
 
-		Tester.db("\t(address>>bitsForByteInLine)\t& ((1<<bitsForLine)-1)");
-		Tester.db("\t" + String.valueOf(address>>bitsForByteInLine) + "\t\t\t\t& ((" + String.valueOf(1<<bitsForLine) + ")-1)\t\t\t" + String.valueOf(line)); // XXX
+		Tester.db("\t(address\t>> bitsForByteInLine)\t& ((1<<bitsForLine)-1)");
+		Tester.db("\t(" + String.valueOf(address) + "\t>> " + String.valueOf(bitsForByteInLine) + ")\t\t\t& ((" + String.valueOf(1<<bitsForLine) + ")-1)\t\t" + String.valueOf(line)); // XXX
 
 		System.out.printf("line:    0x%08x (%d)\n", line, line);
 

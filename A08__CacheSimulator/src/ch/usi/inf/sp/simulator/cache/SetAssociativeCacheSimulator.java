@@ -99,7 +99,21 @@ public class SetAssociativeCacheSimulator implements
 	@Override
 	public boolean handleMemoryAccess(int address) {
 		System.out.printf("address: 0x%08x (%d)\n", address, address);
-//		final int 
+
+		final int line = (address>>bitsForByteInLine) & ((1<<bitsForByteInLine)-1); // TODO
+		Tester.db("\t(address>>bitsForByteInLine) & ((1<<bitsForByteInLine)-1)");
+		Tester.db("\t(" + String.valueOf(address) + " >> " + String.valueOf(bitsForByteInLine) + ") & ((1 << " + String.valueOf(bitsForByteInLine) + ")-1) = " + String.valueOf(line));
+		System.out.printf("line:    0x%08x (%d)\n", line, line);
+
+		final int set = address>>>(bitsForByteInLine + bitsForSet);
+		Tester.db("\taddress>>>(bitsForByteInLine + bitsForSet)");
+		Tester.db("\t" + String.valueOf(address) + " >>>( " + String.valueOf(bitsForByteInLine) + " + " + String.valueOf(bitsForSet) + " ) = " + String.valueOf(set) );
+		System.out.printf("set:     0x%08x (%d)\n", set, set);
+
+		final int tag = address>>>(bitsForByteInLine + bitsForByteInLine + bitsForSet); // TODO check
+		Tester.db("\taddress>>>(bitsForByteInLine + bitsForByteInLine + bitsForSet)");
+		Tester.db("\t" + String.valueOf(address) + " >>>( " + String.valueOf( bitsForByteInLine) + " + " + String.valueOf(bitsForByteInLine) + " + " + String.valueOf(bitsForSet) + ") = " + String.valueOf(tag));
+		System.out.printf("tag:     0x%08x (%d)\n", tag, tag);
 /*
 		final int line = (address>>bitsForByteInLine)&((1<<bitsForLine)-1);
 		System.out.printf("line:    0x%08x (%d)\n", line, line);
