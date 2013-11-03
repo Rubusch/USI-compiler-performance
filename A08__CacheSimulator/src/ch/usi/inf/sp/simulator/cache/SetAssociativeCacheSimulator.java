@@ -99,7 +99,7 @@ public class SetAssociativeCacheSimulator implements
 	@Override
 	public boolean handleMemoryAccess(int address) {
 		System.out.printf("address: 0x%08x (%d)\n", address, address);
-		final int 
+//		final int 
 /*
 		final int line = (address>>bitsForByteInLine)&((1<<bitsForLine)-1);
 		System.out.printf("line:    0x%08x (%d)\n", line, line);
