@@ -25,10 +25,10 @@ public class Tester {
 			return;
 		}else{
 			// Intel Core 2 L1 data cache
-			tester.runDataSet(args[0], 6, 6, 8, 32); // TODO 32kb Cache - how!?
+//			tester.runDataSet(args[0], 6, 6, 8, 32); // TODO 32kb Cache - how!?
 
 			// Twice as many ways
-//			tester.runDataSet(args[0], 6, 6, 16, 64); // TODO 32kb Cache - how!?
+			tester.runDataSet(args[0], 6, 6, 16, 64); // TODO 32kb Cache - how!?
 
 			// Twice as many sets
 //			tester.runDataSet(args[0], 7, 6, 8, 64); // TODO 32kb Cache - how!?
@@ -173,9 +173,9 @@ public class Tester {
 //						+ Integer.toHexString(dataAddress) + ", write=" + isWrite);
 
 				// process data
-				if( isWrite ){
-					cache.handleMemoryAccess(dataAddress);
-				}
+//				if( isWrite ){
+				cache.handleMemoryAccess(dataAddress);
+//				}
 			}
 		}
 		br.close();
