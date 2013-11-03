@@ -100,7 +100,7 @@ public class SetAssociativeCacheSimulator implements
 			Tester.db("lru - memory full, need to discard...");
 			set = Integer.valueOf(memory.get(0).split(":")[0]);
 			way = Integer.valueOf(memory.get(0).split(":")[1]);
-			
+
 //			Tester.db("lru - memory full, set " + String.valueOf(set) + ", way " + String.valueOf(way)); // XXX
 			tags[set][way] = 0;
 			validBits[set][way] = false;

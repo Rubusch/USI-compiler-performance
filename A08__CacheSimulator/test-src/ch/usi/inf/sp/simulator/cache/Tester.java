@@ -35,7 +35,7 @@ public class Tester {
 	 */
 
 	public static void db(String msg){
-		System.out.println("DEBUG:\t" + msg );
+//		System.out.println("DEBUG:\t" + msg );
 	}
 
 	public static void die(){
@@ -127,17 +127,18 @@ public class Tester {
 
 		System.out.println("---");
 		System.out.println("Result:");
-		System.out.println("bitsForSet\t" + bitsForSet);
-		System.out.println("bitsForByteInLine\t\t" + bitsForByteInLine);
-		System.out.println("numberOfWays\t\t" + numberOfWays);
-		System.out.println("memory_size\t\t" + memory_size);
-
+		System.out.println("numberOfBitsForSet\t\t" + bitsForSet);
+		System.out.println("numberOfBitsForByteInLine\t" + bitsForByteInLine);
+		System.out.println("numberOfWays\t\t\t" + numberOfWays);
+		System.out.println("memory_size\t\t\t" + memory_size);
+		System.out.println("---");
 		System.out.println("hit count: " + cache.getHitCount() + ", miss count: " + cache.getMissCount() );
-
+		System.out.println("---");
 		double totalAccess = cache.getHitCount() + cache.getMissCount();
 		double hitRate = ((double) cache.getHitCount()) / totalAccess;
 		double missRate = ((double) cache.getMissCount()) / totalAccess;
 		System.out.println("hit rate: " + String.valueOf(hitRate) + ", miss rate " + String.valueOf(missRate) );
+		System.out.println("===");
 	}
 
 
