@@ -20,7 +20,7 @@ public class Tester {
 	 */
 
 	public static void db(String msg){
-//		System.out.println("DEBUG:\t" + msg );
+		System.out.println("DEBUG:\t" + msg );
 	}
 
 	public static void die(){
@@ -61,7 +61,9 @@ public class Tester {
 //		db("testAccessSameLineThroughAliases()");
 //		cache.testAccessSameLineThroughAliases();
 //		db("");
+
 		/*/
+
 		db("Set Associative Cache");
 
 		SetAssociativeCacheSimulatorTest cache = new SetAssociativeCacheSimulatorTest();

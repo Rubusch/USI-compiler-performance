@@ -28,6 +28,9 @@ public class SetAssociativeCacheSimulator implements
 	private long hitCount;
 	private long missCount;
 
+	private List<String> memory;
+	private int memory_MAXSIZE = 10;
+
 	/**
 	 * 
 	 * @param bitsForSet
@@ -55,6 +58,8 @@ public class SetAssociativeCacheSimulator implements
 		tags = new int[numberOfSets][numberOfWays]; // TODO check
 
 		validBits = new boolean[numberOfSets][numberOfWays];
+
+		memory = new ArrayList<String>();
 	}
 
 	/*
@@ -68,7 +73,35 @@ public class SetAssociativeCacheSimulator implements
 		this.missCount = 0;
 	}
 
+	/*
+	 * tools
+	 */
+	private void lru_update(int set, int way){
+		// append to stack
+		String element = String.valueOf(set) + ":" + String.valueOf(way);
+//		Tester.db("lru - element "+ element); // XXX
+		if(memory.contains(element)){
+//			Tester.db("lru - update element"); // XXX
+			memory.remove(element);
+		}
+		memory.add(element);
 
+		// check and in case remove old elements
+		if(memory_MAXSIZE < memory.size()){
+			Tester.db("lru - memory full, need to discard...");
+			set = Integer.valueOf(memory.get(0).split(":")[0]);
+			way = Integer.valueOf(memory.get(0).split(":")[1]);
+			
+//			Tester.db("lru - memory full, set " + String.valueOf(set) + ", way " + String.valueOf(way)); // XXX
+			tags[set][way] = 0;
+			validBits[set][way] = false;
+			memory.remove(0);
+		}
+	}
+
+	/*
+	 * interface
+	 */
 	@Override
 	public int getNumberOfBitsForTag() {
 		return bitsForTag;
@@ -123,15 +156,20 @@ public class SetAssociativeCacheSimulator implements
 		Tester.db("\t" + String.valueOf(address) + " >>>( " + String.valueOf( bitsForByteInLine) + " + " + String.valueOf(bitsForByteInLine) + " + " + String.valueOf(bitsForSet) + ") = " + String.valueOf(tag));
 		System.out.printf("tag:     0x%08x (%d)\n", tag, tag);
 
+		boolean ret = false;
+
 		if(tags[set][way] == tag && validBits[set][way]){ // TODO 2d array
 			hitCount++;
-			return true;
+			ret = true;
 		}else{
 			tags[set][way] = tag; // TODO 2d array
 			validBits[set][way] = true; // 2d array
 			missCount++;
+
+			lru_update(set, way);
 		}
-		return false;
+
+		return ret;
 	}
 
 	@Override
