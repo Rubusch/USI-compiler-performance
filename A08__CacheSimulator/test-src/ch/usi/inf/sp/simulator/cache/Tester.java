@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  *
  */
 public class Tester {
-	private SetAssociativeCacheSimulatorTest cache;
+	private SetAssociativeCacheSimulator cache;
 
 	/**
 	 * @param args
@@ -26,6 +26,7 @@ public class Tester {
 		}else{
 			tester.runDataSet(args[0]);
 		}
+		db("READY.\n");
 	}
 
 	/*
@@ -110,17 +111,20 @@ public class Tester {
 		db("testAccessAllBytesInOneSet()");
 		cache.testAccessAllBytesInOneSet();
 		db("");
-
-		db("READY.\n");
 	}
 
-	private void runDataSet(String traceFileName){
+	private void runDataSet(String traceFileName ){
+//	private void runDataSet(String traceFileName, bitsForSet, bitsForByteInLine, numberOfWays, memory_size ){
+		cache = new SetAssociativeCacheSimulator(6, 6, 8);
+		cache.setMemorySize(32); // XXX
+
 		try {
-			cache = new SetAssociativeCacheSimulatorTest();
 			read(traceFileName);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
+		System.out.println("hit count: " + cache.getHitCount() + ", miss count: " + cache.getMissCount() );
 	}
 
 	public void read(String traceFileName) throws IOException {
@@ -141,12 +145,12 @@ public class Tester {
 				// only accepts values up to +2^31-1)
 
 				final int dataAddress = (int) Long.parseLong(dataAddressString, 16);
-//				System.out.println("ia=" + Integer.toHexString(instructionAddress) + ", da="
+//				db("ia=" + Integer.toHexString(instructionAddress) + ", da="
 //						+ Integer.toHexString(dataAddress) + ", write=" + isWrite);
 
 				// process data
 				if( isWrite ){
-					
+					cache.handleMemoryAccess(dataAddress);
 				}
 			}
 		}
