@@ -155,9 +155,9 @@ public class SetAssociativeCacheSimulator implements
 //		Tester.db("\t(address>>bitsForByteInLine) & ((1<<bitsForByteInLine)-1)");
 //		Tester.db("\t(" + String.valueOf(address) + " >> " + String.valueOf(bitsForByteInLine) + ") & ((1 << " + String.valueOf(bitsForByteInLine) + ")-1) = " + String.valueOf(set));
 
-		final int set = (address>>bitsForSet) & ((1<<bitsForSet)-1); // TODO
-		Tester.db("\t(address>>bitsForSet) & ((1<<bitsForSet)-1)");
-		Tester.db("\t(" + String.valueOf(address) + " >> " + String.valueOf(bitsForSet) + ") & ((1 << " + String.valueOf(bitsForSet) + ")-1) = " + String.valueOf(set));
+		final int set = (address>>bitsForByteInLine) & ((1<<bitsForSet)-1); // TODO
+		Tester.db("\t(address>>bitsForByteInLine) & ((1<<bitsForSet)-1)");
+		Tester.db("\t(" + String.valueOf(address) + " >> " + String.valueOf(bitsForByteInLine) + ") & ((1 << " + String.valueOf(bitsForSet) + ")-1) = " + String.valueOf(set));
 		System.out.printf("set:    0x%08x (%d)\n", set, set);
 
 // TODO check
@@ -165,14 +165,14 @@ public class SetAssociativeCacheSimulator implements
 //		Tester.db("\taddress>>>(bitsForByteInLine + bitsForSet) & ((1<<bitsForSet)-1)");
 //		Tester.db("\t" + String.valueOf(address) + " >>>( " + String.valueOf(bitsForByteInLine) + " + " + String.valueOf(bitsForSet) + " ) & ((1<< " + String.valueOf( bitsForSet ) + ")-1) = " + String.valueOf(way) );
 
-		final int way = (address >>> (bitsForSet + bitsForWay) ) & ((1 << bitsForWay)-1);
-		Tester.db("\taddress>>>(bitsForSet + bitsForWay) & ((1<<bitsForWay)-1)");
-		Tester.db("\t" + String.valueOf(address) + " >>>( " + String.valueOf(bitsForSet) + " + " + String.valueOf(bitsForWay) + " ) & ((1<< " + String.valueOf( bitsForWay ) + ")-1) = " + String.valueOf(way) );
+		final int way = (address >>> (bitsForByteInLine + bitsForSet) ) & ((1 << bitsForWay)-1);
+		Tester.db("\taddress>>>(bitsForByteInLine + bitsForSet) & ((1<<bitsForWay)-1)");
+		Tester.db("\t" + String.valueOf(address) + " >>>( " + String.valueOf(bitsForByteInLine) + " + " + String.valueOf(bitsForSet) + " ) & ((1<< " + String.valueOf( bitsForWay ) + ")-1) = " + String.valueOf(way) );
 		System.out.printf("way:     0x%08x (%d)\n", way, way);
 
-		final int tag = address>>>(bitsForByteInLine + bitsForByteInLine + bitsForSet); // TODO check
-		Tester.db("\taddress>>>(bitsForByteInLine + bitsForByteInLine + bitsForSet)");
-		Tester.db("\t" + String.valueOf(address) + " >>>( " + String.valueOf( bitsForByteInLine) + " + " + String.valueOf(bitsForByteInLine) + " + " + String.valueOf(bitsForSet) + ") = " + String.valueOf(tag));
+		final int tag = address>>>(bitsForByteInLine + bitsForSet + bitsForWay); // TODO check
+		Tester.db("\taddress>>>(bitsForByteInLine + bitsForSet + bitsForWay)");
+		Tester.db("\t" + String.valueOf(address) + " >>>( " + String.valueOf( bitsForByteInLine) + " + " + String.valueOf(bitsForSet) + " + " + String.valueOf(bitsForWay) + ") = " + String.valueOf(tag));
 		System.out.printf("tag:     0x%08x (%d)\n", tag, tag);
 
 		boolean ret = false;

@@ -24,7 +24,8 @@ public class Tester {
 			tester.runSetAssociativeCacheTests();
 			return;
 		}else{
-			tester.runDataSet(args[0]);
+			// Intel Core 2 L1 data cache
+			tester.runDataSet(args[0], 6, 6, 8, 32); // TODO 32kb Cache - how!?
 		}
 		db("READY.\n");
 	}
@@ -113,10 +114,10 @@ public class Tester {
 		db("");
 	}
 
-	private void runDataSet(String traceFileName ){
-//	private void runDataSet(String traceFileName, bitsForSet, bitsForByteInLine, numberOfWays, memory_size ){
-		cache = new SetAssociativeCacheSimulator(6, 6, 8);
-		cache.setMemorySize(32); // XXX
+//	private void runDataSet(String traceFileName ){
+	private void runDataSet(String traceFileName, int bitsForSet, int bitsForByteInLine, int numberOfWays, int memory_size ){
+		cache = new SetAssociativeCacheSimulator( bitsForSet, bitsForByteInLine, numberOfWays);
+		cache.setMemorySize( memory_size ); // XXX
 
 		try {
 			read(traceFileName);
@@ -124,8 +125,21 @@ public class Tester {
 			e.printStackTrace();
 		}
 
+		System.out.println("---");
+		System.out.println("Result:");
+		System.out.println("bitsForSet\t\t" + bitsForSet);
+		System.out.println("bitsForByteInLine\t\t" + bitsForByteInLine);
+		System.out.println("numberOfWays\t\t" + numberOfWays);
+		System.out.println("memory_size\t\t" + memory_size);
+
 		System.out.println("hit count: " + cache.getHitCount() + ", miss count: " + cache.getMissCount() );
+
+		double totalAccess = cache.getHitCount() + cache.getMissCount();
+		double hitRate = ((double) cache.getHitCount()) / totalAccess;
+		double missRate = ((double) cache.getMissCount()) / totalAccess;
+		System.out.println("hit rate: " + String.valueOf(hitRate) + ", miss rate " + String.valueOf(missRate) );
 	}
+
 
 	public void read(String traceFileName) throws IOException {
 		final BufferedReader br = new BufferedReader(new FileReader(traceFileName));
