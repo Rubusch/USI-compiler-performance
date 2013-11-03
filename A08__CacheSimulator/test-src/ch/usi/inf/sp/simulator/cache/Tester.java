@@ -25,7 +25,16 @@ public class Tester {
 			return;
 		}else{
 			// Intel Core 2 L1 data cache
-			tester.runDataSet(args[0], 6, 6, 8, 32); // TODO 32kb Cache - how!?
+//			tester.runDataSet(args[0], 6, 6, 8, 32); // TODO 32kb Cache - how!?
+
+			// Twice as many ways
+			tester.runDataSet(args[0], 6, 6, 16, 64); // TODO 32kb Cache - how!?
+
+			// Twice as many sets
+//			tester.runDataSet(args[0], 7, 6, 8, 64); // TODO 32kb Cache - how!?
+
+			// Twice as large cache lines
+//			tester.runDataSet(args[0], 6, 7, 8, 64); // TODO 32kb Cache - how!?
 		}
 		db("READY.\n");
 	}
@@ -35,6 +44,7 @@ public class Tester {
 	 */
 
 	public static void db(String msg){
+// XXX uncomment for debugging 
 //		System.out.println("DEBUG:\t" + msg );
 	}
 
@@ -114,7 +124,6 @@ public class Tester {
 		db("");
 	}
 
-//	private void runDataSet(String traceFileName ){
 	private void runDataSet(String traceFileName, int bitsForSet, int bitsForByteInLine, int numberOfWays, int memory_size ){
 		cache = new SetAssociativeCacheSimulator( bitsForSet, bitsForByteInLine, numberOfWays);
 		cache.setMemorySize( memory_size ); // XXX
