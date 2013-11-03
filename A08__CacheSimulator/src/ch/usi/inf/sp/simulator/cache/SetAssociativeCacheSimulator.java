@@ -111,12 +111,12 @@ public class SetAssociativeCacheSimulator implements
 		final int set = (address>>bitsForByteInLine) & ((1<<bitsForByteInLine)-1); // TODO
 		Tester.db("\t(address>>bitsForByteInLine) & ((1<<bitsForByteInLine)-1)");
 		Tester.db("\t(" + String.valueOf(address) + " >> " + String.valueOf(bitsForByteInLine) + ") & ((1 << " + String.valueOf(bitsForByteInLine) + ")-1) = " + String.valueOf(set));
-		System.out.printf("line:    0x%08x (%d)\n", set, set);
+		System.out.printf("set:    0x%08x (%d)\n", set, set);
 
 		final int way = (address>>>(bitsForByteInLine + bitsForSet) ) & ((1<<bitsForSet)-1);
 		Tester.db("\taddress>>>(bitsForByteInLine + bitsForSet) & ((1<<bitsForSet)-1)");
 		Tester.db("\t" + String.valueOf(address) + " >>>( " + String.valueOf(bitsForByteInLine) + " + " + String.valueOf(bitsForSet) + " ) & ((1<< " + String.valueOf( bitsForSet ) + ")-1) = " + String.valueOf(way) );
-		System.out.printf("set:     0x%08x (%d)\n", way, way);
+		System.out.printf("way:     0x%08x (%d)\n", way, way);
 
 		final int tag = address>>>(bitsForByteInLine + bitsForByteInLine + bitsForSet); // TODO check
 		Tester.db("\taddress>>>(bitsForByteInLine + bitsForByteInLine + bitsForSet)");

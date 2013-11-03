@@ -20,7 +20,7 @@ public class Tester {
 	 */
 
 	public static void db(String msg){
-		System.out.println("DEBUG:\t" + msg );
+//		System.out.println("DEBUG:\t" + msg );
 	}
 
 	public static void die(){
@@ -78,21 +78,21 @@ public class Tester {
 		cache.testAccessOneLineTwice();
 		db("");
 
-//		db("testAccessAllBytesInOneLine()");
-//		cache.testAccessAllBytesInOneLine();
-//		db("");
+		db("testAccessAllBytesInOneLine()");
+		cache.testAccessAllBytesInOneLine();
+		db("");
 
-//		db("testAccessEachSetOnce()");
-//		cache.testAccessEachSetOnce();
-//		db("");
+		db("testAccessEachSetOnce()");
+		cache.testAccessEachSetOnce();
+		db("");
 
-//		db("testAccessEachSlotInOneSetOnce()");
-//		cache.testAccessEachSlotInOneSetOnce();
-//		db("");
+		db("testAccessEachSlotInOneSetOnce()");
+		cache.testAccessEachSlotInOneSetOnce();
+		db("");
 
-//		db("testAccessAllBytesInOneSet()");
-//		cache.testAccessAllBytesInOneSet();
-//		db("");
+		db("testAccessAllBytesInOneSet()");
+		cache.testAccessAllBytesInOneSet();
+		db("");
 //*/
 		db("READY.\n");
 	}
