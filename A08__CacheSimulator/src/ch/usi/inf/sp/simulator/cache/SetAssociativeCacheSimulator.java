@@ -1,5 +1,8 @@
 package ch.usi.inf.sp.simulator.cache;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 
  * @author Lothar Rubusch
@@ -19,9 +22,11 @@ public class SetAssociativeCacheSimulator implements
 
 	private int cacheSizeInBytes;
 
-	private int[] tags; // XXX
-	private boolean[] validBits; // XXX
-	
+//	private int[] tags; // XXX
+	private int[][] tags;
+//	private boolean[] validBits; // XXX
+	private boolean[][] validBits;
+
 	private long hitCount; // XXX
 	private long missCount; // XXX
 
@@ -33,15 +38,34 @@ public class SetAssociativeCacheSimulator implements
 	 */
 	public SetAssociativeCacheSimulator(int bitsForSet, int bitsForByteInLine, int numberOfWays) {
 		this.bitsForSet= bitsForSet;
+		Tester.db("\tbitsForSet\t\t" + this.bitsForSet);
+
 		this.bitsForByteInLine = bitsForByteInLine;
+		Tester.db("\tbitsForByteInLine\t" + this.bitsForByteInLine);
+
 		this.numberOfWays = numberOfWays;
+		Tester.db("\tnumberOfWays\t\t" + this.getNumberOfWays());
+
+		final int numberOfSets = this.getNumberOfSets();
+		Tester.db("\tnumberOfSets\t\t" + numberOfSets);
+
+//		final int numberOfLines = this.getNumberOfBytesInLine(); // TODO check
+//		Tester.db("\tnumberOfLines\t\t" + numberOfLines );
+
+		Tester.db("-");
 
 		this.initHitCounts();
 		this.initMissCount();
 
-		final int numberOfLines = this.getNumberOfBytesInLine(); // TODO check
-		tags = new int[numberOfLines]; // TODO check
-		validBits = new boolean[numberOfLines]; // TODO check
+		tags = new int[numberOfSets][numberOfWays]; // TODO check
+//		for(int i=0; i<numberOfSets; ++i ){
+//			for(int j=0; j<numberOfWays; ++j ){
+//				this.tags[i][j] = new int();
+//			}
+//		}
+
+//		validBits = new boolean[numberOfLines]; // TODO check
+		validBits = new boolean[numberOfSets][numberOfWays];
 	}
 
 	/*
@@ -105,15 +129,23 @@ public class SetAssociativeCacheSimulator implements
 		Tester.db("\t(" + String.valueOf(address) + " >> " + String.valueOf(bitsForByteInLine) + ") & ((1 << " + String.valueOf(bitsForByteInLine) + ")-1) = " + String.valueOf(line));
 		System.out.printf("line:    0x%08x (%d)\n", line, line);
 
-		final int set = address>>>(bitsForByteInLine + bitsForSet);
-		Tester.db("\taddress>>>(bitsForByteInLine + bitsForSet)");
-		Tester.db("\t" + String.valueOf(address) + " >>>( " + String.valueOf(bitsForByteInLine) + " + " + String.valueOf(bitsForSet) + " ) = " + String.valueOf(set) );
+		final int set = (address>>>(bitsForByteInLine + bitsForSet) ) & ((1<<bitsForSet)-1);
+		Tester.db("\taddress>>>(bitsForByteInLine + bitsForSet) & ((1<<bitsForSet)-1)");
+		Tester.db("\t" + String.valueOf(address) + " >>>( " + String.valueOf(bitsForByteInLine) + " + " + String.valueOf(bitsForSet) + " ) & ((1<< " + String.valueOf( bitsForSet ) + ")-1) = " + String.valueOf(set) );
 		System.out.printf("set:     0x%08x (%d)\n", set, set);
 
 		final int tag = address>>>(bitsForByteInLine + bitsForByteInLine + bitsForSet); // TODO check
 		Tester.db("\taddress>>>(bitsForByteInLine + bitsForByteInLine + bitsForSet)");
 		Tester.db("\t" + String.valueOf(address) + " >>>( " + String.valueOf( bitsForByteInLine) + " + " + String.valueOf(bitsForByteInLine) + " + " + String.valueOf(bitsForSet) + ") = " + String.valueOf(tag));
 		System.out.printf("tag:     0x%08x (%d)\n", tag, tag);
+
+//		if(tags[line] == tag && validBits[line]){ // TODO 2d array
+//			hitCount++;
+//		}else{
+//			tags[line] = tag; // TODO 2d array
+//			validBits[line] = true; // 2d array
+//			missCount++;
+//		}
 /*
 		final int line = (address>>bitsForByteInLine)&((1<<bitsForLine)-1);
 		System.out.printf("line:    0x%08x (%d)\n", line, line);

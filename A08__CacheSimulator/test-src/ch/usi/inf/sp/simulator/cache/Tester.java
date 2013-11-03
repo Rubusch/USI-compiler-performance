@@ -35,6 +35,7 @@ public class Tester {
 	
 	private void runTests(){
 /*
+		db("Direct Mapped Cache");
 		DirectMappedCacheSimulatorTest cache = new DirectMappedCacheSimulatorTest();
 
 		db("testInit()");
@@ -61,6 +62,8 @@ public class Tester {
 //		cache.testAccessSameLineThroughAliases();
 //		db("");
 		/*/
+		db("Set Associative Cache");
+
 		SetAssociativeCacheSimulatorTest cache = new SetAssociativeCacheSimulatorTest();
 
 		db("testInit()");
