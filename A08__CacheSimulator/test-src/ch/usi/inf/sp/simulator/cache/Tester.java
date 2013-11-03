@@ -127,7 +127,7 @@ public class Tester {
 
 		System.out.println("---");
 		System.out.println("Result:");
-		System.out.println("bitsForSet\t\t" + bitsForSet);
+		System.out.println("bitsForSet\t" + bitsForSet);
 		System.out.println("bitsForByteInLine\t\t" + bitsForByteInLine);
 		System.out.println("numberOfWays\t\t" + numberOfWays);
 		System.out.println("memory_size\t\t" + memory_size);
