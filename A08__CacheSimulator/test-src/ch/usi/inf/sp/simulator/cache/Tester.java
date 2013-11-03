@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
  *
  */
 public class Tester {
+	private SetAssociativeCacheSimulatorTest cache;
 
 	/**
 	 * @param args
@@ -22,14 +23,8 @@ public class Tester {
 		if(0 == args.length){
 			tester.runSetAssociativeCacheTests();
 			return;
-		}
-
-		// else..
-		String traceFileName = args[0];
-		try {
-			tester.read(traceFileName);
-		} catch (IOException e) {
-			e.printStackTrace();
+		}else{
+			tester.runDataSet(args[0]);
 		}
 	}
 
@@ -50,35 +45,37 @@ public class Tester {
 		System.exit(0);
 	}
 
-	
+	/*
+	 * tests
+	 */
 	private void runDirectMappedCacheTests(){
-
 		db("Direct Mapped Cache");
+
 		DirectMappedCacheSimulatorTest cache = new DirectMappedCacheSimulatorTest();
 
 		db("testInit()");
 		cache.testInit();
 		db("");
 
-//		db("testOneLineOnce()");
-//		cache.testOneLineOnce();
-//		db("");
+		db("testOneLineOnce()");
+		cache.testOneLineOnce();
+		db("");
 
-//		db("testAccessOneLineTwice()");
-//		cache.testAccessOneLineTwice();
-//		db("");
+		db("testAccessOneLineTwice()");
+		cache.testAccessOneLineTwice();
+		db("");
 
 		db("testAccessAllBytesInOneLine()");
 		cache.testAccessAllBytesInOneLine();
 		db("");
 
-//		db("testAccessEachLineOnce()");
-//		cache.testAccessEachLineOnce();
-//		db("");
+		db("testAccessEachLineOnce()");
+		cache.testAccessEachLineOnce();
+		db("");
 
-//		db("testAccessSameLineThroughAliases()");
-//		cache.testAccessSameLineThroughAliases();
-//		db("");
+		db("testAccessSameLineThroughAliases()");
+		cache.testAccessSameLineThroughAliases();
+		db("");
 	}
 
 	private void runSetAssociativeCacheTests(){
@@ -113,12 +110,18 @@ public class Tester {
 		db("testAccessAllBytesInOneSet()");
 		cache.testAccessAllBytesInOneSet();
 		db("");
-//*/
 
 		db("READY.\n");
 	}
-	
 
+	private void runDataSet(String traceFileName){
+		try {
+			cache = new SetAssociativeCacheSimulatorTest();
+			read(traceFileName);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
 	public void read(String traceFileName) throws IOException {
 		final BufferedReader br = new BufferedReader(new FileReader(traceFileName));
@@ -138,8 +141,13 @@ public class Tester {
 				// only accepts values up to +2^31-1)
 
 				final int dataAddress = (int) Long.parseLong(dataAddressString, 16);
-				System.out.println("ia=" + Integer.toHexString(instructionAddress) + ", da="
-						+ Integer.toHexString(dataAddress) + ", write=" + isWrite);
+//				System.out.println("ia=" + Integer.toHexString(instructionAddress) + ", da="
+//						+ Integer.toHexString(dataAddress) + ", write=" + isWrite);
+
+				// process data
+				if( isWrite ){
+					
+				}
 			}
 		}
 		br.close();
