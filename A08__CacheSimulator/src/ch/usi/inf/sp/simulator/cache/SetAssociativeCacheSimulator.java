@@ -88,9 +88,7 @@ public class SetAssociativeCacheSimulator implements
 	private void lru_update(int set, int way){
 		// append to stack
 		String element = String.valueOf(set) + ":" + String.valueOf(way);
-//		Tester.db("lru - element "+ element); // XXX
 		if(memory.contains(element)){
-//			Tester.db("lru - update element"); // XXX
 			memory.remove(element);
 		}
 		memory.add(element);
@@ -100,8 +98,6 @@ public class SetAssociativeCacheSimulator implements
 			Tester.db("lru - memory full, need to discard...");
 			set = Integer.valueOf(memory.get(0).split(":")[0]);
 			way = Integer.valueOf(memory.get(0).split(":")[1]);
-
-//			Tester.db("lru - memory full, set " + String.valueOf(set) + ", way " + String.valueOf(way)); // XXX
 			tags[set][way] = 0;
 			validBits[set][way] = false;
 			memory.remove(0);
