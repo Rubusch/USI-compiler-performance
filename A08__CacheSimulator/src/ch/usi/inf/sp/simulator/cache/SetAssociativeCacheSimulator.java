@@ -8,9 +8,6 @@ import java.util.List;
  * @author Lothar Rubusch
  *
  */
-// TODO Note that in a freshly instantiated SetAssociativeCacheSimulator, all cache lines are invalid.
-// TODO After you implement your class, run the existing JUnit tests (SetAssociativeCacheSimulatorTest) and make sure your simulator passes all the test cases.
-// TODO Then add some additional test cases. You get a bonus point for each submitted SetAssociativeCacheSimulator implementation (except yours) that the existing test cases don't break but that your additional test cases manage to break.
 public class SetAssociativeCacheSimulator implements
 		ISetAssociativeCacheSimulator {
 	
@@ -173,12 +170,12 @@ public class SetAssociativeCacheSimulator implements
 
 		boolean ret = false;
 
-		if(tags[set][way] == tag && validBits[set][way]){ // TODO 2d array
+		if(tags[set][way] == tag && validBits[set][way]){
 			hitCount++;
 			ret = true;
 		}else{
-			tags[set][way] = tag; // TODO 2d array
-			validBits[set][way] = true; // 2d array
+			tags[set][way] = tag;
+			validBits[set][way] = true;
 			missCount++;
 			lru_update(set, way);
 		}
