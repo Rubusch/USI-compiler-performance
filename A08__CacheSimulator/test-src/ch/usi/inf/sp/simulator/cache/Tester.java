@@ -126,7 +126,9 @@ public class Tester {
 
 	private void runDataSet(String traceFileName, int bitsForSet, int bitsForByteInLine, int numberOfWays, int memory_size ){
 		cache = new SetAssociativeCacheSimulator( bitsForSet, bitsForByteInLine, numberOfWays);
-		cache.setMemorySize( memory_size ); // XXX
+
+		int cache_size = memory_size * 1000 / (2^bitsForSet * 2^bitsForByteInLine); // XXX
+		cache.setMemorySize( memory_size );
 
 		try {
 			read(traceFileName);
@@ -169,13 +171,8 @@ public class Tester {
 				// only accepts values up to +2^31-1)
 
 				final int dataAddress = (int) Long.parseLong(dataAddressString, 16);
-//				db("ia=" + Integer.toHexString(instructionAddress) + ", da="
-//						+ Integer.toHexString(dataAddress) + ", write=" + isWrite);
 
-				// process data
-//				if( isWrite ){
 				cache.handleMemoryAccess(dataAddress);
-//				}
 			}
 		}
 		br.close();

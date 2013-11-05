@@ -51,7 +51,7 @@ public class SetAssociativeCacheSimulator implements
 		this.initMissCount();
 
 		final int numberOfSets = this.getNumberOfSets();
-		tags = new int[numberOfSets][numberOfWays]; // TODO check
+		tags = new int[numberOfSets][numberOfWays];
 		validBits = new boolean[numberOfSets][numberOfWays];
 		memory = new ArrayList<String>();
 
@@ -143,20 +143,10 @@ public class SetAssociativeCacheSimulator implements
 	public boolean handleMemoryAccess(int address) {
 //		System.out.printf("address: 0x%08x (%d)\n", address, address);
 
-// TODO check
-//		final int set = (address>>bitsForByteInLine) & ((1<<bitsForByteInLine)-1); // TODO
-//		Tester.db("\t(address>>bitsForByteInLine) & ((1<<bitsForByteInLine)-1)");
-//		Tester.db("\t(" + String.valueOf(address) + " >> " + String.valueOf(bitsForByteInLine) + ") & ((1 << " + String.valueOf(bitsForByteInLine) + ")-1) = " + String.valueOf(set));
-
-		final int set = (address>>bitsForByteInLine) & ((1<<bitsForSet)-1); // TODO
+		final int set = (address>>bitsForByteInLine) & ((1<<bitsForSet)-1);
 		Tester.db("\t(address>>bitsForByteInLine) & ((1<<bitsForSet)-1)");
 		Tester.db("\t(" + String.valueOf(address) + " >> " + String.valueOf(bitsForByteInLine) + ") & ((1 << " + String.valueOf(bitsForSet) + ")-1) = " + String.valueOf(set));
 //		System.out.printf("set:    0x%08x (%d)\n", set, set);
-
-// TODO check
-//		final int way = (address>>>(bitsForByteInLine + bitsForSet) ) & ((1<<bitsForSet)-1);
-//		Tester.db("\taddress>>>(bitsForByteInLine + bitsForSet) & ((1<<bitsForSet)-1)");
-//		Tester.db("\t" + String.valueOf(address) + " >>>( " + String.valueOf(bitsForByteInLine) + " + " + String.valueOf(bitsForSet) + " ) & ((1<< " + String.valueOf( bitsForSet ) + ")-1) = " + String.valueOf(way) );
 
 		final int way = (address >>> (bitsForByteInLine + bitsForSet) ) & ((1 << bitsForWay)-1);
 		Tester.db("\taddress>>>(bitsForByteInLine + bitsForSet) & ((1<<bitsForWay)-1)");
