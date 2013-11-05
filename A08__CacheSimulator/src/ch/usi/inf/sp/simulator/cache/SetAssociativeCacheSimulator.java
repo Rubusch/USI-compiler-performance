@@ -153,7 +153,7 @@ public class SetAssociativeCacheSimulator implements
 		Tester.db("\t" + String.valueOf(address) + " >>>( " + String.valueOf(bitsForByteInLine) + " + " + String.valueOf(bitsForSet) + " ) & ((1<< " + String.valueOf( bitsForWay ) + ")-1) = " + String.valueOf(way) );
 //		System.out.printf("way:     0x%08x (%d)\n", way, way);
 
-		final int tag = address>>>(bitsForByteInLine + bitsForSet + bitsForWay); // TODO check
+		final int tag = address>>>(bitsForByteInLine + bitsForSet + bitsForWay);
 		Tester.db("\taddress>>>(bitsForByteInLine + bitsForSet + bitsForWay)");
 		Tester.db("\t" + String.valueOf(address) + " >>>( " + String.valueOf( bitsForByteInLine) + " + " + String.valueOf(bitsForSet) + " + " + String.valueOf(bitsForWay) + ") = " + String.valueOf(tag));
 //		System.out.printf("tag:     0x%08x (%d)\n", tag, tag);
