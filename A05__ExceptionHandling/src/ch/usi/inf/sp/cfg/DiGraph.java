@@ -97,14 +97,7 @@ public class DiGraph {
 				for( Edge edge : edges ){
 					parents.add(edge.getFromNode());
 				}
-//*
 				currCFG.inheritageMerge(parents);
-/*/
-				if( false == currCFG.inheritageMerge(parents) ){
-// TODO parse this node later again
-					passedIds.remove(passedIds.indexOf(currCFG.id()));
-				}
-//*/
 			}
 		}
 
@@ -141,13 +134,10 @@ public class DiGraph {
 		System.out.println( "  nodeE [label = \"end\"];" );
 		for( Node node : nodelist ){
 			node.dotPrint();
-// TODO another label?
-//			System.out.println("  node" + node.id() + "[ label = \""+ node.id() + "\"];");
 		}
 
 		// edges
 		System.out.println( "  nodeS -> node0" );
-//		for( Edge edge : CFGedgelist ){
 		for( Edge edge : DAedgelist ){
 			edge.dotPrint();
 		}

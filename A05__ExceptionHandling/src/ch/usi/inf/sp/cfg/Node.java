@@ -67,7 +67,6 @@ public class Node {
 
 		// find dominator (reset dominator)
 		identifyDominator( parents );
-//System.out.println( "XXX result idom = " + this.idom); // XXX
 	}
 
 	public Integer getIDom(){
@@ -84,14 +83,10 @@ public class Node {
 		for( Node nd : parents){
 			boolean pending=false; // more ugly quickfixes
 			if( 0 == nd.getInheritage().size()){
-// TODO in case one parent is still not parsed (upward link), just postpone this 
-// node, and generate the merge later (to be implemented), so far, simply omited, 
-// since it works anyway +/-
 				pending = true;
 			}else{
 				this.idom = nd.getInheritage().get(0).get( nd.getInheritage().get(0).size()-1 );
 			}
-// TODO improve this by parse order
 			if( pending ) return;
 		}
 
@@ -181,12 +176,7 @@ public class Node {
 
 
 	public void dotPrint(){
-// TODO check, another label?
-//*
 		System.out.println( "  node" + Id + " [label = \"block" + Id + "\"]");
-/*/
-		System.out.println( ControlFlowGraphExtractor.dotPrintBlock(Id, blockinstructions));
-//*/
 	}
 
 	public Integer id(){

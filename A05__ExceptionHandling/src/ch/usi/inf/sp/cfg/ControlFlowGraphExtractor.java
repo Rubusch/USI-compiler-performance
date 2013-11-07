@@ -34,7 +34,7 @@ public class ControlFlowGraphExtractor {
 	private static InsnList instructions;
 	private MethodNode method;
 	private List<Integer> forwardJump;
-	private List<String> edgesList; // TODO rename "jumpTable"?
+	private List<String> edgesList;
 	private List<Integer> omitFallthruList;
 	
 	private final ExceptionTable exceptionTable	;
@@ -60,7 +60,7 @@ public class ControlFlowGraphExtractor {
 		}
 		
 		// exception handling
-		exceptionTable = new ExceptionTable(); // TODO LinkedList?
+		exceptionTable = new ExceptionTable();
 
 		initInstructions();
 	}
