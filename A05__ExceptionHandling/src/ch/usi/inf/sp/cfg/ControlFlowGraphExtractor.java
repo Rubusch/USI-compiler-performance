@@ -23,7 +23,7 @@ import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.util.Printer;
 
 /**
- * 
+ *
  * @author Lothar Rubusch
  *
  */
@@ -36,7 +36,7 @@ public class ControlFlowGraphExtractor {
 	private List<Integer> forwardJump;
 	private List<String> edgesList;
 	private List<Integer> omitFallthruList;
-	
+
 	private final ExceptionTable exceptionTable	;
 
 	/*
@@ -58,7 +58,7 @@ public class ControlFlowGraphExtractor {
 				omitFallthruList.add(new Integer(iOpcode));
 			}
 		}
-		
+
 		// exception handling
 		exceptionTable = new ExceptionTable();
 
@@ -259,7 +259,7 @@ public class ControlFlowGraphExtractor {
 				case Opcodes.ARETURN:
 				case Opcodes.RETURN:
 					if(1 >= instructions.size() - idx + 1){
-						// RETURN at the end - before last instruction or last 
+						// RETURN at the end - before last instruction or last
 						// instruction, don't split, just connect to E
 						edgeslistAdd( idx, -1, "label=\"return\"");
 					}else{
@@ -305,7 +305,7 @@ public class ControlFlowGraphExtractor {
 			}else if( isHandler(idx)){
 				if( exceptionTable.isHavingFinally(idx)){
 					branching( idx, exceptionTable.getNextHandler(idx), "label=\"catching to finally\",style=dotted" );
-				
+
 					// start new block
 					branchNextIteration = true;
 				} // else try-catch, normal ending
@@ -344,7 +344,7 @@ public class ControlFlowGraphExtractor {
 		case Opcodes.ANEWARRAY: // NegativeArraySizeException, (linking)
 		case Opcodes.ARETURN: // IllegalMonitorStateException (if synchronized)
 		case Opcodes.ARRAYLENGTH: // NullPointerException
-		case Opcodes.ATHROW: // NullPointerException, IllegalMonitorStateException (if synchronized), 
+		case Opcodes.ATHROW: // NullPointerException, IllegalMonitorStateException (if synchronized),
 		case Opcodes.BALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
 		case Opcodes.BASTORE: // NullPointerException, ArrayIndexOutOfBoundsException
 		case Opcodes.CALOAD: // NullPointerException, ArrayIndexOutOfBoundsException
