@@ -10,7 +10,20 @@ import java.util.List;
  */
 public class SetAssociativeCacheSimulator implements
 		ISetAssociativeCacheSimulator {
-	
+
+	/*
+// TODO correction
+
+	cache will be a list of size 2^bitsForSet
+	cache elements are lists of size 2^bitsForWay
+
+	a line corresponds to a way in the set
+
+	there will be a hashmap to check if a tag is already in one of the ways (then update) of a way (line)
+
+	 */
+// TODO
+
 	private int bitsForTag;
 	private int bitsForSet;
 	private int bitsForWay;
