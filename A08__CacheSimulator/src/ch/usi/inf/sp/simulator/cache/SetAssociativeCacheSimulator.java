@@ -18,6 +18,8 @@ public class SetAssociativeCacheSimulator implements
 	cache elements are lists of size 2^bitsForWay
 
 	a line corresponds to a way in the set
+	
+	offset // byte will be 2^offset number of bytes of data (dcache) or instruction (icache)
 
 	there will be a hashmap to check if a tag is already in one of the ways (then update) of a way (line)
 
