@@ -1,7 +1,9 @@
 package ch.usi.inf.sp.simulator.cache;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -22,7 +24,6 @@ public class SetAssociativeCacheSimulator implements
 	offset // byte will be 2^offset number of bytes of data (dcache) or instruction (icache)
 
 	there will be a hashmap to check if a tag is already in one of the ways (then update) of a way (line)
-
 	 */
 // TODO
 
@@ -35,7 +36,13 @@ public class SetAssociativeCacheSimulator implements
 
 	private int cacheSizeInBytes;
 
+/*
 	private int[][] tags;
+/*/
+	// key: tags, value: line // way in memory
+	private Map tags;
+//*/
+
 	private boolean[][] validBits;
 
 	private long hitCount;
@@ -66,7 +73,11 @@ public class SetAssociativeCacheSimulator implements
 		this.initMissCount();
 
 		final int numberOfSets = this.getNumberOfSets();
+/*
 		tags = new int[numberOfSets][numberOfWays];
+/*/
+		tags = new HashMap<String, String>();
+//*/
 		validBits = new boolean[numberOfSets][numberOfWays];
 		memory = new ArrayList<String>();
 
@@ -105,6 +116,7 @@ public class SetAssociativeCacheSimulator implements
 		}
 		memory.add(element);
 
+/*
 		// check and in case remove old elements
 		if(memory_SIZE < memory.size()){
 			Tester.db("lru - memory full, need to discard...");
@@ -114,6 +126,9 @@ public class SetAssociativeCacheSimulator implements
 			validBits[set][way] = false;
 			memory.remove(0);
 		}
+/*/
+		// TODO
+//*/
 	}
 
 	/*
@@ -175,6 +190,7 @@ public class SetAssociativeCacheSimulator implements
 
 		boolean ret = false;
 
+/*
 		if(tags[set][way] == tag && validBits[set][way]){
 			hitCount++;
 			ret = true;
@@ -184,7 +200,9 @@ public class SetAssociativeCacheSimulator implements
 			missCount++;
 			lru_update(set, way);
 		}
-
+/*/
+		// TODO
+//*/
 		return ret;
 	}
 

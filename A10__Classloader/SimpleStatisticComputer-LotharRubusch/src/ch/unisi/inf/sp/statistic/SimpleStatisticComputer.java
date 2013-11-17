@@ -25,8 +25,13 @@ public final class SimpleStatisticComputer {
 	
 	private static Statistic createStatistic(final String name) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		final String packageName = "ch.unisi.inf.sp.statistic";
-		// TODO: Load class (with Class.forName())
-		// TODO: Instantiate an object of the class
+
+		// Load class (with Class.forName())
+		// TODO
+
+		// Instantiate an object of the class
+		// TODO
+
 		return statistic;
 	}
 
