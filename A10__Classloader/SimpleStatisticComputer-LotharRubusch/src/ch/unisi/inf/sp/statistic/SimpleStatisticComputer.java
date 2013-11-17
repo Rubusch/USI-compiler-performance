@@ -27,9 +27,11 @@ public final class SimpleStatisticComputer {
 		final String packageName = "ch.unisi.inf.sp.statistic";
 
 		// Load class (with Class.forName())
+		Class cl = Class.forName(name);
 		// TODO
 
 		// Instantiate an object of the class
+		Object obj = cl.newInstance();
 		// TODO
 
 		return statistic;
