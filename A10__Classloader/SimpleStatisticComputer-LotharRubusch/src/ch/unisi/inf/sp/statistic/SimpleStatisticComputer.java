@@ -31,8 +31,13 @@ public final class SimpleStatisticComputer {
 		// TODO
 
 		// Instantiate an object of the class
+// TODO do I need to catch exps and re-throw them here???
 		Object obj = cl.newInstance();
+		
+		Statistic statistic = (Statistic) obj;
 		// TODO
+		
+//		cl.getMethod(Max.compute(), parameterTypes) // TODO check how to come to "statistic" from the loaded class...
 
 		return statistic;
 	}

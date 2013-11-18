@@ -20,7 +20,7 @@ public class SetAssociativeCacheSimulator implements
 	cache elements are lists of size 2^bitsForWay
 
 	a line corresponds to a way in the set
-	
+
 	offset // byte will be 2^offset number of bytes of data (dcache) or instruction (icache)
 
 	there will be a hashmap to check if a tag is already in one of the ways (then update) of a way (line)
@@ -48,8 +48,12 @@ public class SetAssociativeCacheSimulator implements
 	private long hitCount;
 	private long missCount;
 
+/*
 	private List<String> memory;
 	private int memory_SIZE = 10;
+/*/
+	private List<List<Integer>> cache;
+//*/
 
 	/**
 	 * 
@@ -79,21 +83,32 @@ public class SetAssociativeCacheSimulator implements
 		tags = new HashMap<String, String>();
 //*/
 		validBits = new boolean[numberOfSets][numberOfWays];
-		memory = new ArrayList<String>();
+//		memory = new ArrayList<String>();
+		
+		cache = new ArrayList<List<Integer>>();
+		int cacheSize = 1<<bitsForSet;
+		int elementSizeInByte = 1<<this.bitsForWay;
+		for( int i=0; i<cacheSize; ++i){
+			List<Integer> element = new ArrayList<Integer>();
+			for( int j=0;j<elementSizeInByte;++j){
+				element.add(0);
+			}
+			cache.add(element);
+		}
 
 		// debug
 		Tester.db("\tbitsForSet\t\t" + bitsForSet + "\tnumberOfSets\t\t" + getNumberOfSets());
 		Tester.db("\tbitsForWays\t\t" + bitsForWay + "\tnumberOfWays\t\t" + getNumberOfWays() );
-		Tester.db("\tmemory_SIZE\t\t" + this.memory_SIZE);
+//		Tester.db("\tmemory_SIZE\t\t" + this.memory_SIZE);
 		Tester.db("\tbitsForByteInLine\t" + this.bitsForByteInLine);
 
 		Tester.db("-");
 	}
-
+/* TODO rm
 	public void setMemorySize( int memory_size ){
 		this.memory_SIZE = memory_size;
 	}
-
+//*/
 	/*
 	 * init counts
 	 */
@@ -111,10 +126,14 @@ public class SetAssociativeCacheSimulator implements
 	private void lru_update(int set, int way){
 		// append to stack
 		String element = String.valueOf(set) + ":" + String.valueOf(way);
+/* TODO rm
 		if(memory.contains(element)){
 			memory.remove(element);
 		}
 		memory.add(element);
+//*/
+
+
 
 /*
 		// check and in case remove old elements
