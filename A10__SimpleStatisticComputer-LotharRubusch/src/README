@@ -9,4 +9,3 @@ $ java -cp bin ch.unisi.inf.sp.statistic.SimpleStatisticComputer sample.txt Min
 iDEBIAN<18:28:56>::user("/opt/git_java_performance/A10__SimpleStatisticComputer-LotharRubusch/");
 $ java -cp bin ch.unisi.inf.sp.statistic.SimpleStatisticComputer sample.txt Max
 55.0
-

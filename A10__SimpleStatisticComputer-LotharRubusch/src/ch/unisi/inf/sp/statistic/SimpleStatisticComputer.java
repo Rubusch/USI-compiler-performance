@@ -28,14 +28,12 @@ public final class SimpleStatisticComputer {
 
 		// Load class (with Class.forName())
 		Class cl = Class.forName("ch.unisi.inf.sp.statistic." + name);
-		// TODO
 
 		// Instantiate an object of the class
 		Object obj = cl.newInstance();
-		
+
+		// brutally cast obj, and just return it, will be fine..
 		return (Statistic) obj;
-//		Statistic statistic = (Statistic) obj;
-//		return statistic;
 	}
 
 	private static double[] loadSample(final String fileName) throws IOException, NumberFormatException {
