@@ -22,24 +22,20 @@ public final class SimpleStatisticComputer {
 			System.err.println("File '"+fileName+"' contains a line that is not a double: "+ex.getMessage());
 		}
 	}
-	
+
 	private static Statistic createStatistic(final String name) throws ClassNotFoundException, InstantiationException, IllegalAccessException {
 		final String packageName = "ch.unisi.inf.sp.statistic";
 
 		// Load class (with Class.forName())
-		Class cl = Class.forName(name);
+		Class cl = Class.forName("ch.unisi.inf.sp.statistic." + name);
 		// TODO
 
 		// Instantiate an object of the class
-// TODO do I need to catch exps and re-throw them here???
 		Object obj = cl.newInstance();
 		
-		Statistic statistic = (Statistic) obj;
-		// TODO
-		
-//		cl.getMethod(Max.compute(), parameterTypes) // TODO check how to come to "statistic" from the loaded class...
-
-		return statistic;
+		return (Statistic) obj;
+//		Statistic statistic = (Statistic) obj;
+//		return statistic;
 	}
 
 	private static double[] loadSample(final String fileName) throws IOException, NumberFormatException {

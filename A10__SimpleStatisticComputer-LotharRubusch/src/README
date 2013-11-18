@@ -3,5 +3,10 @@ SimpleStatisticComputer
 An example for running the default class loader, by a call of class.loadName()
 
 Run the code as follows:
-iDEBIAN<18:14:42>::user("/opt/git_java_performance/");
+iDEBIAN<18:25:19>::user("/opt/git_java_performance/A10__SimpleStatisticComputer-LotharRubusch/");
 $ java -cp bin ch.unisi.inf.sp.statistic.SimpleStatisticComputer sample.txt Min
+3.0
+iDEBIAN<18:28:56>::user("/opt/git_java_performance/A10__SimpleStatisticComputer-LotharRubusch/");
+$ java -cp bin ch.unisi.inf.sp.statistic.SimpleStatisticComputer sample.txt Max
+55.0
+
