@@ -1,0 +1,17 @@
+Flexible Statistic Computer
+
+Using a separate ClassLoader just for loading that plug-in. This requires a bit
+more work (new URLClassLoader(…), …), but allows plug-ins to sit at any location
+(even somewhere on the Internet, or at a place that was not yet known when the
+application was started), it allows unloading and reloading, and it even allows
+multiple versions of a class with the exact same fully-qualified name to coexist
+(if they are defined by different ClassLoader objects).
+
+Run the code as follows:
+
+iDEBIAN<18:54:32>::user("/opt/git_java_performance/A10__FlexibleStatisticsComputer-LotharRubusch/");
+$ java -cp bin ch.unisi.inf.sp.statistic.FlexibleStatisticComputer sample.txt Min
+3.0
+iDEBIAN<18:54:36>::user("/opt/git_java_performance/A10__FlexibleStatisticsComputer-LotharRubusch/");
+$ java -cp bin ch.unisi.inf.sp.statistic.FlexibleStatisticComputer sample.txt Max
+55.0

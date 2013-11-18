@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public final class FlexibleStatisticComputer {
 
-	public static void main(final String[] args) {
+	public static void main(final String[] args) throws MalformedURLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
 		final String fileName = args[0];
 		final String statisticName = args[1];
 		final Statistic statistic = createStatistic(statisticName);
@@ -43,10 +43,17 @@ public final class FlexibleStatisticComputer {
 	
 	private static Statistic createStatistic(final String name) throws MalformedURLException, ClassNotFoundException, InstantiationException, IllegalAccessException {
 		final URL[] pluginClassPath = new URL[] {new URL("file:plugin-bin/")};
-		// TODO: Create class loader (using above class path)
-		// TODO: Load class
-		// TODO: Instantiate an object of the class
-		return statistic;
+
+		// Create class loader (using above class path)
+		ClassLoader loader = new URLClassLoader(pluginClassPath);
+
+		// Load class
+		Class cl = loader.loadClass("ch.unisi.inf.sp.statistic." + name);
+
+		// Instantiate an object of the class
+		Object obj = cl.newInstance();
+
+		return ((Statistic) obj);
 	}
 
 	private static double[] loadSample(final String fileName) throws IOException, NumberFormatException {

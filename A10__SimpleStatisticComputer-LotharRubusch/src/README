@@ -1,6 +1,11 @@
 SimpleStatisticComputer
 
-An example for running the default class loader, by a call of class.loadName()
+Using Class.forName(). This requires the least amount of work from you as a
+developer, but requires the plug-in classes to be in the same class path as the
+application class, and prevents the plug-in from ever being unloaded resp.
+reloaded (assume you edit and recompile the plug-in while the application is
+running, there is no way for the application to pick up the new version of the
+plug-in).
 
 Run the code as follows:
 iDEBIAN<18:25:19>::user("/opt/git_java_performance/A10__SimpleStatisticComputer-LotharRubusch/");
