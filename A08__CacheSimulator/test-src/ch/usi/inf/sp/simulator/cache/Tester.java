@@ -128,7 +128,6 @@ public class Tester {
 		cache = new SetAssociativeCacheSimulator( bitsForSet, bitsForByteInLine, numberOfWays);
 
 		int cache_size = memory_size * 1000 / (2^bitsForSet * 2^bitsForByteInLine);
-//		cache.setMemorySize( memory_size ); // TODO still necessary?
 
 		try {
 			read(traceFileName);

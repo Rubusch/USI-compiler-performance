@@ -180,7 +180,7 @@ public class SetAssociativeCacheSimulator implements
 	}
 
 /*
- * set associative cache structure (32 bit)
+ * set associative cache, structure (32 bit)
  * 
  *  3 3 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1
  *  1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
@@ -204,7 +204,18 @@ public class SetAssociativeCacheSimulator implements
 		Tester.db("\t(" + String.valueOf(address) + " >> " + String.valueOf(bitsForByteInLine) + ") & ((1 << " + String.valueOf(bitsForSet) + ")-1) = " + String.valueOf(set));
 //		System.out.printf("set:    0x%08x (%d)\n", set, set);
 
+
+
 // FIXME, if no specific bits per way encoding are set, how much to shift to obtain a tag for the cache?
+		int tmp = numberOfWays;
+		int bitsForWay = 0;
+		for( int cnt=0; tmp > 1;++cnt){
+			tmp = tmp >>> 1;
+			bitsForWay++;
+		}
+
+
+
 		final int way = (address >>> (bitsForByteInLine + bitsForSet) ) & ((1 << bitsForWay)-1);
 		Tester.db("\taddress>>>(bitsForByteInLine + bitsForSet) & ((1<<bitsForWay)-1)");
 		Tester.db("\t" + String.valueOf(address) + " >>>( " + String.valueOf(bitsForByteInLine) + " + " + String.valueOf(bitsForSet) + " ) & ((1<< " + String.valueOf( bitsForWay ) + ")-1) = " + String.valueOf(way) );
@@ -216,17 +227,7 @@ public class SetAssociativeCacheSimulator implements
 //		System.out.printf("tag:     0x%08x (%d)\n", tag, tag);
 
 		boolean ret = false;
-/*
-		if(tags[set][way] == tag && validBits[set][way]){
-			hitCount++;
-			ret = true;
-		}else{
-			tags[set][way] = tag;
-			validBits[set][way] = true;
-			missCount++;
-			lru_update(set, way);
-		}
-/*/
+
 		if(cache[set][way] == tag && validBits[set][way]){
 			hits++;
 			ret = true;
@@ -235,9 +236,10 @@ public class SetAssociativeCacheSimulator implements
 			validBits[set][way] = true;
 			misses++;
 
+			// call lru policy
 			lru_update(set,way);
 		}
-//*/
+
 		return ret;
 	}
 
