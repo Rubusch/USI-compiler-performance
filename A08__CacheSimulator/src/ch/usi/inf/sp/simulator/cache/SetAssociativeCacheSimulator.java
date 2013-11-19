@@ -25,37 +25,26 @@ public class SetAssociativeCacheSimulator implements
 
 	there will be a hashmap to check if a tag is already in one of the ways (then update) of a way (line)
 	 */
-// TODO
 
 	private int bitsForTag;
 	private int bitsForSet;
-	private int bitsForWay;
+//	private int bitsForWay; // TODO is this necessary?
 	private int bitsForByteInLine;
-
 	private int numberOfWays;
 
 	private int cacheSizeInBytes;
 
-/*
-	private int[][] tags;
-/*/
-// TODO perhaps better take array of array
+	// cache for the tags
 	private int[][] cache;
-//*/
 
+	// valid bit
 	private boolean[][] validBits;
 
-	private long hitCount;
-	private long missCount;
+	private long hits;
+	private long misses;
 
-/*
 	// lru
 	private List<String> memory;
-	private int memory_SIZE = 10;
-/*/
-	// lru
-	private List<String> memory;
-//*/
 
 	/**
 	 * 
@@ -67,12 +56,15 @@ public class SetAssociativeCacheSimulator implements
 		this.bitsForSet=bitsForSet;
 		this.bitsForByteInLine = bitsForByteInLine;
 
+// TODO is it actually necessary to calculate the "bits for ways", in order to read out a specific way in the address?
+/*
 		int tmp = numberOfWays;
 		this.bitsForWay = 0;
 		for( int cnt=0; tmp > 1;++cnt){
 			tmp = tmp >>> 1;
 			this.bitsForWay++;
 		}
+//*/
 
 		this.numberOfWays = numberOfWays;
 		this.initHitCounts();
@@ -90,23 +82,22 @@ public class SetAssociativeCacheSimulator implements
 
 
 		// debug
-		Tester.db("\tbitsForSet\t\t" + bitsForSet + "\tnumberOfSets\t\t" + getNumberOfSets());
-		Tester.db("\tbitsForWays\t\t" + bitsForWay + "\tnumberOfWays\t\t" + getNumberOfWays() );
+//		Tester.db("\tbitsForSet\t\t" + bitsForSet + "\tnumberOfSets\t\t" + getNumberOfSets());
+//		Tester.db("\tbitsForWays\t\t" + bitsForWay + "\tnumberOfWays\t\t" + getNumberOfWays() );
 //		Tester.db("\tmemory_SIZE\t\t" + this.memory_SIZE);
-		Tester.db("\tbitsForByteInLine\t" + this.bitsForByteInLine);
-
-		Tester.db("-");
+//		Tester.db("\tbitsForByteInLine\t" + this.bitsForByteInLine);
+//		Tester.db("-");
 	}
 
 	/*
 	 * init counts
 	 */
 	private void initHitCounts(){
-		this.hitCount = 0;
+		this.hits = 0;
 	}
 
 	private void initMissCount(){
-		this.missCount = 0;
+		this.misses = 0;
 	}
 
 	/*
@@ -188,6 +179,22 @@ public class SetAssociativeCacheSimulator implements
 		return this.getNumberOfWays() * (1<<this.getNumberOfBitsForByteInLine()) * this.getNumberOfSets();
 	}
 
+/*
+ * set associative cache structure (32 bit)
+ * 
+ *  3 3 2 2 2 2 2 2 2 2 2 2 1 1 1 1 1 1 1 1 1 1
+ *  1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * |T|T|T|T|T|T|T|T|T|T|T|T|T|T|T|T|T|T|T|T|S|S|S|S|S|S|B|B|B|B|B|B|
+ * +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+ * 
+ * +---------------------------------------+-----------+-----------+
+ *                  tag                        set          byte
+ * 
+ * (non-Javadoc)
+ * @see ch.usi.inf.sp.simulator.cache.ISetAssociativeCacheSimulator#handleMemoryAccess(int)
+ */
+
 	@Override
 	public boolean handleMemoryAccess(int address) {
 //		System.out.printf("address: 0x%08x (%d)\n", address, address);
@@ -197,6 +204,7 @@ public class SetAssociativeCacheSimulator implements
 		Tester.db("\t(" + String.valueOf(address) + " >> " + String.valueOf(bitsForByteInLine) + ") & ((1 << " + String.valueOf(bitsForSet) + ")-1) = " + String.valueOf(set));
 //		System.out.printf("set:    0x%08x (%d)\n", set, set);
 
+// FIXME, if no specific bits per way encoding are set, how much to shift to obtain a tag for the cache?
 		final int way = (address >>> (bitsForByteInLine + bitsForSet) ) & ((1 << bitsForWay)-1);
 		Tester.db("\taddress>>>(bitsForByteInLine + bitsForSet) & ((1<<bitsForWay)-1)");
 		Tester.db("\t" + String.valueOf(address) + " >>>( " + String.valueOf(bitsForByteInLine) + " + " + String.valueOf(bitsForSet) + " ) & ((1<< " + String.valueOf( bitsForWay ) + ")-1) = " + String.valueOf(way) );
@@ -220,12 +228,12 @@ public class SetAssociativeCacheSimulator implements
 		}
 /*/
 		if(cache[set][way] == tag && validBits[set][way]){
-			hitCount++;
+			hits++;
 			ret = true;
 		}else{
 			cache[set][way] = tag;
 			validBits[set][way] = true;
-			missCount++;
+			misses++;
 
 			lru_update(set,way);
 		}
@@ -235,11 +243,11 @@ public class SetAssociativeCacheSimulator implements
 
 	@Override
 	public long getHitCount() {
-		return this.hitCount;
+		return this.hits;
 	}
 
 	@Override
 	public long getMissCount() {
-		return this.missCount;
+		return this.misses;
 	}
 }
