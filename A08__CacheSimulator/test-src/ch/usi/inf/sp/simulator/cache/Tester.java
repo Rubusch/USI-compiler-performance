@@ -127,8 +127,8 @@ public class Tester {
 	private void runDataSet(String traceFileName, int bitsForSet, int bitsForByteInLine, int numberOfWays, int memory_size ){
 		cache = new SetAssociativeCacheSimulator( bitsForSet, bitsForByteInLine, numberOfWays);
 
-		int cache_size = memory_size * 1000 / (2^bitsForSet * 2^bitsForByteInLine); // XXX
-		cache.setMemorySize( memory_size );
+		int cache_size = memory_size * 1000 / (2^bitsForSet * 2^bitsForByteInLine);
+//		cache.setMemorySize( memory_size ); // TODO still necessary?
 
 		try {
 			read(traceFileName);
