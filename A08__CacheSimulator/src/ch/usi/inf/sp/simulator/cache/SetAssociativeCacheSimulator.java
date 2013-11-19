@@ -39,8 +39,8 @@ public class SetAssociativeCacheSimulator implements
 /*
 	private int[][] tags;
 /*/
-	// key: tags, value: line // way in memory
-	private Map tags;
+// TODO perhaps better take array of array
+	private int[][] cache;
 //*/
 
 	private boolean[][] validBits;
@@ -49,10 +49,12 @@ public class SetAssociativeCacheSimulator implements
 	private long missCount;
 
 /*
+	// lru
 	private List<String> memory;
 	private int memory_SIZE = 10;
 /*/
-	private List<List<Integer>> cache;
+	// lru
+	private List<String> memory;
 //*/
 
 	/**
@@ -62,7 +64,7 @@ public class SetAssociativeCacheSimulator implements
 	 * @param numberOfWays
 	 */
 	public SetAssociativeCacheSimulator(int bitsForSet, int bitsForByteInLine, int numberOfWays) {
-		this.bitsForSet= bitsForSet;
+		this.bitsForSet=bitsForSet;
 		this.bitsForByteInLine = bitsForByteInLine;
 
 		int tmp = numberOfWays;
@@ -77,24 +79,15 @@ public class SetAssociativeCacheSimulator implements
 		this.initMissCount();
 
 		final int numberOfSets = this.getNumberOfSets();
-/*
-		tags = new int[numberOfSets][numberOfWays];
-/*/
-		tags = new HashMap<String, String>();
-//*/
+
 		validBits = new boolean[numberOfSets][numberOfWays];
-//		memory = new ArrayList<String>();
-		
-		cache = new ArrayList<List<Integer>>();
-		int cacheSize = 1<<bitsForSet;
-		int elementSizeInByte = 1<<this.bitsForWay;
-		for( int i=0; i<cacheSize; ++i){
-			List<Integer> element = new ArrayList<Integer>();
-			for( int j=0;j<elementSizeInByte;++j){
-				element.add(0);
-			}
-			cache.add(element);
-		}
+
+		// lru policy
+		memory = new ArrayList<String>();
+
+		// cache
+		cache = new int[numberOfSets][numberOfWays];
+
 
 		// debug
 		Tester.db("\tbitsForSet\t\t" + bitsForSet + "\tnumberOfSets\t\t" + getNumberOfSets());
@@ -104,11 +97,7 @@ public class SetAssociativeCacheSimulator implements
 
 		Tester.db("-");
 	}
-/* TODO rm
-	public void setMemorySize( int memory_size ){
-		this.memory_SIZE = memory_size;
-	}
-//*/
+
 	/*
 	 * init counts
 	 */
@@ -126,17 +115,15 @@ public class SetAssociativeCacheSimulator implements
 	private void lru_update(int set, int way){
 		// append to stack
 		String element = String.valueOf(set) + ":" + String.valueOf(way);
-/* TODO rm
+
+		// add to list
 		if(memory.contains(element)){
 			memory.remove(element);
 		}
 		memory.add(element);
-//*/
 
-
-
-/*
 		// check and in case remove old elements
+/*
 		if(memory_SIZE < memory.size()){
 			Tester.db("lru - memory full, need to discard...");
 			set = Integer.valueOf(memory.get(0).split(":")[0]);
@@ -146,7 +133,20 @@ public class SetAssociativeCacheSimulator implements
 			memory.remove(0);
 		}
 /*/
-		// TODO
+		// get max size
+		int cacheSize = 1<<bitsForSet;
+
+//		int elementSizeInByte = 1<<this.bitsForWay;
+
+		// check if too many elements
+		if(cacheSize < memory.size()){
+			Tester.db("lru - memory full, need to discard...");
+			set = Integer.valueOf(memory.get(0).split(":")[0]);
+			way = Integer.valueOf(memory.get(0).split(":")[1]);
+			cache[set][way] = 0;
+			validBits[set][way] = false;
+			memory.remove(0);
+		}
 //*/
 	}
 
@@ -208,7 +208,6 @@ public class SetAssociativeCacheSimulator implements
 //		System.out.printf("tag:     0x%08x (%d)\n", tag, tag);
 
 		boolean ret = false;
-
 /*
 		if(tags[set][way] == tag && validBits[set][way]){
 			hitCount++;
@@ -220,7 +219,16 @@ public class SetAssociativeCacheSimulator implements
 			lru_update(set, way);
 		}
 /*/
-		// TODO
+		if(cache[set][way] == tag && validBits[set][way]){
+			hitCount++;
+			ret = true;
+		}else{
+			cache[set][way] = tag;
+			validBits[set][way] = true;
+			missCount++;
+
+			lru_update(set,way);
+		}
 //*/
 		return ret;
 	}
