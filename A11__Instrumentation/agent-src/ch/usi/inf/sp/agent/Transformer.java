@@ -25,8 +25,16 @@ public final class Transformer implements ClassFileTransformer{
 			throws IllegalClassFormatException {
 		System.out.println("About to transform class <" + loader + ", " + className + ">" );
 
-		// transformer instruments
-		return instrument( classfileBuffer );
+		if( className.startsWith("java/") ||
+				className.startsWith("sun/") ||
+				className.startsWith("ch/usi/inf/sp/agent/") ||
+				className.startsWith("ch/usi/inf/sp/profiler/")) {
+
+			return classfileBuffer;
+		}else{
+			// transformer instruments
+			return instrument( classfileBuffer );
+		}
 	}
 
 
