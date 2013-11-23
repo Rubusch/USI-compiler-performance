@@ -1,6 +1,6 @@
+package ch.usi.inf.sp.application;
 
 public class Application {
-
 	/**
 	 * @param args
 	 */
