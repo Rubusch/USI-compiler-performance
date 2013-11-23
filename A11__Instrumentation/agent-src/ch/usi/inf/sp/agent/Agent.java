@@ -9,6 +9,7 @@ public class Agent {
 	 */
 	public static void premain(String agentArgs, Instrumentation inst){
 		System.out.println("Agent stating (arguments: '"+agentArgs+"')");
-	}
 
+		inst.addTransformer(new Transformer());
+	}
 }
