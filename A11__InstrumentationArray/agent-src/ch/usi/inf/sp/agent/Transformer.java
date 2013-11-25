@@ -30,7 +30,7 @@ public final class Transformer implements ClassFileTransformer{
 			, ProtectionDomain protectionDomain
 			, byte[] classfileBuffer )
 			throws IllegalClassFormatException {
-		System.out.println("XXX About to transform class <" + loader + ", " + className + ">" );
+		System.out.println("## About to transform class <" + loader + ", " + className + ">" );
 
 		if( className.startsWith("Java/")
 				|| className.startsWith("sun/")
@@ -61,6 +61,7 @@ public final class Transformer implements ClassFileTransformer{
 
 	private void instrument(ClassNode cn) {
 /*
+// legacy - TODO rm
 		// instrument method calls by INVOKESTATIC
 		for( MethodNode mn : (List<MethodNode>)cn.methods) {
 			InsnList patch = new InsnList();
@@ -69,59 +70,46 @@ public final class Transformer implements ClassFileTransformer{
 		}
 //*/
 
-		 // INT_INSN : newarray
 		for( MethodNode mn : (List<MethodNode>)cn.methods) {
 			final InsnList instructions = mn.instructions;
 			for( int idx=0; idx<instructions.size(); ++idx){
 				final AbstractInsnNode ins = instructions.get(idx);
 
+				// INT_INSN : newarray
 				if( ins.getType() == AbstractInsnNode.INT_INSN ){
 					if( ins.getOpcode() == Opcodes.NEWARRAY ){
-						InsnList patch = new InsnList();
-						patch.add( new LdcInsnNode( "NewArray "+Printer.TYPES[((IntInsnNode)ins).operand]+" called"));
-						patch.add( new MethodInsnNode( Opcodes.NEWARRAY, "ch/usi/inf/sp/profiler/Profiler", "log", "(Ljava/lang/String;)V" ));
+// TODO does Profiler should write actually a CSV file?
+// TODO do we need to read out arguments (size, type, etc - if so, where? )?
+// TODO  - if we need to read out the arguments, do we need to store predeceding BIPUSH args?
+						
+// TODO is this necessary, what is this code actually good for? Why do we need a separate "Profiler", when we can print out directly here?
+//						InsnList patch = new InsnList();
+//						patch.add( new LdcInsnNode( "NewArray "+Printer.TYPES[((IntInsnNode)ins).operand]+" called"));
+//						patch.add( new MethodInsnNode( Opcodes.NEWARRAY, "ch/usi/inf/sp/profiler/Profiler", "log", "(Ljava/lang/String;)V" ));
+						System.out.println("NEWARRAY");
 					}
 
+				// TYPE_INSN : anewarray
 				}else if( ins.getType() == AbstractInsnNode.TYPE_INSN ){
 					if( ins.getOpcode() == Opcodes.ANEWARRAY ){
-						InsnList patch = new InsnList();
-						patch.add( new LdcInsnNode( "ANewArray " + ((TypeInsnNode)ins).desc + " called"));
-						patch.add( new MethodInsnNode( Opcodes.ANEWARRAY, "ch/usi/inf/sp/profiler/Profiler", "log", "(Ljava/lang/String;)V" ));
+// TODO dito
+//						InsnList patch = new InsnList();
+//						patch.add( new LdcInsnNode( "ANewArray " + ((TypeInsnNode)ins).desc + " called"));
+//						patch.add( new MethodInsnNode( Opcodes.ANEWARRAY, "ch/usi/inf/sp/profiler/Profiler", "log", "(Ljava/lang/String;)V" ));
+						System.out.println("ANEWARRAY");
 					}
 
+				 // MULTIANEWARRAY_INSN : multianewarray
 				}else if( ins.getType() == AbstractInsnNode.MULTIANEWARRAY_INSN){
 					if( ins.getOpcode() == Opcodes.MULTIANEWARRAY ){
-// TODO
+// TODO is this necessary
 						;
+// TODO what do we need to handle here?
+						System.out.println("MULTIANEWARRAY");
 					}
 				}
 
 			}
 		}
 	}
-
-		 // TYPE_INSN : anewarray
-// TODO
-
-		 // MULTIANEWARRAY_INSN : multianewarray
-// TODO
-
-/*
-		// filter array instructions
-		// TODO IntInsnNode ?
-		// TODO MultiANewArrayInsnNode ?
-		for( FieldNode fn : (List<FieldNode>)cn.fields ){ // TODO "fields?"
-//		for( IntNode in : (List<IntInsnNode>)cn.fileds ){
-			InsnList patch  = new InsnList();
-			patch.add( new LdcInsnNode( "NewArray " + fn.name + fn.desc + " called" ));
-			patch.add( new FieldInsnNode( Opcodes.NEWARRAY, "ch/usi/inf/sp/profiler/Profiler", "log", "(Ljava/lang/String;)V")); // TODO check
-
-//			patch.add( new FieldInsnNode( Opcodes.ANEWARRAY, "ch/usi/inf/sp/profiler/Profiler", "log", "(Ljava/lang/String;)V")); // TODO check
-//			patch.add( new FieldInsnNode( Opcodes.MULTIANEWARRAY, "ch/usi/inf/sp/profiler/Profiler", "log", "(Ljava/lang/String;)V")); // TODO check
-
-			fn.instructions.insert(patch); // FIXME
-		}
-//		patch.add( new LdcInsnNode( "NewArray " + mn.name + mn.desc + ));
-	}
-//*/
 }
