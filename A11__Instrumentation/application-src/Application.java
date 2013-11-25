@@ -1,5 +1,6 @@
-
-
+/*
+ * just any test application
+ */
 public class Application {
 	/**
 	 * @param args
