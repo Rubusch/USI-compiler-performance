@@ -99,35 +99,6 @@ public class ControlFlowGraphExtractor {
 	}
 
 	private void branching( int idxSrc, int idxDst, String opt ){
-/*
-// TODO rm
-		String dotConnection = "";
-		dotConnection += String.valueOf( idxSrc ) + ":" + String.valueOf(idxDst);
-		if(0 < opt.length()){
-			dotConnection += ":" + opt;
-		}
-		this.edgesList.add(dotConnection);
-
-		if( idxDst < idxSrc ){
-			// backward jump
-			int idxLastFirstIns = 0;
-//			for( int listIdx = 1; listIdx < this.listlist.size(); ++listIdx ){ // TODO test
-			for( int listIdx = 1; listIdx < this.blockList.size()-1; ++listIdx ){
-				int idxFirstIns = this.blockList.indexOf( this.blockList.get(listIdx).get(0) );
-				if( idxDst < idxFirstIns ){
-					int start = idxLastFirstIns;
-					int diff = idxDst - start;
-					this.blockList.add( listIdx, new ArrayList<AbstractInsnNode>( this.blockList.get(listIdx-1).subList( diff, this.blockList.get(listIdx-1).size())));
-					this.blockList.get( listIdx-1 ).removeAll( this.blockList.get( listIdx ) );
-					break;
-				}
-				idxLastFirstIns = idxFirstIns;
-			}
-		}else if( idxDst > idxSrc){
-			// forward jump
-			this.forwardJump.add(new Integer(idxDst));
-		} // no else: jump to next element
-/*/
 		edgeslistAdd( idxSrc, idxDst, opt);
 
 		if( idxDst < idxSrc && idxDst > 0 ){
@@ -171,7 +142,6 @@ public class ControlFlowGraphExtractor {
 			// forward jump
 			this.forwardJump.add(new Integer(idxDst));
 		} // no else: jump to next element
-//*/
 	}
 
 

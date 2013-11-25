@@ -8,6 +8,7 @@ import java.util.List;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
@@ -64,10 +65,24 @@ public final class Transformer implements ClassFileTransformer{
 		}
 //*/
 
-		 // newarray
-		 // anewarray
-		 // multianewarray
+		 // INT_INSN : newarray
+		for( MethodNode mn : (List<MethodNode>)cn.methods) {
+			final InsnList instructions = mn.instructions;
+			for( int idx=0; idx<instructions.size(); ++idx){
+				final AbstractInsnNode ins = instructions.get(idx);
 
+// TODO extract as separate method
+				
+			}
+		}
+
+		 // TYPE_INSN : anewarray
+// TODO
+
+		 // MULTIANEWARRAY_INSN : multianewarray
+// TODO
+
+/*
 		// filter array instructions
 		// TODO IntInsnNode ?
 		// TODO MultiANewArrayInsnNode ?
@@ -84,4 +99,5 @@ public final class Transformer implements ClassFileTransformer{
 		}
 //		patch.add( new LdcInsnNode( "NewArray " + mn.name + mn.desc + ));
 	}
+//*/
 }
