@@ -14,9 +14,12 @@ import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.TypeInsnNode;
+import org.objectweb.asm.util.Printer;
 
 public final class Transformer implements ClassFileTransformer{
 
@@ -72,15 +75,27 @@ public final class Transformer implements ClassFileTransformer{
 			for( int idx=0; idx<instructions.size(); ++idx){
 				final AbstractInsnNode ins = instructions.get(idx);
 
-// TODO extract as separate method
 				if( ins.getType() == AbstractInsnNode.INT_INSN ){
 					if( ins.getOpcode() == Opcodes.NEWARRAY ){
-						// TODO
 						InsnList patch = new InsnList();
-						patch.add( new LdcInsnNode( "Newarray called"));
+						patch.add( new LdcInsnNode( "NewArray "+Printer.TYPES[((IntInsnNode)ins).operand]+" called"));
 						patch.add( new MethodInsnNode( Opcodes.NEWARRAY, "ch/usi/inf/sp/profiler/Profiler", "log", "(Ljava/lang/String;)V" ));
 					}
+
+				}else if( ins.getType() == AbstractInsnNode.TYPE_INSN ){
+					if( ins.getOpcode() == Opcodes.ANEWARRAY ){
+						InsnList patch = new InsnList();
+						patch.add( new LdcInsnNode( "ANewArray " + ((TypeInsnNode)ins).desc + " called"));
+						patch.add( new MethodInsnNode( Opcodes.ANEWARRAY, "ch/usi/inf/sp/profiler/Profiler", "log", "(Ljava/lang/String;)V" ));
+					}
+
+				}else if( ins.getType() == AbstractInsnNode.MULTIANEWARRAY_INSN){
+					if( ins.getOpcode() == Opcodes.MULTIANEWARRAY ){
+// TODO
+						;
+					}
 				}
+
 			}
 		}
 	}
