@@ -2,6 +2,7 @@
  * 
  */
 public class Application {
+//*
 	public static void main( final String[] args){
 		for( int i=1; i<2; ++i){
 			final long[] is = new long[i * 10];
@@ -11,4 +12,13 @@ public class Application {
 		}
 		System.out.println("READY.");
 	}
+/*/
+	public static void main(String[] args) {
+		sayHi();
+	}
+
+	private static void sayHi(){
+		System.out.println("Hello");
+	}
+//*/
 }

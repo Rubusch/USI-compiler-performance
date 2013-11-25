@@ -9,6 +9,8 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
@@ -53,10 +55,33 @@ public final class Transformer implements ClassFileTransformer{
 
 
 	private void instrument(ClassNode cn) {
+/*
+		// instrument method calls by INVOKESTATIC
 		for( MethodNode mn : (List<MethodNode>)cn.methods) {
 			InsnList patch = new InsnList();
 			patch.add( new LdcInsnNode( "Method " + mn.name + mn.desc + " called" ));
 			patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC, "ch/usi/inf/sp/profiler/Profiler", "log", "(Ljava/lang/String;)V" ));
 		}
+//*/
+
+		 // newarray
+		 // anewarray
+		 // multianewarray
+
+		// filter array instructions
+		// TODO IntInsnNode ?
+		// TODO MultiANewArrayInsnNode ?
+		for( FieldNode fn : (List<FieldNode>)cn.fields ){ // TODO "fields?"
+//		for( IntNode in : (List<IntInsnNode>)cn.fileds ){
+			InsnList patch  = new InsnList();
+			patch.add( new LdcInsnNode( "NewArray " + fn.name + fn.desc + " called" ));
+			patch.add( new FieldInsnNode( Opcodes.NEWARRAY, "ch/usi/inf/sp/profiler/Profiler", "log", "(Ljava/lang/String;)V")); // TODO check
+
+//			patch.add( new FieldInsnNode( Opcodes.ANEWARRAY, "ch/usi/inf/sp/profiler/Profiler", "log", "(Ljava/lang/String;)V")); // TODO check
+//			patch.add( new FieldInsnNode( Opcodes.MULTIANEWARRAY, "ch/usi/inf/sp/profiler/Profiler", "log", "(Ljava/lang/String;)V")); // TODO check
+
+			fn.instructions.insert(patch); // FIXME
+		}
+//		patch.add( new LdcInsnNode( "NewArray " + mn.name + mn.desc + ));
 	}
 }
