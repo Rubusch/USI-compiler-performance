@@ -1,4 +1,4 @@
-package ch.usi.inf.sp;
+package ch.usi.inf.sp.agent;
 
 import java.lang.instrument.Instrumentation;
 
