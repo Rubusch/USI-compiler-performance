@@ -13,6 +13,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -72,9 +73,17 @@ public final class Transformer implements ClassFileTransformer{
 				final AbstractInsnNode ins = instructions.get(idx);
 
 // TODO extract as separate method
-				
+				if( ins.getType() == AbstractInsnNode.INT_INSN ){
+					if( ins.getOpcode() == Opcodes.NEWARRAY ){
+						// TODO
+						InsnList patch = new InsnList();
+						patch.add( new LdcInsnNode( "Newarray called"));
+						patch.add( new MethodInsnNode( Opcodes.NEWARRAY, "ch/usi/inf/sp/profiler/Profiler", "log", "(Ljava/lang/String;)V" ));
+					}
+				}
 			}
 		}
+	}
 
 		 // TYPE_INSN : anewarray
 // TODO
