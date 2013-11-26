@@ -72,42 +72,36 @@ public final class Transformer implements ClassFileTransformer{
 			patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC, "ch/usi/inf/sp/profiler/Profiler", "log", "(Ljava/lang/String;)V" ));
 		}
 //*/
-
 		for( MethodNode mn : (List<MethodNode>)cn.methods) {
 			final InsnList instructions = mn.instructions;
-			final Stack<String> bipusher = new Stack<String>();
 			for( int idx=0; idx<instructions.size(); ++idx){
 				final AbstractInsnNode ins = instructions.get(idx);
 
 				// INT_INSN : newarray
-//				if( ins.getType() == AbstractInsnNode.INT_INSN ){ // XXX
-					if( ins.getOpcode() == Opcodes.NEWARRAY ){
+				if( ins.getOpcode() == Opcodes.NEWARRAY ){
 // TODO does Profiler should write actually a CSV file?
 // TODO do we need to read out arguments (size, type, etc - if so, where? )?
 // TODO  - if we need to read out the arguments, do we need to store predeceding BIPUSH args?
-							
 // TODO is this necessary, what is this code actually good for? Why do we need a separate "Profiler", when we can print out directly here?
+					InsnList patch = new InsnList();
 
-
-
-						InsnList patch = new InsnList();
-
-//						String bipushed = bipusher.pop();
-						String type = String.valueOf(Printer.TYPES[((IntInsnNode) ins).operand]);
-						patch.add( new LdcInsnNode( "NEWARRAY, " + type + ", "));
-						patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC, "ch/usi/inf/sp/profiler/Profiler", "logNewArray", "(Ljava/lang/String;)V" ));
-						mn.instructions.insert(patch); // XXX
-//					}
-
+					String type = String.valueOf(Printer.TYPES[((IntInsnNode) ins).operand]);
+// FIXME a dup removes the rest, somehow
+//					patch.add( new InsnNode( Opcodes.DUP ));   // size
+					patch.add( new LdcInsnNode( "NEWARRAY, " + type + ", "));
+					patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
+							, "ch/usi/inf/sp/profiler/Profiler"
+							, "log"
+//							, "logNewArray"
+							, "(Ljava/lang/String;)V" ));
+					instructions.insert(ins, patch);
 /*
-						String bipushed = bipusher.pop();
 						String type = String.valueOf(Printer.TYPES[((IntInsnNode) ins).operand]);
 						System.out.println("NEWARRAY, " + type + ", " + bipushed);
 					}else if( ins.getOpcode() == Opcodes.BIPUSH ){
 						bipusher.push( String.valueOf( ((IntInsnNode) ins).operand ) );
 //*/
-
-					}
+				}
 /*
 				// TYPE_INSN : anewarray
 				}else if( ins.getType() == AbstractInsnNode.TYPE_INSN ){
