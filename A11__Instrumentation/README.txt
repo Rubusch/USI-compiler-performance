@@ -23,18 +23,9 @@ Hello
 
 
 
-test-run transformer
+test-run transformer, with profiler
 
 iDEBIAN<23:43:48>::user("/opt/git_java_performance/A11__Instrumentation/");
 $ jar cfm agent.jar Manifest.txt -C agent-bin .
-iDEBIAN<23:51:11>::user("/opt/git_java_performance/A11__Instrumentation/");
-$ java -javaagent:agent.jar -cp application-bin Application
-Agent stating (arguments: 'null')
-About to transform class <null, sun/launcher/LauncherHelper>
-About to transform class <null, java/lang/Enum>
-About to transform class <null, sun/misc/URLClassPath$FileLoader$1>
-About to transform class <sun.misc.Launcher$AppClassLoader@18efd7c, Application>
-About to transform class <null, java/lang/Void>
-Hello
-About to transform class <null, java/lang/Shutdown>
-About to transform class <null, java/lang/Shutdown$Lock>
+
+$ java -javaagent:agent.jar -Xbootclasspath/p:profiler-bin -cp application-bin Application

@@ -91,9 +91,10 @@ public final class Transformer implements ClassFileTransformer{
 					patch.add( new LdcInsnNode( "NEWARRAY, " + type + ", "));
 					patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
 							, "ch/usi/inf/sp/profiler/Profiler"
-							, "log"
-//							, "logNewArray"
-							, "(Ljava/lang/String;)V" ));
+//							, "log"
+							, "logNewArray"
+//							, "(Ljava/lang/String;)V" ));
+							, "(Lj,Ljava/lang/String;)V" ));
 					instructions.insert(ins, patch);
 /*
 						String type = String.valueOf(Printer.TYPES[((IntInsnNode) ins).operand]);
