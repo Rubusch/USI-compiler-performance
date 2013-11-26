@@ -3,7 +3,9 @@ package ch.usi.inf.sp.agent;
 import java.lang.instrument.ClassFileTransformer;
 import java.lang.instrument.IllegalClassFormatException;
 import java.security.ProtectionDomain;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -18,6 +20,7 @@ import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.MultiANewArrayInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.util.Printer;
 
@@ -72,6 +75,7 @@ public final class Transformer implements ClassFileTransformer{
 
 		for( MethodNode mn : (List<MethodNode>)cn.methods) {
 			final InsnList instructions = mn.instructions;
+			final Stack<String> bipusher = new Stack<String>();
 			for( int idx=0; idx<instructions.size(); ++idx){
 				final AbstractInsnNode ins = instructions.get(idx);
 
@@ -86,26 +90,45 @@ public final class Transformer implements ClassFileTransformer{
 //						InsnList patch = new InsnList();
 //						patch.add( new LdcInsnNode( "NewArray "+Printer.TYPES[((IntInsnNode)ins).operand]+" called"));
 //						patch.add( new MethodInsnNode( Opcodes.NEWARRAY, "ch/usi/inf/sp/profiler/Profiler", "log", "(Ljava/lang/String;)V" ));
-						System.out.println("NEWARRAY");
+
+//						AbstractInsnNode insBefore = instructions.get(idx-2);
+						String bipushed = bipusher.pop();
+						String type = String.valueOf(Printer.TYPES[((IntInsnNode) ins).operand]);
+						System.out.println("NEWARRAY, " + type + ", " + bipushed);
+
+					}else if( ins.getOpcode() == Opcodes.BIPUSH ){
+						bipusher.push( String.valueOf( ((IntInsnNode) ins).operand ) );
 					}
 
 				// TYPE_INSN : anewarray
 				}else if( ins.getType() == AbstractInsnNode.TYPE_INSN ){
 					if( ins.getOpcode() == Opcodes.ANEWARRAY ){
 // TODO dito
-//						InsnList patch = new InsnList();
-//						patch.add( new LdcInsnNode( "ANewArray " + ((TypeInsnNode)ins).desc + " called"));
-//						patch.add( new MethodInsnNode( Opcodes.ANEWARRAY, "ch/usi/inf/sp/profiler/Profiler", "log", "(Ljava/lang/String;)V" ));
-						System.out.println("ANEWARRAY");
+						InsnList patch = new InsnList();
+						patch.add( new LdcInsnNode( "ANewArray " + ((TypeInsnNode)ins).desc + " called"));
+						patch.add( new MethodInsnNode( Opcodes.ANEWARRAY, "ch/usi/inf/sp/profiler/Profiler", "log", "(Ljava/lang/String;)V" ));
+
+						String bipushed = bipusher.pop();
+						String type = String.valueOf(((TypeInsnNode)ins).desc);
+						System.out.println("ANEWARRAY, " + type + ", " + bipushed);
 					}
 
 				 // MULTIANEWARRAY_INSN : multianewarray
 				}else if( ins.getType() == AbstractInsnNode.MULTIANEWARRAY_INSN){
+System.out.println("AAA"); // XXX
 					if( ins.getOpcode() == Opcodes.MULTIANEWARRAY ){
-// TODO is this necessary
-						;
 // TODO what do we need to handle here?
-						System.out.println("MULTIANEWARRAY");
+						String type = String.valueOf( ((MultiANewArrayInsnNode) ins).desc );
+						String dimensions = String.valueOf( ((MultiANewArrayInsnNode) ins).dims );
+						String sizes = "";
+
+						for( int idx_sizes=0; idx_sizes < Integer.valueOf(dimensions)-1; ++idx_sizes){ // FIXME -1 - why?
+							sizes += ", ";
+							sizes += bipusher.pop();
+						}
+System.out.println("BBB"); // FIXME w/o -1 above, no output - why?
+// FIXME entries are missing, why?
+						System.out.println("MULTIANEWARRAY, " + type + ", " + dimensions + sizes);
 					}
 				}
 
