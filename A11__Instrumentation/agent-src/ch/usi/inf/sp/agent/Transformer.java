@@ -17,12 +17,13 @@ import org.objectweb.asm.tree.MethodNode;
 public final class Transformer implements ClassFileTransformer{
 
 	@Override
-	public byte[] transform(ClassLoader loader
-			, String className
-			, Class<?> classBeingRedefined
-			, ProtectionDomain protectionDomain
-			, byte[] classfileBuffer)
+	public byte[] transform( final ClassLoader loader
+			, final String className
+			, final Class<?> classBeingRedefined
+			, final ProtectionDomain protectionDomain
+			, final byte[] classfileBuffer)
 			throws IllegalClassFormatException {
+
 		System.out.println("About to transform class <" + loader + ", " + className + ">" );
 
 		if( className.startsWith("java/") ||
@@ -31,6 +32,7 @@ public final class Transformer implements ClassFileTransformer{
 				className.startsWith("ch/usi/inf/sp/profiler/")) {
 
 			return classfileBuffer;
+
 		}else{
 			// transformer instruments
 			return instrument( classfileBuffer );

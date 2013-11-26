@@ -16,12 +16,8 @@ $ java -cp lib/asm-all-4.1.jar:disassembler-bin ch/usi/inf/sp/disassembler/JavaC
 
 
 
-instrumentation
+instrumentation, with profiler
 
 iDEBIAN<13:53:35>::user("/opt/git_java_performance/A11__InstrumentationArray/");
 $ jar cfm agent.jar Manifest.txt -C agent-bin .
-
-iDEBIAN<13:53:35>::user("/opt/git_java_performance/A11__InstrumentationArray/");
-$ java -javaagent:agent.jar=blablabla -cp application-bin Application
-XXX Agent starting (agentArgs: 'blablabla')
-READY.
+$ java -javaagent:agent.jar -Xbootclasspath/p:profiler-bin -cp application-bin Application

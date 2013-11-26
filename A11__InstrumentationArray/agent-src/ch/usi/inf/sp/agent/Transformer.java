@@ -65,7 +65,7 @@ public final class Transformer implements ClassFileTransformer{
 	private void instrument(ClassNode cn) {
 /*
 // legacy - TODO rm
-		// instrument method calls by INVOKESTATIC
+		// instrument static method in profile by INVOKESTATIC
 		for( MethodNode mn : (List<MethodNode>)cn.methods) {
 			InsnList patch = new InsnList();
 			patch.add( new LdcInsnNode( "Method " + mn.name + mn.desc + " called" ));
@@ -80,26 +80,35 @@ public final class Transformer implements ClassFileTransformer{
 				final AbstractInsnNode ins = instructions.get(idx);
 
 				// INT_INSN : newarray
-				if( ins.getType() == AbstractInsnNode.INT_INSN ){
+//				if( ins.getType() == AbstractInsnNode.INT_INSN ){ // XXX
 					if( ins.getOpcode() == Opcodes.NEWARRAY ){
 // TODO does Profiler should write actually a CSV file?
 // TODO do we need to read out arguments (size, type, etc - if so, where? )?
 // TODO  - if we need to read out the arguments, do we need to store predeceding BIPUSH args?
-						
+							
 // TODO is this necessary, what is this code actually good for? Why do we need a separate "Profiler", when we can print out directly here?
-//						InsnList patch = new InsnList();
-//						patch.add( new LdcInsnNode( "NewArray "+Printer.TYPES[((IntInsnNode)ins).operand]+" called"));
-//						patch.add( new MethodInsnNode( Opcodes.NEWARRAY, "ch/usi/inf/sp/profiler/Profiler", "log", "(Ljava/lang/String;)V" ));
 
-//						AbstractInsnNode insBefore = instructions.get(idx-2);
+
+
+						InsnList patch = new InsnList();
+
+//						String bipushed = bipusher.pop();
+						String type = String.valueOf(Printer.TYPES[((IntInsnNode) ins).operand]);
+						patch.add( new LdcInsnNode( "NEWARRAY, " + type + ", "));
+						patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC, "ch/usi/inf/sp/profiler/Profiler", "logNewArray", "(Ljava/lang/String;)V" ));
+						mn.instructions.insert(patch); // XXX
+//					}
+
+/*
 						String bipushed = bipusher.pop();
 						String type = String.valueOf(Printer.TYPES[((IntInsnNode) ins).operand]);
 						System.out.println("NEWARRAY, " + type + ", " + bipushed);
-
 					}else if( ins.getOpcode() == Opcodes.BIPUSH ){
 						bipusher.push( String.valueOf( ((IntInsnNode) ins).operand ) );
-					}
+//*/
 
+					}
+/*
 				// TYPE_INSN : anewarray
 				}else if( ins.getType() == AbstractInsnNode.TYPE_INSN ){
 					if( ins.getOpcode() == Opcodes.ANEWARRAY ){
@@ -115,7 +124,6 @@ public final class Transformer implements ClassFileTransformer{
 
 				 // MULTIANEWARRAY_INSN : multianewarray
 				}else if( ins.getType() == AbstractInsnNode.MULTIANEWARRAY_INSN){
-System.out.println("AAA"); // XXX
 					if( ins.getOpcode() == Opcodes.MULTIANEWARRAY ){
 // TODO what do we need to handle here?
 						String type = String.valueOf( ((MultiANewArrayInsnNode) ins).desc );
@@ -126,12 +134,11 @@ System.out.println("AAA"); // XXX
 							sizes += ", ";
 							sizes += bipusher.pop();
 						}
-System.out.println("BBB"); // FIXME w/o -1 above, no output - why?
 // FIXME entries are missing, why?
 						System.out.println("MULTIANEWARRAY, " + type + ", " + dimensions + sizes);
 					}
 				}
-
+//*/
 			}
 		}
 	}
