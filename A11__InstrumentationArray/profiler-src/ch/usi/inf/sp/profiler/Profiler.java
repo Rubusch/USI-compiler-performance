@@ -5,14 +5,36 @@ public class Profiler {
 		System.out.println(message);
 	}
 
+	/*
+	 * IMPORTANT: the order of the arguments has to be arg1: int, arg2: String / rest
+	 * 
+	 * 
+	 * setup on the operand stack:
+	 * 
+	 *  1. duplicate the NEWARRAY count operand: DUP
+	 *  2. push the String onto the stack: LDC
+	 *  3. keep the order in the function signature
+	 *
+	 *                                     2)
+	 *                                     +--------+
+	 *                   1)                | String |
+	 *                   +-------+         +--------+
+	 *             DUP   | count |   LDC   | count  |
+	 * +-------+   ==>   +-------+   ==>   +--------+
+	 * | count |         | count |         | count  |
+	 * +-------+         +-------+         +--------+
+	 * | (...) |         | (...) |         | (...)  |
+	 * 
+	 * 
+	 * 3) func( int count, String arg )
+	 * 
+	 */
 	public static void logNewArray( int size, String message ){
-//	public static void logNewArray( String message, int size ){
 		System.out.println(message + String.valueOf( size ));
 	}
 
-	// TODO
 	public static void logANewArray(  int size, String message ){
-		System.out.println(message + ", " + String.valueOf( size ));
+		System.out.println(message + String.valueOf( size ));
 	}
 
 	// TODO

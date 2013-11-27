@@ -141,8 +141,12 @@ public final class Transformer implements ClassFileTransformer{
 
 
 					// insert STRING - INVOKESTATIC after ins
-					AbstractInsnNode insBefore = instructions.get(idx-1);
-					instructions.insert(insBefore, patch);
+					if( idx == 0 ){
+						instructions.insert(patch);
+					}else{
+						AbstractInsnNode insBefore = instructions.get(idx-1);
+						instructions.insert(insBefore, patch);
+					}
 
 					// QUICKFIX: move 3 positions
 					idx += 3; 
@@ -152,14 +156,32 @@ public final class Transformer implements ClassFileTransformer{
 				// TYPE_INSN : anewarray
 				}else if( ins.getType() == AbstractInsnNode.TYPE_INSN ){
 					if( ins.getOpcode() == Opcodes.ANEWARRAY ){
+						InsnList patch = new InsnList();
 
-//						InsnList patch = new InsnList();
-//						patch.add( new LdcInsnNode( "ANewArray " + ((TypeInsnNode)ins).desc + " called"));
-//						patch.add( new MethodInsnNode( Opcodes.ANEWARRAY, "ch/usi/inf/sp/profiler/Profiler", "log", "(Ljava/lang/String;)V" ));
-//
-//						String type = String.valueOf(((TypeInsnNode)ins).desc);
-//						System.out.println("ANEWARRAY, " + type + ", " + bipushed);
-						;
+						// DUP
+						patch.add( new InsnNode( Opcodes.DUP )); // size
+
+						// LDC
+						String type = String.valueOf(((TypeInsnNode)ins).desc);
+						patch.add( new LdcInsnNode( "NEWARRAY, [" + type + ", "));
+
+						// INVOKESTATIC
+						patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
+								, "ch/usi/inf/sp/profiler/Profiler"
+								, "logANewArray"
+								, "(ILjava/lang/String;)V" ));
+
+
+						// insert STRING - INVOKESTATIC after ins
+						if( idx == 0 ){
+							instructions.insert(patch);
+						}else{
+							AbstractInsnNode insBefore = instructions.get(idx-1);
+							instructions.insert(insBefore, patch);
+						}
+
+						// QUICKFIX: move 3 positions
+						idx += 3; 
 					}
 
 				 // MULTIANEWARRAY_INSN : multianewarray
