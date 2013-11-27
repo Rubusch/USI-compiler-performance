@@ -11,12 +11,12 @@ public class Profiler {
 	}
 
 	// TODO
-	public static void logANewArray( String message, int size ){
+	public static void logANewArray(  int size, String message ){
 		System.out.println(message + ", " + String.valueOf( size ));
 	}
 
 	// TODO
-	public static void logMultiANewArray( String message, int size ){
+	public static void logMultiANewArray( int size, String message ){
 		System.out.println(message + ", " + String.valueOf( size ));
 	}
 }

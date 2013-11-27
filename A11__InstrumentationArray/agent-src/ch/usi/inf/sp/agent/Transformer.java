@@ -126,7 +126,6 @@ public final class Transformer implements ClassFileTransformer{
 				if( ins.getOpcode() == Opcodes.NEWARRAY ){
 					InsnList patch = new InsnList();
 
-///////////////
 					// DUP
 					patch.add( new InsnNode( Opcodes.DUP )); // size
 
@@ -137,16 +136,15 @@ public final class Transformer implements ClassFileTransformer{
 					// INVOKESTATIC
 					patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
 							, "ch/usi/inf/sp/profiler/Profiler"
-//							, "log"
-//							, "(Ljava/lang/String;)V" ));
 							, "logNewArray"
 							, "(ILjava/lang/String;)V" ));
 
 
 					// insert STRING - INVOKESTATIC after ins
-					AbstractInsnNode insBefore = instructions.get(idx-1);
-					instructions.insert(insBefore, patch);
-
+//					AbstractInsnNode insBefore = instructions.get(idx-1);
+//					instructions.insert(insBefore, patch);
+					instructions.insert(ins, patch);
+					
 					// QUICKFIX: move 3 positions
 					idx += 3; 
 
