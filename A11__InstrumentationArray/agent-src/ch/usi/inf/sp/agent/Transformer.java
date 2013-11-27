@@ -61,17 +61,8 @@ public final class Transformer implements ClassFileTransformer{
 	}
 
 
-
+//*
 	private void instrument(ClassNode cn) {
-/*
-// legacy - TODO rm
-		// instrument static method in profile by INVOKESTATIC
-		for( MethodNode mn : (List<MethodNode>)cn.methods) {
-			InsnList patch = new InsnList();
-			patch.add( new LdcInsnNode( "Method " + mn.name + mn.desc + " called" ));
-			patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC, "ch/usi/inf/sp/profiler/Profiler", "log", "(Ljava/lang/String;)V" ));
-		}
-//*/
 		for( MethodNode mn : (List<MethodNode>)cn.methods) {
 			final InsnList instructions = mn.instructions;
 			for( int idx=0; idx<instructions.size(); ++idx){
@@ -81,88 +72,135 @@ public final class Transformer implements ClassFileTransformer{
 				if( ins.getOpcode() == Opcodes.NEWARRAY ){
 					InsnList patch = new InsnList();
 
-//*
-
-//					patch.add( new TypeInsnNode( Opcodes.NEW, "(I)I" )); // size
-//					patch.add( new InsnNode( Opcodes.DUP )); // size
-
-					String type = String.valueOf(Printer.TYPES[((IntInsnNode) ins).operand]);
+					String type = String.valueOf(Printer.TYPES[((IntInsnNode) ins).operand]);  // BEWARE: if this cast casts to a wrong type, nothing will happen!
 					patch.add( new LdcInsnNode( "NEWARRAY, [" + type + ", "));
-
-					patch.add( new TypeInsnNode( Opcodes.NEW, "(I)" )); // size
-					patch.add( new InsnNode( Opcodes.DUP )); // size // XXX
-
 
 					patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
 							, "ch/usi/inf/sp/profiler/Profiler"
-							, "logNewArray"
-							, "(Ljava/lang/String;I)V" ));
-/*/
+							, "log"
+							, "(Ljava/lang/String;)V"));
+
+					instructions.insert(ins, patch);
+
+				// TYPE_INSN : anewarray
+				}else if( ins.getOpcode() == Opcodes.ANEWARRAY ){
+					InsnList patch = new InsnList();
+
+					String type = String.valueOf(((TypeInsnNode)ins).desc); // BEWARE: if this cast casts to a wrong type, nothing will happen!
+					patch.add( new LdcInsnNode( "ANEWARRAY, [" + type + ", "));
+
 					patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
 							, "ch/usi/inf/sp/profiler/Profiler"
 							, "log"
 							, "(Ljava/lang/String;)V" ));
-//*/
+
+					instructions.insert(ins, patch);
+
+				}else if( ins.getOpcode() == Opcodes.MULTIANEWARRAY ){
+					InsnList patch = new InsnList();
+
+					String type = String.valueOf( ((MultiANewArrayInsnNode) ins).desc );  // BEWARE: if this cast casts to a wrong type, nothing will happen!
+					String dimensions = String.valueOf( ((MultiANewArrayInsnNode) ins).dims );
+					patch.add( new LdcInsnNode( "MULTIANEWARRAY, [" + type + ", " + dimensions));
+
+					patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
+							, "ch/usi/inf/sp/profiler/Profiler"
+							, "log"
+							, "(Ljava/lang/String;)V" ));
+
+					instructions.insert(ins, patch);
+				}
+			} // instructions
+		} // methods
+	}
+
+/*/
+	private void instrument(ClassNode cn) {
+
+		for( MethodNode mn : (List<MethodNode>)cn.methods) {
+			final InsnList instructions = mn.instructions;
+			for( int idx=0; idx<instructions.size(); ++idx){
+				final AbstractInsnNode ins = instructions.get(idx);
+
+				// INT_INSN : newarray
+				if( ins.getOpcode() == Opcodes.NEWARRAY ){
+					InsnList patch = new InsnList();
+
+///////////////
+
+//					patch.add( new TypeInsnNode( Opcodes.NEW, "(I)" )); // size
+//					patch.add( new InsnNode( Opcodes.DUP )); // size
+//					patch.add( new TypeInsnNode( Opcodes.NEW, "(I)" )); // size
+
+
+					String type = String.valueOf(Printer.TYPES[((IntInsnNode) ins).operand]);
+					patch.add( new LdcInsnNode( "NEWARRAY, [" + type + ", "));
+
+//					patch.add( new TypeInsnNode( Opcodes.NEW, "" )); // size
+//					patch.add( new InsnNode( Opcodes.DUP )); // size // XXX
+//					patch.add( new TypeInsnNode( Opcodes.NEW, "" )); // size
+
+
+					patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
+							, "ch/usi/inf/sp/profiler/Profiler"
+							, "log"
+							, "(Ljava/lang/String;)V"));
+//					patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
+//							, "ch/usi/inf/sp/profiler/Profiler"
+//							, "logNewArray"
+//							, "(Ljava/lang/String;I)V" ));
+
+
 //					patch.add( new InsnNode( Opcodes.DUP )); // size
 
-/*
-					InsnList patch2 = new InsnList();
-					patch2.add( new InsnNode( Opcodes.DUP )); // size
-					patch.add( new TypeInsnNode( Opcodes.NEW, "(I)I" )); // size
 
-					AbstractInsnNode insBefore = instructions.get(idx-2);
-					instructions.insert(insBefore, patch2);
-					idx += 2;
-//*/
+//					InsnList patch2 = new InsnList();
+//					patch2.add( new InsnNode( Opcodes.DUP )); // size
+//					patch.add( new TypeInsnNode( Opcodes.NEW, "(I)I" )); // size
+//
+//					AbstractInsnNode insBefore = instructions.get(idx-2);
+//					instructions.insert(insBefore, patch2);
+//					idx += 2;
 
-					instructions.insert(ins, patch); // XXX
-					idx += 4;
+//					instructions.insert(ins, patch); // XXX
+//					idx += 4;
 
-/*
+
 					AbstractInsnNode insBefore = instructions.get(idx-1);
 					instructions.insert(insBefore, patch);
-					idx += 4;
-//*/
+					idx += 5;
 
-/*
-						String type = String.valueOf(Printer.TYPES[((IntInsnNode) ins).operand]);
-						System.out.println("NEWARRAY, " + type + ", " + bipushed);
-					}else if( ins.getOpcode() == Opcodes.BIPUSH ){
-						bipusher.push( String.valueOf( ((IntInsnNode) ins).operand ) );
-//*/
-				}
-/*
 				// TYPE_INSN : anewarray
 				}else if( ins.getType() == AbstractInsnNode.TYPE_INSN ){
 					if( ins.getOpcode() == Opcodes.ANEWARRAY ){
-// TODO dito
-						InsnList patch = new InsnList();
-						patch.add( new LdcInsnNode( "ANewArray " + ((TypeInsnNode)ins).desc + " called"));
-						patch.add( new MethodInsnNode( Opcodes.ANEWARRAY, "ch/usi/inf/sp/profiler/Profiler", "log", "(Ljava/lang/String;)V" ));
 
-						String bipushed = bipusher.pop();
-						String type = String.valueOf(((TypeInsnNode)ins).desc);
-						System.out.println("ANEWARRAY, " + type + ", " + bipushed);
+//						InsnList patch = new InsnList();
+//						patch.add( new LdcInsnNode( "ANewArray " + ((TypeInsnNode)ins).desc + " called"));
+//						patch.add( new MethodInsnNode( Opcodes.ANEWARRAY, "ch/usi/inf/sp/profiler/Profiler", "log", "(Ljava/lang/String;)V" ));
+//
+//						String type = String.valueOf(((TypeInsnNode)ins).desc);
+//						System.out.println("ANEWARRAY, " + type + ", " + bipushed);
+						;
 					}
 
 				 // MULTIANEWARRAY_INSN : multianewarray
 				}else if( ins.getType() == AbstractInsnNode.MULTIANEWARRAY_INSN){
 					if( ins.getOpcode() == Opcodes.MULTIANEWARRAY ){
-// TODO what do we need to handle here?
-						String type = String.valueOf( ((MultiANewArrayInsnNode) ins).desc );
-						String dimensions = String.valueOf( ((MultiANewArrayInsnNode) ins).dims );
-						String sizes = "";
-
-						for( int idx_sizes=0; idx_sizes < Integer.valueOf(dimensions)-1; ++idx_sizes){ // FIXME -1 - why?
-							sizes += ", ";
-							sizes += bipusher.pop();
-						}
-// FIXME entries are missing, why?
-						System.out.println("MULTIANEWARRAY, " + type + ", " + dimensions + sizes);
+//						String type = String.valueOf( ((MultiANewArrayInsnNode) ins).desc );
+//						String dimensions = String.valueOf( ((MultiANewArrayInsnNode) ins).dims );
+//						String sizes = "";
+//
+//						for( int idx_sizes=0; idx_sizes < Integer.valueOf(dimensions)-1; ++idx_sizes){ // FIXME -1 - why?
+//							sizes += ", ";
+//							sizes += bipusher.pop();
+//						}
+//
+//						System.out.println("MULTIANEWARRAY, " + type + ", " + dimensions + sizes);
+						;
 					}
 				}
-//*/
 			}
 		}
 	}
+//*/
 }

@@ -59,7 +59,10 @@ public final class Transformer implements ClassFileTransformer{
 		for( MethodNode mn : (List<MethodNode>)cn.methods) {
 			InsnList patch = new InsnList();
 			patch.add( new LdcInsnNode("Method " + mn.name + mn.desc + " called" ));
-			patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC, "ch/usi/inf/sp/profiler/Profiler", "log", "(Ljava/lang/String;)V"));
+			patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
+					, "ch/usi/inf/sp/profiler/Profiler"
+					, "log"
+					, "(Ljava/lang/String;)V"));
 			mn.instructions.insert(patch);
 		}
 	}
