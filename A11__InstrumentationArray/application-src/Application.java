@@ -55,7 +55,16 @@ public class Application {
 			final Object[][] mos = new Object[i * 10][i * 10];
 		}
 		System.out.println("READY.");
-	}
 
+//		logNewArray( "foo", 7);
+//		logNewArray( 7, "foo");
+	}
+//*/
+
+/*
+//	public static void logNewArray( String message, int size ){
+	public static void logNewArray( int size, String message ){
+		System.out.println(message + ", " + String.valueOf( size ));
+	}
 //*/
 }

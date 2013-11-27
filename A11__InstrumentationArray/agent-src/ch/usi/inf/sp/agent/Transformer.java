@@ -33,7 +33,7 @@ public final class Transformer implements ClassFileTransformer{
 			, ProtectionDomain protectionDomain
 			, byte[] classfileBuffer )
 			throws IllegalClassFormatException {
-		System.out.println("## About to transform class <" + loader + ", " + className + ">" );
+//		System.out.println("## About to transform class <" + loader + ", " + className + ">" );
 
 		if( className.startsWith("Java/")
 				|| className.startsWith("sun/")
@@ -79,23 +79,51 @@ public final class Transformer implements ClassFileTransformer{
 
 				// INT_INSN : newarray
 				if( ins.getOpcode() == Opcodes.NEWARRAY ){
-// TODO does Profiler should write actually a CSV file?
-// TODO do we need to read out arguments (size, type, etc - if so, where? )?
-// TODO  - if we need to read out the arguments, do we need to store predeceding BIPUSH args?
-// TODO is this necessary, what is this code actually good for? Why do we need a separate "Profiler", when we can print out directly here?
 					InsnList patch = new InsnList();
 
+//*
+
+//					patch.add( new TypeInsnNode( Opcodes.NEW, "(I)I" )); // size
+//					patch.add( new InsnNode( Opcodes.DUP )); // size
+
 					String type = String.valueOf(Printer.TYPES[((IntInsnNode) ins).operand]);
-// FIXME a dup removes the rest, somehow
-//					patch.add( new InsnNode( Opcodes.DUP ));   // size
-					patch.add( new LdcInsnNode( "NEWARRAY, " + type + ", "));
+					patch.add( new LdcInsnNode( "NEWARRAY, [" + type + ", "));
+
+					patch.add( new TypeInsnNode( Opcodes.NEW, "(I)" )); // size
+					patch.add( new InsnNode( Opcodes.DUP )); // size // XXX
+
+
 					patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
 							, "ch/usi/inf/sp/profiler/Profiler"
-//							, "log"
 							, "logNewArray"
-//							, "(Ljava/lang/String;)V" ));
-							, "(Lj,Ljava/lang/String;)V" ));
-					instructions.insert(ins, patch);
+							, "(Ljava/lang/String;I)V" ));
+/*/
+					patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
+							, "ch/usi/inf/sp/profiler/Profiler"
+							, "log"
+							, "(Ljava/lang/String;)V" ));
+//*/
+//					patch.add( new InsnNode( Opcodes.DUP )); // size
+
+/*
+					InsnList patch2 = new InsnList();
+					patch2.add( new InsnNode( Opcodes.DUP )); // size
+					patch.add( new TypeInsnNode( Opcodes.NEW, "(I)I" )); // size
+
+					AbstractInsnNode insBefore = instructions.get(idx-2);
+					instructions.insert(insBefore, patch2);
+					idx += 2;
+//*/
+
+					instructions.insert(ins, patch); // XXX
+					idx += 4;
+
+/*
+					AbstractInsnNode insBefore = instructions.get(idx-1);
+					instructions.insert(insBefore, patch);
+					idx += 4;
+//*/
+
 /*
 						String type = String.valueOf(Printer.TYPES[((IntInsnNode) ins).operand]);
 						System.out.println("NEWARRAY, " + type + ", " + bipushed);
