@@ -5,9 +5,9 @@ public class Profiler {
 		System.out.println(message);
 	}
 
-//	public static void logNewArray( int size, String message ){
-	public static void logNewArray( String message, int size ){
-		System.out.println(message + ", " + String.valueOf( size ));
+	public static void logNewArray( int size, String message ){
+//	public static void logNewArray( String message, int size ){
+		System.out.println(message + String.valueOf( size ));
 	}
 
 	// TODO

@@ -140,7 +140,7 @@ public final class Transformer implements ClassFileTransformer{
 //							, "log"
 //							, "(Ljava/lang/String;)V" ));
 							, "logNewArray"
-							, "(Ljava/lang/String;I)V" ));
+							, "(ILjava/lang/String;)V" ));
 
 
 					// insert STRING - INVOKESTATIC after ins
