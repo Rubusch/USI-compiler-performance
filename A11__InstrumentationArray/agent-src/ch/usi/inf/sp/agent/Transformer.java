@@ -141,10 +141,9 @@ public final class Transformer implements ClassFileTransformer{
 
 
 					// insert STRING - INVOKESTATIC after ins
-//					AbstractInsnNode insBefore = instructions.get(idx-1);
-//					instructions.insert(insBefore, patch);
-					instructions.insert(ins, patch);
-					
+					AbstractInsnNode insBefore = instructions.get(idx-1);
+					instructions.insert(insBefore, patch);
+
 					// QUICKFIX: move 3 positions
 					idx += 3; 
 
