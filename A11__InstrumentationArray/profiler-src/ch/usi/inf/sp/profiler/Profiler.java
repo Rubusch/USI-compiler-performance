@@ -37,8 +37,11 @@ public class Profiler {
 		System.out.println(message + String.valueOf( size ));
 	}
 
-	// TODO
-	public static void logMultiANewArray( int size, String message ){
-		System.out.println(message + ", " + String.valueOf( size ));
+	public static void logMultiANewArray( int size, String message, String dimensions ){
+		System.out.print(message + String.valueOf( size ));
+		for( int idx=0; idx<Integer.valueOf(dimensions); ++idx){
+			System.out.print("XXX");
+		}
+		System.out.println("");
 	}
 }

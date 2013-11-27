@@ -139,8 +139,7 @@ public final class Transformer implements ClassFileTransformer{
 							, "logNewArray"
 							, "(ILjava/lang/String;)V" ));
 
-
-					// insert STRING - INVOKESTATIC after ins
+					// insert before ins
 					if( idx == 0 ){
 						instructions.insert(patch);
 					}else{
@@ -150,7 +149,6 @@ public final class Transformer implements ClassFileTransformer{
 
 					// QUICKFIX: move 3 positions
 					idx += 3; 
-
 
 
 				// TYPE_INSN : anewarray
@@ -163,7 +161,7 @@ public final class Transformer implements ClassFileTransformer{
 
 						// LDC
 						String type = String.valueOf(((TypeInsnNode)ins).desc);
-						patch.add( new LdcInsnNode( "NEWARRAY, [" + type + ", "));
+						patch.add( new LdcInsnNode( "ANEWARRAY, [" + type + ", "));
 
 						// INVOKESTATIC
 						patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
@@ -172,7 +170,7 @@ public final class Transformer implements ClassFileTransformer{
 								, "(ILjava/lang/String;)V" ));
 
 
-						// insert STRING - INVOKESTATIC after ins
+						// insert before ins
 						if( idx == 0 ){
 							instructions.insert(patch);
 						}else{
@@ -187,17 +185,53 @@ public final class Transformer implements ClassFileTransformer{
 				 // MULTIANEWARRAY_INSN : multianewarray
 				}else if( ins.getType() == AbstractInsnNode.MULTIANEWARRAY_INSN){
 					if( ins.getOpcode() == Opcodes.MULTIANEWARRAY ){
-//						String type = String.valueOf( ((MultiANewArrayInsnNode) ins).desc );
-//						String dimensions = String.valueOf( ((MultiANewArrayInsnNode) ins).dims );
-//						String sizes = "";
-//
-//						for( int idx_sizes=0; idx_sizes < Integer.valueOf(dimensions)-1; ++idx_sizes){ // FIXME -1 - why?
-//							sizes += ", ";
-//							sizes += bipusher.pop();
-//						}
-//
-//						System.out.println("MULTIANEWARRAY, " + type + ", " + dimensions + sizes);
-						;
+						InsnList patch = new InsnList();
+						int shift=0;
+
+						String dimensions = String.valueOf( ((MultiANewArrayInsnNode) ins).dims );
+
+						for( int idx_count=0; idx_count<Integer.valueOf(dimensions); ++idx_count){
+							// ISTORE
+// TODO
+							// ILOAD
+// TODO
+							// ILOAD
+// TODO
+							shift += 3;
+						}
+
+						// TODO instead of DUB, do ISTORE and ILOAD combinations
+						// DUP
+//						patch.add( new InsnNode( Opcodes.DUP )); // size
+
+						// LDC - text
+						String type = String.valueOf( ((MultiANewArrayInsnNode) ins).desc );
+						patch.add( new LdcInsnNode( "MULTIANEWARRAY, [" + type + ", " ));
+						shift += 1;
+
+						// LDC - dimensions
+						patch.add( new LdcInsnNode( dimensions ));
+						shift += 1;
+
+						// INVOKESTATIC
+						patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
+								, "ch/usi/inf/sp/profiler/Profiler"
+								, "logMultiANewArray"
+								, "(ILjava/lang/String;)V" ));
+						shift += 1;
+
+						// insert before ins
+/* TODO
+						if( idx == 0 ){
+							instructions.insert(patch);
+						}else{
+							AbstractInsnNode insBefore = instructions.get(idx-1);
+							instructions.insert(insBefore, patch);
+						}
+
+						// QUICKFIX
+						idx += shift; 
+//*/
 					}
 				}
 			}
