@@ -9,4 +9,14 @@ public class Profiler {
 	public static void logNewArray( String message, int size ){
 		System.out.println(message + ", " + String.valueOf( size ));
 	}
+
+	// TODO
+	public static void logANewArray( String message, int size ){
+		System.out.println(message + ", " + String.valueOf( size ));
+	}
+
+	// TODO
+	public static void logMultiANewArray( String message, int size ){
+		System.out.println(message + ", " + String.valueOf( size ));
+	}
 }

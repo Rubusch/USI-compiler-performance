@@ -61,7 +61,7 @@ public final class Transformer implements ClassFileTransformer{
 	}
 
 
-//*
+/*
 	private void instrument(ClassNode cn) {
 		for( MethodNode mn : (List<MethodNode>)cn.methods) {
 			final InsnList instructions = mn.instructions;
@@ -127,48 +127,30 @@ public final class Transformer implements ClassFileTransformer{
 					InsnList patch = new InsnList();
 
 ///////////////
+					// DUP
+					patch.add( new InsnNode( Opcodes.DUP )); // size
 
-//					patch.add( new TypeInsnNode( Opcodes.NEW, "(I)" )); // size
-//					patch.add( new InsnNode( Opcodes.DUP )); // size
-//					patch.add( new TypeInsnNode( Opcodes.NEW, "(I)" )); // size
-
-
+					// LDC
 					String type = String.valueOf(Printer.TYPES[((IntInsnNode) ins).operand]);
 					patch.add( new LdcInsnNode( "NEWARRAY, [" + type + ", "));
 
-//					patch.add( new TypeInsnNode( Opcodes.NEW, "" )); // size
-//					patch.add( new InsnNode( Opcodes.DUP )); // size // XXX
-//					patch.add( new TypeInsnNode( Opcodes.NEW, "" )); // size
-
-
+					// INVOKESTATIC
 					patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
 							, "ch/usi/inf/sp/profiler/Profiler"
-							, "log"
-							, "(Ljava/lang/String;)V"));
-//					patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
-//							, "ch/usi/inf/sp/profiler/Profiler"
-//							, "logNewArray"
-//							, "(Ljava/lang/String;I)V" ));
+//							, "log"
+//							, "(Ljava/lang/String;)V" ));
+							, "logNewArray"
+							, "(Ljava/lang/String;I)V" ));
 
 
-//					patch.add( new InsnNode( Opcodes.DUP )); // size
-
-
-//					InsnList patch2 = new InsnList();
-//					patch2.add( new InsnNode( Opcodes.DUP )); // size
-//					patch.add( new TypeInsnNode( Opcodes.NEW, "(I)I" )); // size
-//
-//					AbstractInsnNode insBefore = instructions.get(idx-2);
-//					instructions.insert(insBefore, patch2);
-//					idx += 2;
-
-//					instructions.insert(ins, patch); // XXX
-//					idx += 4;
-
-
+					// insert STRING - INVOKESTATIC after ins
 					AbstractInsnNode insBefore = instructions.get(idx-1);
 					instructions.insert(insBefore, patch);
-					idx += 5;
+
+					// QUICKFIX: move 3 positions
+					idx += 3; 
+
+
 
 				// TYPE_INSN : anewarray
 				}else if( ins.getType() == AbstractInsnNode.TYPE_INSN ){
