@@ -22,6 +22,7 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.MultiANewArrayInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
+import org.objectweb.asm.tree.VarInsnNode;
 import org.objectweb.asm.util.Printer;
 
 public final class Transformer implements ClassFileTransformer{
@@ -152,75 +153,95 @@ public final class Transformer implements ClassFileTransformer{
 
 
 				// TYPE_INSN : anewarray
-				}else if( ins.getType() == AbstractInsnNode.TYPE_INSN ){
-					if( ins.getOpcode() == Opcodes.ANEWARRAY ){
-						InsnList patch = new InsnList();
+				}else if( ins.getOpcode() == Opcodes.ANEWARRAY ){
+					InsnList patch = new InsnList();
 
-						// DUP
-						patch.add( new InsnNode( Opcodes.DUP )); // size
+					// DUP
+					patch.add( new InsnNode( Opcodes.DUP )); // size
 
-						// LDC
-						String type = String.valueOf(((TypeInsnNode)ins).desc);
-						patch.add( new LdcInsnNode( "ANEWARRAY, [" + type + ", "));
+					// LDC
+					String type = String.valueOf(((TypeInsnNode)ins).desc);
+					patch.add( new LdcInsnNode( "ANEWARRAY, [" + type + ", "));
 
-						// INVOKESTATIC
-						patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
-								, "ch/usi/inf/sp/profiler/Profiler"
-								, "logANewArray"
-								, "(ILjava/lang/String;)V" ));
+					// INVOKESTATIC
+					patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
+							, "ch/usi/inf/sp/profiler/Profiler"
+							, "logANewArray"
+							, "(ILjava/lang/String;)V" ));
 
 
-						// insert before ins
-						if( idx == 0 ){
-							instructions.insert(patch);
-						}else{
-							AbstractInsnNode insBefore = instructions.get(idx-1);
-							instructions.insert(insBefore, patch);
-						}
-
-						// QUICKFIX: move 3 positions
-						idx += 3; 
+					// insert before ins
+					if( idx == 0 ){
+						instructions.insert(patch);
+					}else{
+						AbstractInsnNode insBefore = instructions.get(idx-1);
+						instructions.insert(insBefore, patch);
 					}
 
-				 // MULTIANEWARRAY_INSN : multianewarray
-				}else if( ins.getType() == AbstractInsnNode.MULTIANEWARRAY_INSN){
-					if( ins.getOpcode() == Opcodes.MULTIANEWARRAY ){
-						InsnList patch = new InsnList();
-						int shift=0;
+					// QUICKFIX: move 3 positions
+					idx += 3; 
 
-						String dimensions = String.valueOf( ((MultiANewArrayInsnNode) ins).dims );
+				// MULTIANEWARRAY_INSN : multianewarray
+				}else if( ins.getOpcode() == Opcodes.MULTIANEWARRAY ){
 
-						for( int idx_count=0; idx_count<Integer.valueOf(dimensions); ++idx_count){
-							// ISTORE
-// TODO
+					InsnList patch = new InsnList();
+					int shift=0;
+
+					String dimensions = String.valueOf( ((MultiANewArrayInsnNode) ins).dims );
+
+					for( int idx_count=0; idx_count<Integer.valueOf(dimensions); ++idx_count){
+
+
+
+
+						// ISTORE
+//						patch.add( new VarInsnNode( Opcodes.ISTORE )); // dimension count
+// mn.maxlocalvars
 							// ILOAD
-// TODO
+// TODO pass array of dim counts as array to the function
+							/*
+							loop dims
+								istore
+
+							Ldc count(=dims)
+							newarray XXX
+
+							loop dims
+								DUP
+								LDC0123
+								ILOAD
+								IASTORE
+
+							//ldc - nice to have
+
+							Invokestatic
+							iload (back to stack f multianewarray)
+							//*/
+
 							// ILOAD
-// TODO
-							shift += 3;
-						}
+						patch.add( new InsnNode( Opcodes.ILOAD )); // 2. duplicate
 
-						// TODO instead of DUB, do ISTORE and ILOAD combinations
-						// DUP
-//						patch.add( new InsnNode( Opcodes.DUP )); // size
+// TODO how to adjust the signature of logMultiANewarray to the number of dimensions, do I need to set up an array?
+						shift += 3;
+					}
 
-						// LDC - text
-						String type = String.valueOf( ((MultiANewArrayInsnNode) ins).desc );
-						patch.add( new LdcInsnNode( "MULTIANEWARRAY, [" + type + ", " ));
-						shift += 1;
+					// LDC - text
+					String type = String.valueOf( ((MultiANewArrayInsnNode) ins).desc );
+					patch.add( new LdcInsnNode( "MULTIANEWARRAY, [" + type + ", " ));
+					shift += 1;
 
-						// LDC - dimensions
-						patch.add( new LdcInsnNode( dimensions ));
-						shift += 1;
+					// LDC - dimensions
+					patch.add( new LdcInsnNode( dimensions ));
+					shift += 1;
 
-						// INVOKESTATIC
-						patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
-								, "ch/usi/inf/sp/profiler/Profiler"
-								, "logMultiANewArray"
-								, "(ILjava/lang/String;)V" ));
-						shift += 1;
+					// INVOKESTATIC
+					patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
+							, "ch/usi/inf/sp/profiler/Profiler"
+							, "logMultiANewArray"
+							, "(ILjava/lang/String;)V" ));
+					shift += 1;
 
-						// insert before ins
+					// insert before ins
 /* TODO
 						if( idx == 0 ){
 							instructions.insert(patch);
@@ -232,7 +253,6 @@ public final class Transformer implements ClassFileTransformer{
 						// QUICKFIX
 						idx += shift; 
 //*/
-					}
 				}
 			}
 		}
