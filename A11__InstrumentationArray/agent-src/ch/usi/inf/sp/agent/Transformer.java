@@ -62,62 +62,7 @@ public final class Transformer implements ClassFileTransformer{
 	}
 
 
-/*
 	private void instrument(ClassNode cn) {
-		for( MethodNode mn : (List<MethodNode>)cn.methods) {
-			final InsnList instructions = mn.instructions;
-			for( int idx=0; idx<instructions.size(); ++idx){
-				final AbstractInsnNode ins = instructions.get(idx);
-
-				// INT_INSN : newarray
-				if( ins.getOpcode() == Opcodes.NEWARRAY ){
-					InsnList patch = new InsnList();
-
-					String type = String.valueOf(Printer.TYPES[((IntInsnNode) ins).operand]);  // BEWARE: if this cast casts to a wrong type, nothing will happen!
-					patch.add( new LdcInsnNode( "NEWARRAY, [" + type + ", "));
-
-					patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
-							, "ch/usi/inf/sp/profiler/Profiler"
-							, "log"
-							, "(Ljava/lang/String;)V"));
-
-					instructions.insert(ins, patch);
-
-				// TYPE_INSN : anewarray
-				}else if( ins.getOpcode() == Opcodes.ANEWARRAY ){
-					InsnList patch = new InsnList();
-
-					String type = String.valueOf(((TypeInsnNode)ins).desc); // BEWARE: if this cast casts to a wrong type, nothing will happen!
-					patch.add( new LdcInsnNode( "ANEWARRAY, [" + type + ", "));
-
-					patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
-							, "ch/usi/inf/sp/profiler/Profiler"
-							, "log"
-							, "(Ljava/lang/String;)V" ));
-
-					instructions.insert(ins, patch);
-
-				}else if( ins.getOpcode() == Opcodes.MULTIANEWARRAY ){
-					InsnList patch = new InsnList();
-
-					String type = String.valueOf( ((MultiANewArrayInsnNode) ins).desc );  // BEWARE: if this cast casts to a wrong type, nothing will happen!
-					String dimensions = String.valueOf( ((MultiANewArrayInsnNode) ins).dims );
-					patch.add( new LdcInsnNode( "MULTIANEWARRAY, [" + type + ", " + dimensions));
-
-					patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
-							, "ch/usi/inf/sp/profiler/Profiler"
-							, "log"
-							, "(Ljava/lang/String;)V" ));
-
-					instructions.insert(ins, patch);
-				}
-			} // instructions
-		} // methods
-	}
-
-/*/
-	private void instrument(ClassNode cn) {
-
 		for( MethodNode mn : (List<MethodNode>)cn.methods) {
 			final InsnList instructions = mn.instructions;
 			for( int idx=0; idx<instructions.size(); ++idx){

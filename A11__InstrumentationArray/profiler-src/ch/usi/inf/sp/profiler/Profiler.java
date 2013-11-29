@@ -33,7 +33,7 @@ public class Profiler {
 		System.out.println(message + String.valueOf( size ));
 	}
 
-	public static void logANewArray(  int size, String message ){
+	public static void logANewArray( int size, String message ){
 		System.out.println(message + String.valueOf( size ));
 	}
 
@@ -43,5 +43,12 @@ public class Profiler {
 			System.out.print("XXX");
 		}
 		System.out.println("");
+	}
+
+	/*
+	 * DEBUG
+	 */
+	public static void DEBUG_opstack(int val){
+		System.out.println("DEBUG '" + val + '"');
 	}
 }
