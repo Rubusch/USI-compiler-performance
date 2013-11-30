@@ -61,6 +61,33 @@ public final class Transformer implements ClassFileTransformer{
 		return cw.toByteArray();
 	}
 
+	private void instr_NEWARRAY(int opcode){
+		InsnList patch = new InsnList();
+
+		// DUP
+		patch.add( new InsnNode( Opcodes.DUP )); // size
+
+		// LDC
+		String type = String.valueOf(Printer.TYPES[((IntInsnNode) ins).operand]);
+		patch.add( new LdcInsnNode( "NEWARRAY, [" + type + ", "));
+
+		// INVOKESTATIC
+		patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
+				, "ch/usi/inf/sp/profiler/Profiler"
+				, "logNewArray"
+				, "(ILjava/lang/String;)V" ));
+
+		// insert before ins
+		if( idx == 0 ){
+			instructions.insert(patch);
+		}else{
+			AbstractInsnNode insBefore = instructions.get(idx-1);
+			instructions.insert(insBefore, patch);
+		}
+
+		// QUICKFIX: move 3 positions
+		idx += 3; 
+	}
 
 	private void instrument(ClassNode cn) {
 		for( MethodNode mn : (List<MethodNode>)cn.methods) {
@@ -70,6 +97,7 @@ public final class Transformer implements ClassFileTransformer{
 
 				// INT_INSN : newarray
 				if( ins.getOpcode() == Opcodes.NEWARRAY ){
+/*
 					InsnList patch = new InsnList();
 
 					// DUP
@@ -95,7 +123,7 @@ public final class Transformer implements ClassFileTransformer{
 
 					// QUICKFIX: move 3 positions
 					idx += 3; 
-
+//*/
 
 				// TYPE_INSN : anewarray
 				}else if( ins.getOpcode() == Opcodes.ANEWARRAY ){
