@@ -95,6 +95,120 @@ public final class Transformer implements ClassFileTransformer{
 		return idx_instr;
 	}
 
+	private int instr_ANEWARRAY( int idx_instr){
+		final AbstractInsnNode ins = method_instructions.get(idx_instr);
+
+		// TYPE_INSN : anewarray
+		if( ins.getOpcode() == Opcodes.ANEWARRAY ){
+			InsnList patch = new InsnList();
+
+			// DUP
+			patch.add( new InsnNode( Opcodes.DUP )); // size
+
+			// LDC
+			String type = String.valueOf(((TypeInsnNode)ins).desc);
+			patch.add( new LdcInsnNode( "ANEWARRAY, [" + type + ", "));
+
+			// INVOKESTATIC
+			patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
+					, "ch/usi/inf/sp/profiler/Profiler"
+					, "logANewArray"
+					, "(ILjava/lang/String;)V" ));
+
+
+			// insert before ins
+			if( idx_instr == 0 ){
+				method_instructions.insert(patch);
+			}else{
+				AbstractInsnNode insBefore = method_instructions.get(idx_instr-1);
+				method_instructions.insert(insBefore, patch);
+			}
+
+			// QUICKFIX: move 3 positions
+			idx_instr += 3; 
+
+		}
+
+		return idx_instr;
+	}
+
+
+	private int instr_MULTIANEWARRAY( int idx_instr ){
+		final AbstractInsnNode ins = method_instructions.get(idx_instr);
+
+		// MULTIANEWARRAY_INSN : multianewarray
+		if( ins.getOpcode() == Opcodes.MULTIANEWARRAY ){
+
+			InsnList patch = new InsnList();
+			int shift=0;
+
+			String dimensions = String.valueOf( ((MultiANewArrayInsnNode) ins).dims );
+
+			for( int idx_count=0; idx_count<Integer.valueOf(dimensions); ++idx_count){
+				// ISTORE
+//				patch.add( new VarInsnNode( Opcodes.ISTORE )); // dimension count
+//mn.maxlocalvars
+				// ILOAD
+//TODO pass array of dim counts as array to the function
+				/*
+				loop dims
+					istore
+
+				Ldc count(=dims)
+				newarray XXX
+
+				loop dims
+					DUP
+					LDC0123
+					ILOAD
+					IASTORE
+
+				//ldc - nice to have
+
+				Invokestatic
+				iload (back to stack f multianewarray)
+				//*/
+
+				// ILOAD
+				patch.add( new InsnNode( Opcodes.ILOAD )); // 2. duplicate
+
+//TODO how to adjust the signature of logMultiANewarray to the number of dimensions, do I need to set up an array?
+				shift += 3;
+			}
+
+			// LDC - text
+			String type = String.valueOf( ((MultiANewArrayInsnNode) ins).desc );
+			patch.add( new LdcInsnNode( "MULTIANEWARRAY, [" + type + ", " ));
+			shift += 1;
+
+			// LDC - dimensions
+			patch.add( new LdcInsnNode( dimensions ));
+			shift += 1;
+
+			// INVOKESTATIC
+			patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
+				, "ch/usi/inf/sp/profiler/Profiler"
+				, "logMultiANewArray"
+				, "(ILjava/lang/String;)V" ));
+			shift += 1;
+
+			// insert before ins
+/* TODO
+			if( idx == 0 ){
+				instructions.insert(patch);
+			}else{
+				AbstractInsnNode insBefore = instructions.get(idx-1);
+				instructions.insert(insBefore, patch);
+			}
+
+			// QUICKFIX
+			idx += shift; 
+//*/
+		}
+		return idx_instr;
+	}
+
+
 	private InsnList method_instructions;
 	private void instrument(ClassNode cn) {
 		for( MethodNode mn : (List<MethodNode>)cn.methods) {
@@ -104,8 +218,6 @@ public final class Transformer implements ClassFileTransformer{
 			method_instructions = mn.instructions;
 			InsnList instructions = method_instructions;
 			//*/
-
-
 
 			for( int idx=0; idx<instructions.size(); ++idx){
 				final AbstractInsnNode ins = instructions.get(idx);
@@ -143,8 +255,10 @@ public final class Transformer implements ClassFileTransformer{
 				}else 
 /*/
 				idx = instr_NEWARRAY(idx);
-				instructions = method_instructions;
+//				instructions = method_instructions;
 //*/
+
+/*
 				if( ins.getOpcode() == Opcodes.ANEWARRAY ){
 					InsnList patch = new InsnList();
 
@@ -174,7 +288,13 @@ public final class Transformer implements ClassFileTransformer{
 					idx += 3; 
 
 				// MULTIANEWARRAY_INSN : multianewarray
-				}else if( ins.getOpcode() == Opcodes.MULTIANEWARRAY ){
+				}else
+//*/
+				idx = instr_ANEWARRAY(idx);
+/*
+				instructions = method_instructions;
+
+					if( ins.getOpcode() == Opcodes.MULTIANEWARRAY ){
 
 					InsnList patch = new InsnList();
 					int shift=0;
@@ -208,7 +328,7 @@ public final class Transformer implements ClassFileTransformer{
 
 							Invokestatic
 							iload (back to stack f multianewarray)
-							//*/
+							//* /
 
 							// ILOAD
 						patch.add( new InsnNode( Opcodes.ILOAD )); // 2. duplicate
@@ -216,6 +336,8 @@ public final class Transformer implements ClassFileTransformer{
 // TODO how to adjust the signature of logMultiANewarray to the number of dimensions, do I need to set up an array?
 						shift += 3;
 					}
+
+					idx = instr_MULTIANEWARRAY(idx);
 
 					// LDC - text
 					String type = String.valueOf( ((MultiANewArrayInsnNode) ins).desc );
@@ -244,10 +366,12 @@ public final class Transformer implements ClassFileTransformer{
 
 						// QUICKFIX
 						idx += shift; 
-//*/
+//* /
 				}
-			}
-		}
+//*/
+				idx = instr_MULTIANEWARRAY(idx);
+			} // for instructions
+		} // for methods
 	}
 //*/
 }
