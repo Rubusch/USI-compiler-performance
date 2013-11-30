@@ -61,43 +61,56 @@ public final class Transformer implements ClassFileTransformer{
 		return cw.toByteArray();
 	}
 
-	private void instr_NEWARRAY(int opcode){
-		InsnList patch = new InsnList();
+	private int instr_NEWARRAY( int idx_instr){
+		final AbstractInsnNode ins = method_instructions.get(idx_instr);
 
-		// DUP
-		patch.add( new InsnNode( Opcodes.DUP )); // size
+		// INT_INSN : newarray
+		if( ins.getOpcode() == Opcodes.NEWARRAY ){
+			InsnList patch = new InsnList();
 
-		// LDC
-		String type = String.valueOf(Printer.TYPES[((IntInsnNode) ins).operand]);
-		patch.add( new LdcInsnNode( "NEWARRAY, [" + type + ", "));
+			// DUP
+			patch.add( new InsnNode( Opcodes.DUP )); // size
 
-		// INVOKESTATIC
-		patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
+			// LDC
+			String type = String.valueOf(Printer.TYPES[((IntInsnNode) ins).operand]);
+			patch.add( new LdcInsnNode( "NEWARRAY, [" + type + ", "));
+
+			// INVOKESTATIC
+			patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
 				, "ch/usi/inf/sp/profiler/Profiler"
 				, "logNewArray"
 				, "(ILjava/lang/String;)V" ));
 
-		// insert before ins
-		if( idx == 0 ){
-			instructions.insert(patch);
-		}else{
-			AbstractInsnNode insBefore = instructions.get(idx-1);
-			instructions.insert(insBefore, patch);
-		}
+			// insert before ins
+			if( idx_instr == 0 ){
+				method_instructions.insert(patch);
+			}else{
+				AbstractInsnNode insBefore = method_instructions.get(idx_instr-1);
+				method_instructions.insert(insBefore, patch);
+			}
 
-		// QUICKFIX: move 3 positions
-		idx += 3; 
+			// QUICKFIX: move 3 positions
+			idx_instr += 3;
+		}
+		return idx_instr;
 	}
 
+	private InsnList method_instructions;
 	private void instrument(ClassNode cn) {
 		for( MethodNode mn : (List<MethodNode>)cn.methods) {
+			/*
 			final InsnList instructions = mn.instructions;
+			/*/
+			method_instructions = mn.instructions;
+			InsnList instructions = method_instructions;
+			//*/
+
+
+
 			for( int idx=0; idx<instructions.size(); ++idx){
 				final AbstractInsnNode ins = instructions.get(idx);
-
-				// INT_INSN : newarray
-				if( ins.getOpcode() == Opcodes.NEWARRAY ){
 /*
+				if( ins.getOpcode() == Opcodes.NEWARRAY ){
 					InsnList patch = new InsnList();
 
 					// DUP
@@ -123,10 +136,16 @@ public final class Transformer implements ClassFileTransformer{
 
 					// QUICKFIX: move 3 positions
 					idx += 3; 
-//*/
+
+					method_instructions = instructions;
 
 				// TYPE_INSN : anewarray
-				}else if( ins.getOpcode() == Opcodes.ANEWARRAY ){
+				}else 
+/*/
+				idx = instr_NEWARRAY(idx);
+				instructions = method_instructions;
+//*/
+				if( ins.getOpcode() == Opcodes.ANEWARRAY ){
 					InsnList patch = new InsnList();
 
 					// DUP
