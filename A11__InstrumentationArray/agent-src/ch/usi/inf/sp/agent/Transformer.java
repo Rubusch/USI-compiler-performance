@@ -216,11 +216,11 @@ public final class Transformer implements ClassFileTransformer{
 			final InsnList instructions = mn.instructions;
 			/*/
 			method_instructions = mn.instructions;
-			InsnList instructions = method_instructions;
+//			InsnList instructions = method_instructions;
 			//*/
 
-			for( int idx=0; idx<instructions.size(); ++idx){
-				final AbstractInsnNode ins = instructions.get(idx);
+			for( int idx=0; idx<method_instructions.size(); ++idx){
+//				final AbstractInsnNode ins = instructions.get(idx);
 /*
 				if( ins.getOpcode() == Opcodes.NEWARRAY ){
 					InsnList patch = new InsnList();
