@@ -131,9 +131,7 @@ public final class Transformer implements ClassFileTransformer{
 
 		// MULTIANEWARRAY_INSN : multianewarray
 		if( ins.getOpcode() == Opcodes.MULTIANEWARRAY ){
-
 			InsnList patch = new InsnList();
-
 			String dimensions = String.valueOf( ((MultiANewArrayInsnNode) ins).dims );
 
 			for( int idx_count=0; idx_count<Integer.valueOf(dimensions); ++idx_count){
@@ -199,7 +197,6 @@ public final class Transformer implements ClassFileTransformer{
 				instr_MULTIANEWARRAY(ins);
 
 			} // for instructions
-
 			DEBUG_bytecode_method(mn); // XXX
 		} // for methods
 		DEBUG_die(); // XXX
@@ -212,6 +209,31 @@ public final class Transformer implements ClassFileTransformer{
 		System.out.println("*************************************************");
 	}
 
+	private void DEBUG_opstack(final AbstractInsnNode ins){
+// TODO test
+		InsnList patch = new InsnList();
+
+		// DUP
+		patch.add( new InsnNode( Opcodes.DUP )); // size
+
+		// LDC
+//		String type = String.valueOf(Printer.TYPES[((IntInsnNode) ins).operand]);
+//		patch.add( new LdcInsnNode( "NEWARRAY, [" + type + ", "));
+
+		// INVOKESTATIC
+		patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
+			, "ch/usi/inf/sp/profiler/Profiler"
+			, "DEBUG_opstack"
+			, "(I)V" ));
+
+		// insert before ins
+		AbstractInsnNode insBefore = ins.getPrevious();
+		if(null == insBefore ){
+			method_instructions.insert(patch);
+		}else{
+			method_instructions.insert(insBefore, patch);
+		}
+	}
 
 	private static void DEBUG_die(){
 		System.exit(0);
