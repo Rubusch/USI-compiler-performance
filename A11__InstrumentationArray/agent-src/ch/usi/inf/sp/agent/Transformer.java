@@ -143,6 +143,37 @@ public final class Transformer implements ClassFileTransformer{
 	}
 
 
+//	for( int idx_count=0; idx_count<Integer.valueOf(dimensions); ++idx_count){
+		// ISTORE
+//		patch.add( new VarInsnNode( Opcodes.ISTORE )); // dimension count
+//mn.maxlocalvars
+		// ILOAD
+//TODO pass array of dim counts as array to the function
+
+		/*
+		loop dims
+			istore
+
+		Ldc count(=dims)
+		newarray XXX
+
+		loop dims
+			DUP
+			LDC0123
+			ILOAD
+			IASTORE
+
+		//ldc - nice to have
+
+		Invokestatic
+		iload (back to stack f multianewarray)
+		//*/
+
+		// ILOAD
+//		patch.add( new InsnNode( Opcodes.ILOAD )); // 2. duplicate
+
+//TODO how to adjust the signature of logMultiANewarray to the number of dimensions, do I need to set up an array?
+//	}
 	private void instr_MULTIANEWARRAY(final AbstractInsnNode ins){
 
 		// MULTIANEWARRAY_INSN : multianewarray
@@ -151,49 +182,18 @@ public final class Transformer implements ClassFileTransformer{
 
 			String dimensions = String.valueOf( ((MultiANewArrayInsnNode) ins).dims );
 
+/*
 			for( int idx_count=0; idx_count<Integer.valueOf(dimensions); ++idx_count){
 				// ISTORE <count idx by dimension>
 				patch.add(new VarInsnNode( Opcodes.ISTORE, idx_count)); // TODO check
 			}
-
-//			for( int idx_count=0; idx_count<Integer.valueOf(dimensions); ++idx_count){
-				// ISTORE
-//				patch.add( new VarInsnNode( Opcodes.ISTORE )); // dimension count
-//mn.maxlocalvars
-				// ILOAD
-//TODO pass array of dim counts as array to the function
-
-				/*
-				loop dims
-					istore
-
-				Ldc count(=dims)
-				newarray XXX
-
-				loop dims
-					DUP
-					LDC0123
-					ILOAD
-					IASTORE
-
-				//ldc - nice to have
-
-				Invokestatic
-				iload (back to stack f multianewarray)
-				//*/
-
-				// ILOAD
-//				patch.add( new InsnNode( Opcodes.ILOAD )); // 2. duplicate
-
-//TODO how to adjust the signature of logMultiANewarray to the number of dimensions, do I need to set up an array?
-//			}
+//*/
 
 			// LDC - 1. arg: dimensions / String
 			patch.add( new LdcInsnNode( dimensions ));
 
-			// NEWARRAY
-// TODO here or after the declaration of elements?
-//			patch.add( new IntInsnNode( Opcodes.NEWARRAY, Integer.valueOf(dimensions )));
+/*
+			// NEWARRAY - 2. arg
 			patch.add( new IntInsnNode( Opcodes.NEWARRAY, Opcodes.T_INT));
 
 			// loop dims
@@ -212,22 +212,25 @@ public final class Transformer implements ClassFileTransformer{
 				patch.add( new InsnNode( Opcodes.IASTORE ));
 			}
 	
-			// LDC - text
+			// LDC - text - 3. arg
 			String type = String.valueOf( ((MultiANewArrayInsnNode) ins).desc );
 			patch.add( new LdcInsnNode( "MULTIANEWARRAY, [" + type + ", " ));
+//*/
 
 			// INVOKESTATIC
 			patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
 				, "ch/usi/inf/sp/profiler/Profiler"
 				, "logMultiANewArray"
-//				, "(IA I Ljava/lang/String;)V" )
-				, "(Ljava/lang/String;[ILjava/lang/String;)V"
+//				, "(Ljava/lang/String;[ILjava/lang/String;)V"
+				, "(Ljava/lang/String;)V"
 				));
 
+/*
 			// ILOAD - 2. duplicate back on operand stack
 			for( int idx_count=0; idx_count<Integer.valueOf(dimensions); ++idx_count){
 				patch.add( new VarInsnNode( Opcodes.ILOAD, idx_count )); // 2. duplicate
 			}
+//*/
 
 			// insert before ins
 			AbstractInsnNode insBefore = ins.getPrevious();
