@@ -42,13 +42,13 @@ public class Profiler {
 	
 //	public static void logMultiANewArray( String dimensions, int[] sizes, String message ){
 
-	public static void logMultiANewArray( String dimensions){ // , int[] sizes, String message ){ // ok
-//	public static void logMultiANewArray( String dimensions, int[] sizes){ // , String message ){
+//	public static void logMultiANewArray( String dimensions){ // , int[] sizes, String message ){ // ok
+//	public static void logMultiANewArray( String dimensions, int[] sizes){ // , String message ){ // TODO
+	public static void logMultiANewArray( String dimensions, String message ){
 		for( int idx=0; idx<Integer.valueOf(dimensions); ++idx){
 			System.out.print("XXX, ");
 		}
 		System.out.println("");
-
 
 		System.out.println("DEBUG: MULTIANEWARRAY called!!!");
 	}

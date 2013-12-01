@@ -192,10 +192,10 @@ public final class Transformer implements ClassFileTransformer{
 			// LDC - 1. arg: dimensions / String
 			patch.add( new LdcInsnNode( dimensions ));
 
-/*
+
 			// NEWARRAY - 2. arg
 			patch.add( new IntInsnNode( Opcodes.NEWARRAY, Opcodes.T_INT));
-
+/*
 			// loop dims
 			for( int idx_count=0; idx_count<Integer.valueOf(dimensions); ++idx_count){
 				// DUP
@@ -222,7 +222,8 @@ public final class Transformer implements ClassFileTransformer{
 				, "ch/usi/inf/sp/profiler/Profiler"
 				, "logMultiANewArray"
 //				, "(Ljava/lang/String;[ILjava/lang/String;)V"
-				, "(Ljava/lang/String;)V"
+//				, "(Ljava/lang/String;)V" // 1 arg
+				, "(Ljava/lang/String;Ljava/lang/String;)V" // 2 args
 				));
 
 /*
