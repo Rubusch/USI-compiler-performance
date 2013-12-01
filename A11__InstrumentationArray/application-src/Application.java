@@ -46,6 +46,10 @@ public class Application {
 	}
 
 /*/
+//	public static void func(int [] arg0, String arg1, String arg2){
+//		;
+//	}
+
 	// assignment test case
 	public static void main( final String[] args){
 		for( int i=1; i<2; ++i){
@@ -54,6 +58,10 @@ public class Application {
 			final int[][][] mis = new int[i * 10][i * 10][i];
 			final Object[][] mos = new Object[i * 10][i * 10];
 		}
+
+//		int []arr = {1,2,3};
+//		func( arr, "10", "foo");
+
 		System.out.println("READY.");
 	}
 //*/

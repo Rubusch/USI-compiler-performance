@@ -90,10 +90,10 @@ public final class Transformer implements ClassFileTransformer{
 		if( ins.getOpcode() == Opcodes.NEWARRAY ){
 			InsnList patch = new InsnList();
 
-			// DUP
+			// DUP - 1. arg: int
 			patch.add( new InsnNode( Opcodes.DUP )); // size
 
-			// LDC
+			// LDC - 2. arg: string
 			String type = String.valueOf(Printer.TYPES[((IntInsnNode) ins).operand]);
 			patch.add( new LdcInsnNode( "NEWARRAY, [" + type + ", "));
 
@@ -119,10 +119,10 @@ public final class Transformer implements ClassFileTransformer{
 		if( ins.getOpcode() == Opcodes.ANEWARRAY ){
 			InsnList patch = new InsnList();
 
-			// DUP
-			patch.add( new InsnNode( Opcodes.DUP )); // size
+			// DUP - 1. arg: int
+			patch.add( new InsnNode( Opcodes.DUP ));
 
-			// LDC
+			// LDC - 2. arg: string
 			String type = String.valueOf(((TypeInsnNode)ins).desc);
 			patch.add( new LdcInsnNode( "ANEWARRAY, [" + type + ", "));
 
@@ -131,7 +131,6 @@ public final class Transformer implements ClassFileTransformer{
 					, "ch/usi/inf/sp/profiler/Profiler"
 					, "logANewArray"
 					, "(ILjava/lang/String;)V" ));
-
 
 			// insert before ins
 			AbstractInsnNode insBefore = ins.getPrevious();
@@ -153,6 +152,7 @@ public final class Transformer implements ClassFileTransformer{
 			String dimensions = String.valueOf( ((MultiANewArrayInsnNode) ins).dims );
 
 			for( int idx_count=0; idx_count<Integer.valueOf(dimensions); ++idx_count){
+				// ISTORE <count idx by dimension>
 				patch.add(new VarInsnNode( Opcodes.ISTORE, idx_count)); // TODO check
 			}
 
@@ -162,6 +162,8 @@ public final class Transformer implements ClassFileTransformer{
 //mn.maxlocalvars
 				// ILOAD
 //TODO pass array of dim counts as array to the function
+
+
 				/*
 				loop dims
 					istore
@@ -187,18 +189,46 @@ public final class Transformer implements ClassFileTransformer{
 //TODO how to adjust the signature of logMultiANewarray to the number of dimensions, do I need to set up an array?
 //			}
 
+			// LDC - dimensions
+			patch.add( new LdcInsnNode( dimensions ));
+
+			// NEWARRAY
+// TODO here or after the declaration of elements?
+//			patch.add( new IntInsnNode( Opcodes.NEWARRAY, Integer.valueOf(dimensions )));
+			patch.add( new IntInsnNode( Opcodes.NEWARRAY, Opcodes.T_INT));
+
+			// loop dims
+			for( int idx_count=0; idx_count<Integer.valueOf(dimensions); ++idx_count){
+				// DUP
+				patch.add( new InsnNode( Opcodes.DUP )); // size
+
+				// LDC <dimension count : int>
+				patch.add( new LdcInsnNode( idx_count )); // string to int // TODO
+
+				// ILOAD
+				patch.add( new VarInsnNode( Opcodes.ILOAD, idx_count )); 
+
+				// IASTORE - create array element
+				// needs: array, index, value on the operand stack
+				patch.add( new InsnNode( Opcodes.IASTORE ));
+			}
+	
 			// LDC - text
 			String type = String.valueOf( ((MultiANewArrayInsnNode) ins).desc );
 			patch.add( new LdcInsnNode( "MULTIANEWARRAY, [" + type + ", " ));
-
-			// LDC - dimensions
-			patch.add( new LdcInsnNode( dimensions ));
 
 			// INVOKESTATIC
 			patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
 				, "ch/usi/inf/sp/profiler/Profiler"
 				, "logMultiANewArray"
-				, "(ILjava/lang/String;)V" ));
+//				, "(IA I Ljava/lang/String;)V" )
+				, "([ILjava/lang/String;Ljava/lang/String;)V"
+				));
+
+			// ILOAD - 2. duplicate back on operand stack
+			for( int idx_count=0; idx_count<Integer.valueOf(dimensions); ++idx_count){
+				patch.add( new VarInsnNode( Opcodes.ILOAD, idx_count )); // 2. duplicate
+			}
 
 			// insert before ins
 			AbstractInsnNode insBefore = ins.getPrevious();
