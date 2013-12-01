@@ -92,9 +92,7 @@ public final class Transformer implements ClassFileTransformer{
 	}
 
 
-	private int instr_ANEWARRAY( int idx_instr){
-		final AbstractInsnNode ins = method_instructions.get(idx_instr);
-
+	private void instr_ANEWARRAY( final AbstractInsnNode ins){
 		// TYPE_INSN : anewarray
 		if( ins.getOpcode() == Opcodes.ANEWARRAY ){
 			InsnList patch = new InsnList();
@@ -114,19 +112,13 @@ public final class Transformer implements ClassFileTransformer{
 
 
 			// insert before ins
-			if( idx_instr == 0 ){
+			AbstractInsnNode insBefore = ins.getPrevious();
+			if(null==insBefore){
 				method_instructions.insert(patch);
 			}else{
-				AbstractInsnNode insBefore = method_instructions.get(idx_instr-1);
 				method_instructions.insert(insBefore, patch);
 			}
-
-			// QUICKFIX: move 3 positions
-			idx_instr += 3; 
-
 		}
-
-		return idx_instr;
 	}
 
 
@@ -214,10 +206,9 @@ public final class Transformer implements ClassFileTransformer{
 //			for( int idx=0; idx<method_instructions.size(); ++idx){
 			for( AbstractInsnNode ins = method_instructions.getFirst(); ins != null; ins = ins.getNext() ){
 
-//				idx = instr_NEWARRAY(idx);
 				instr_NEWARRAY(ins);
 
-//				idx = instr_ANEWARRAY(idx);
+				instr_ANEWARRAY(ins);
 
 //				idx = instr_MULTIANEWARRAY(idx);
 			} // for instructions
