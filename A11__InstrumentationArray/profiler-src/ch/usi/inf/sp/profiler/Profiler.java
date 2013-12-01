@@ -45,8 +45,11 @@ public class Profiler {
 //	public static void logMultiANewArray( String dimensions){ // , int[] sizes, String message ){ // ok
 //	public static void logMultiANewArray( String dimensions, int[] sizes){ // , String message ){ // TODO
 	public static void logMultiANewArray( String dimensions, String message ){
+		System.out.print(message);
 		for( int idx=0; idx<Integer.valueOf(dimensions); ++idx){
-			System.out.print("XXX, ");
+// TODO read out array sizes values
+//			System.out.print( "," + String.valueOf(sizes[idx]) );
+			System.out.print(", XXX");
 		}
 		System.out.println("");
 

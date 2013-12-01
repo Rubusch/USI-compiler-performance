@@ -192,10 +192,10 @@ public final class Transformer implements ClassFileTransformer{
 			// LDC - 1. arg: dimensions / String
 			patch.add( new LdcInsnNode( dimensions ));
 
-
+/*
 			// NEWARRAY - 2. arg
 			patch.add( new IntInsnNode( Opcodes.NEWARRAY, Opcodes.T_INT));
-/*
+
 			// loop dims
 			for( int idx_count=0; idx_count<Integer.valueOf(dimensions); ++idx_count){
 				// DUP
@@ -211,11 +211,14 @@ public final class Transformer implements ClassFileTransformer{
 				// needs: array, index, value on the operand stack
 				patch.add( new InsnNode( Opcodes.IASTORE ));
 			}
-	
+//*/
+//*
 			// LDC - text - 3. arg
 			String type = String.valueOf( ((MultiANewArrayInsnNode) ins).desc );
 			patch.add( new LdcInsnNode( "MULTIANEWARRAY, [" + type + ", " ));
 //*/
+
+
 
 			// INVOKESTATIC
 			patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
