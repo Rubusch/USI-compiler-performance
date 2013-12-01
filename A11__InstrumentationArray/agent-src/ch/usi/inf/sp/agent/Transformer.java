@@ -163,7 +163,6 @@ public final class Transformer implements ClassFileTransformer{
 				// ILOAD
 //TODO pass array of dim counts as array to the function
 
-
 				/*
 				loop dims
 					istore
@@ -189,7 +188,7 @@ public final class Transformer implements ClassFileTransformer{
 //TODO how to adjust the signature of logMultiANewarray to the number of dimensions, do I need to set up an array?
 //			}
 
-			// LDC - dimensions
+			// LDC - 1. arg: dimensions / String
 			patch.add( new LdcInsnNode( dimensions ));
 
 			// NEWARRAY
@@ -222,7 +221,7 @@ public final class Transformer implements ClassFileTransformer{
 				, "ch/usi/inf/sp/profiler/Profiler"
 				, "logMultiANewArray"
 //				, "(IA I Ljava/lang/String;)V" )
-				, "([ILjava/lang/String;Ljava/lang/String;)V"
+				, "(Ljava/lang/String;[ILjava/lang/String;)V"
 				));
 
 			// ILOAD - 2. duplicate back on operand stack
@@ -238,7 +237,7 @@ public final class Transformer implements ClassFileTransformer{
 				method_instructions.insert(insBefore, patch);
 			}
 
-//*
+/*
 			System.out.println("*************************************************");
 			final InsnList instructions = method_instructions;
 			for (int i=0; i<instructions.size(); i++) {
