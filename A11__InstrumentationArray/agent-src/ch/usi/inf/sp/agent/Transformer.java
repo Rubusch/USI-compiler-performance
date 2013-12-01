@@ -53,22 +53,39 @@ public final class Transformer implements ClassFileTransformer{
 	}
 
 
-
 	private byte[] instrument(byte[] bytes) {
 		ClassReader cr = new ClassReader( bytes );
 		ClassNode cn = new ClassNode();
 		cr.accept( cn, ClassReader.SKIP_FRAMES);
-
 		instrument( cn );
-
 		final ClassWriter cw = new ClassWriter( ClassWriter.COMPUTE_FRAMES );
 		cn.accept( cw );
 		return cw.toByteArray();
 	}
 
 
+	private InsnList method_instructions;
+	private void instrument(ClassNode cn) {
+		for( MethodNode mn : (List<MethodNode>)cn.methods) {
+			method_instructions = mn.instructions;
+
+			for( AbstractInsnNode ins = method_instructions.getFirst(); ins != null; ins = ins.getNext() ){
+
+				instr_NEWARRAY(ins);
+
+				instr_ANEWARRAY(ins);
+
+				instr_MULTIANEWARRAY(ins);
+
+			} // for instructions
+//			DEBUG_bytecode_method(mn); // XXX
+		} // for methods
+//		DEBUG_die(); // XXX
+	}
+
 
 	private void instr_NEWARRAY( final AbstractInsnNode ins){
+
 		// INT_INSN : newarray
 		if( ins.getOpcode() == Opcodes.NEWARRAY ){
 			InsnList patch = new InsnList();
@@ -132,9 +149,14 @@ public final class Transformer implements ClassFileTransformer{
 		// MULTIANEWARRAY_INSN : multianewarray
 		if( ins.getOpcode() == Opcodes.MULTIANEWARRAY ){
 			InsnList patch = new InsnList();
+
 			String dimensions = String.valueOf( ((MultiANewArrayInsnNode) ins).dims );
 
 			for( int idx_count=0; idx_count<Integer.valueOf(dimensions); ++idx_count){
+				patch.add(new VarInsnNode( Opcodes.ISTORE, idx_count)); // TODO check
+			}
+
+//			for( int idx_count=0; idx_count<Integer.valueOf(dimensions); ++idx_count){
 				// ISTORE
 //				patch.add( new VarInsnNode( Opcodes.ISTORE )); // dimension count
 //mn.maxlocalvars
@@ -160,10 +182,10 @@ public final class Transformer implements ClassFileTransformer{
 				//*/
 
 				// ILOAD
-				patch.add( new InsnNode( Opcodes.ILOAD )); // 2. duplicate
+//				patch.add( new InsnNode( Opcodes.ILOAD )); // 2. duplicate
 
 //TODO how to adjust the signature of logMultiANewarray to the number of dimensions, do I need to set up an array?
-			}
+//			}
 
 			// LDC - text
 			String type = String.valueOf( ((MultiANewArrayInsnNode) ins).desc );
@@ -178,33 +200,34 @@ public final class Transformer implements ClassFileTransformer{
 				, "logMultiANewArray"
 				, "(ILjava/lang/String;)V" ));
 
+			// insert before ins
+			AbstractInsnNode insBefore = ins.getPrevious();
+			if(null==insBefore){
+				method_instructions.insert(patch);
+			}else{
+				method_instructions.insert(insBefore, patch);
+			}
+
+//*
+			System.out.println("*************************************************");
+			final InsnList instructions = method_instructions;
+			for (int i=0; i<instructions.size(); i++) {
+				final AbstractInsnNode instruction = instructions.get(i);
+				disassembleInstruction(instruction, i, instructions);
+			}
+			System.out.println("*************************************************");
+//*/
 		}
 	}
 
 
-	private InsnList method_instructions;
-	private void instrument(ClassNode cn) {
-		for( MethodNode mn : (List<MethodNode>)cn.methods) {
-			method_instructions = mn.instructions;
-
-//			for( int idx=0; idx<method_instructions.size(); ++idx){
-			for( AbstractInsnNode ins = method_instructions.getFirst(); ins != null; ins = ins.getNext() ){
-
-				instr_NEWARRAY(ins);
-
-				instr_ANEWARRAY(ins);
-
-				instr_MULTIANEWARRAY(ins);
-
-			} // for instructions
-			DEBUG_bytecode_method(mn); // XXX
-		} // for methods
-		DEBUG_die(); // XXX
-	}
-
-
 	private void DEBUG_bytecode_method(final MethodNode method){
+//	private void DEBUG_bytecode_method(){
 		System.out.println("*************************************************");
+/*
+		MethodNode method = new MethodNode();
+		method.instructions = method_instructions;
+*/
 		disassembleMethod(method);
 		System.out.println("*************************************************");
 	}
@@ -247,7 +270,7 @@ public final class Transformer implements ClassFileTransformer{
 	 * 
 	 * @author Matthias.Hauswirth@usi.ch
 	 */
-	public void disassembleMethod(final MethodNode method) {
+	public static void disassembleMethod(final MethodNode method) {
 		System.out.println("  Method: "+method.name+method.desc);
 		// get the list of all instructions in that method
 		final InsnList instructions = method.instructions;
@@ -265,10 +288,10 @@ public final class Transformer implements ClassFileTransformer{
 	 * shows the list of all opcodes that are represented as instructions of type IntInsnNode.
 	 * That list e.g. includes the BIPUSH opcode.
 	 */
-	public void disassembleInstruction(final AbstractInsnNode instruction, final int i, final InsnList instructions) {
+	public static void disassembleInstruction(final AbstractInsnNode instruction, final int num, final InsnList instructions) {
 		final int opcode = instruction.getOpcode();
 		final String mnemonic = opcode==-1?"":Printer.OPCODES[instruction.getOpcode()];
-		System.out.print(i+":\t"+mnemonic+" ");
+		System.out.print(num+":\t"+mnemonic+" ");
 		// There are different subclasses of AbstractInsnNode.
 		// AbstractInsnNode.getType() represents the subclass as an int.
 		// Note:
@@ -332,7 +355,7 @@ public final class Transformer implements ClassFileTransformer{
 		case AbstractInsnNode.IINC_INSN:
 			// Opcodes: IINC.
 			System.out.print(((IincInsnNode)instruction).var);
-			System.out.println(" ");
+			System.out.print(" ");
 			System.out.print(((IincInsnNode)instruction).incr);
 			break;
 		case AbstractInsnNode.TYPE_INSN:
