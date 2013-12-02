@@ -43,16 +43,18 @@ public class Profiler {
 //	public static void logMultiANewArray( String dimensions, int[] sizes, String message ){
 
 //	public static void logMultiANewArray( String dimensions){ // , int[] sizes, String message ){ // ok
-//	public static void logMultiANewArray( String dimensions, int[] sizes){ // , String message ){ // TODO
-	public static void logMultiANewArray( String dimensions, String message ){
-		System.out.print(message);
-		for( int idx=0; idx<Integer.valueOf(dimensions); ++idx){
+//	public static void logMultiANewArray( int dimensions){ // , int[] sizes, String message ){ // ok
+	public static void logMultiANewArray( int[] sizes){ // FIXME
+//	public static void logMultiANewArray( String dimensions, String message ){ // ok
+/*
+//		System.out.print(message);
+		for( int idx=0; idx<dimensions; ++idx){
 // TODO read out array sizes values
 //			System.out.print( "," + String.valueOf(sizes[idx]) );
 			System.out.print(", XXX");
 		}
 		System.out.println("");
-
+//*/
 		System.out.println("DEBUG: MULTIANEWARRAY called!!!");
 	}
 

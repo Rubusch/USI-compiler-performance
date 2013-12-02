@@ -180,29 +180,35 @@ public final class Transformer implements ClassFileTransformer{
 		if( ins.getOpcode() == Opcodes.MULTIANEWARRAY ){
 			InsnList patch = new InsnList();
 
-			String dimensions = String.valueOf( ((MultiANewArrayInsnNode) ins).dims );
-
-/*
-			for( int idx_count=0; idx_count<Integer.valueOf(dimensions); ++idx_count){
-				// ISTORE <count idx by dimension>
+			int dimensions = ((MultiANewArrayInsnNode) ins).dims;
+//*
+			// ISTORE <count idx by dimension>
+			for( int idx_count=0; idx_count<dimensions; ++idx_count){
 				patch.add(new VarInsnNode( Opcodes.ISTORE, idx_count)); // TODO check
+
+// TODO test
+//				patch.add( new VarInsnNode( Opcodes.ILOAD, idx_count )); // 2. duplicate
 			}
 //*/
 
+/*
 			// LDC - 1. arg: dimensions / String
 			patch.add( new LdcInsnNode( dimensions ));
+//*/
 
-/*
+//*
 			// NEWARRAY - 2. arg
+//			patch.add( new InsnNode( Opcodes.ICONST_0)); // FIXME
 			patch.add( new IntInsnNode( Opcodes.NEWARRAY, Opcodes.T_INT));
-
+//*
 			// loop dims
-			for( int idx_count=0; idx_count<Integer.valueOf(dimensions); ++idx_count){
+			for( int idx_count=0; idx_count<dimensions; ++idx_count){
 				// DUP
 				patch.add( new InsnNode( Opcodes.DUP )); // size
 
 				// LDC <dimension count : int>
-				patch.add( new LdcInsnNode( idx_count )); // string to int // TODO
+			patch.add( new LdcInsnNode( idx_count )); // string to int // TODO check
+//				patch.add( new InsnNode( Opcodes.ICONST_0)); // TODO
 
 				// ILOAD
 				patch.add( new VarInsnNode( Opcodes.ILOAD, idx_count )); 
@@ -212,13 +218,11 @@ public final class Transformer implements ClassFileTransformer{
 				patch.add( new InsnNode( Opcodes.IASTORE ));
 			}
 //*/
-//*
+/*
 			// LDC - text - 3. arg
 			String type = String.valueOf( ((MultiANewArrayInsnNode) ins).desc );
 			patch.add( new LdcInsnNode( "MULTIANEWARRAY, [" + type + ", " ));
 //*/
-
-
 
 			// INVOKESTATIC
 			patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
@@ -226,12 +230,14 @@ public final class Transformer implements ClassFileTransformer{
 				, "logMultiANewArray"
 //				, "(Ljava/lang/String;[ILjava/lang/String;)V"
 //				, "(Ljava/lang/String;)V" // 1 arg
-				, "(Ljava/lang/String;Ljava/lang/String;)V" // 2 args
+//				, "(I)V" // 1 arg
+//				, "(Ljava/lang/String;Ljava/lang/String;)V" // 2 args
+				, "([I)V" // 1 arg
 				));
 
-/*
+//*
 			// ILOAD - 2. duplicate back on operand stack
-			for( int idx_count=0; idx_count<Integer.valueOf(dimensions); ++idx_count){
+			for( int idx_count=0; idx_count<dimensions; ++idx_count){
 				patch.add( new VarInsnNode( Opcodes.ILOAD, idx_count )); // 2. duplicate
 			}
 //*/
@@ -244,7 +250,7 @@ public final class Transformer implements ClassFileTransformer{
 				method_instructions.insert(insBefore, patch);
 			}
 
-/*
+//*
 			System.out.println("*************************************************");
 			final InsnList instructions = method_instructions;
 			for (int i=0; i<instructions.size(); i++) {

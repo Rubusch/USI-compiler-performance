@@ -46,7 +46,7 @@ public class Application {
 	}
 
 /*/
-//	public static void func(int [] arg0, String arg1, String arg2){
+//	public static void func(int [] arg0 ){ //, String arg1, String arg2){
 //		;
 //	}
 
@@ -59,8 +59,8 @@ public class Application {
 			final Object[][] mos = new Object[i * 10][i * 10];
 		}
 
-//		int []arr = {1,2,3};
-//		func( arr, "10", "foo");
+//		int []arr = {};
+//		func( arr ); // , "10", "foo");
 
 		System.out.println("READY.");
 	}
