@@ -241,7 +241,6 @@ public final class Transformer implements ClassFileTransformer{
 				patch.add( new InsnNode( Opcodes.IASTORE ));
 			}
 
-
 			// LDC - text - 3. arg
 			String type = String.valueOf( ((MultiANewArrayInsnNode) ins).desc );
 // TODO type to be resolved
@@ -258,11 +257,12 @@ public final class Transformer implements ClassFileTransformer{
 //				, "(Ljava/lang/String;)V" /*					String */
 //				, "([I)V" /*									int[] */
 //				, "(I[I)V" /*									int, int[] */
-				, "(I[ILjava/lang/String;)V" // int, int[], String
+				, "(I[ILjava/lang/String;)V" /*					int, int[], String */
 					));
 
 			// ILOAD - 2. duplicate back on operand stack, to have it restored for MULTIANEWARRAY again
 			for( int idx_count=0; idx_count<dimensions; ++idx_count){
+// FIXME, still something's wrong with restoring the MULTIANEWARRAY instruction
 				patch.add( new VarInsnNode( Opcodes.ILOAD, idx_count )); // 2. duplicate
 			}
 
