@@ -198,6 +198,8 @@ public final class Transformer implements ClassFileTransformer{
 
 //*
 			// NEWARRAY - 2. arg
+			patch.add( new LdcInsnNode( dimensions )); // TODO check
+
 //			patch.add( new InsnNode( Opcodes.ICONST_0)); // FIXME
 			patch.add( new IntInsnNode( Opcodes.NEWARRAY, Opcodes.T_INT));
 //*
