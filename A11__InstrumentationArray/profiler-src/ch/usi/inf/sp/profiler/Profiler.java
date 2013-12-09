@@ -29,6 +29,9 @@ public class Profiler {
 	 * 3) func( int count, String arg )
 	 * 
 	 */
+
+	// 1/3 log function: declare a function header here
+
 	public static void logNewArray( int size, String message ){
 		System.out.println(message + String.valueOf( size ));
 	}
@@ -37,29 +40,13 @@ public class Profiler {
 		System.out.println(message + String.valueOf( size ));
 	}
 
-	// 1/3 log function: declare a function header here
-
-//	public static void logMultiANewArray( int[] sizes, String message, String dimensions ){
-//	public static void logMultiANewArray( int[] sizes, String dimensions, String message ){
-	
-//	public static void logMultiANewArray( String dimensions, int[] sizes, String message ){
-
-//	public static void logMultiANewArray( String dimensions){ // , int[] sizes, String message ){ // ok
-//	public static void logMultiANewArray( int dimensions){ // , int[] sizes, String message ){ // ok
-//	public static void logMultiANewArray( int[] sizes){ // ok
-//	public static void logMultiANewArray(  int dimensions, int[] sizes){ // ok
-//	public static void logMultiANewArray( String dimensions, String message ){ // ok
 	public static void logMultiANewArray( int dimensions, int[] sizes, String message ){ // FIXME
-//*
 		System.out.print(message);
 		for( int idx=0; idx<dimensions; ++idx){
-// TODO read out array sizes values
 			if( 0 != idx) System.out.print(", ");
 			System.out.print( String.valueOf(sizes[idx]) );
 		}
 		System.out.println("");
-//*/
-		System.out.println("DEBUG: MULTIANEWARRAY called!!!");
 	}
 
 	/*

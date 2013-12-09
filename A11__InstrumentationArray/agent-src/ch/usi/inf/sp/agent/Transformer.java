@@ -78,12 +78,24 @@ public final class Transformer implements ClassFileTransformer{
 				instr_MULTIANEWARRAY(ins);
 
 			} // for instructions
-//			DEBUG_bytecode_method(mn); // XXX
 		} // for methods
-//		DEBUG_die(); // XXX
 	}
 
 
+	/**
+		for logging the NEWARRAY instruction, a logging method by the following
+		signature will be called:
+
+		public static void logNewArray( int size, String message )
+
+		thus, the following bytecode instructions have to be injected before
+		NEWARRAY:
+
+		11:	DUP 
+		12:	LDC NEWARRAY, [T_LONG, 
+		13:	INVOKESTATIC ch/usi/inf/sp/profiler/Profiler.logNewArray (ILjava/lang/String;)V
+		14:	NEWARRAY T_LONG
+	 */
 	private void instr_NEWARRAY( final AbstractInsnNode ins){
 
 		// INT_INSN : newarray
@@ -114,6 +126,20 @@ public final class Transformer implements ClassFileTransformer{
 	}
 
 
+	/**
+		for logging the ANEWARRAY instruction the logging function has the
+		following signature:
+
+		public static void logANewArray( int size, String message )
+
+		the following byte code has to be injected before the ANEWARRAY
+		instruction:
+
+		21:	DUP 
+		22:	LDC ANEWARRAY, [java/lang/Object, 
+		23:	INVOKESTATIC ch/usi/inf/sp/profiler/Profiler.logANewArray (ILjava/lang/String;)V
+		24:	ANEWARRAY java/lang/Object
+	 */
 	private void instr_ANEWARRAY( final AbstractInsnNode ins){
 		// TYPE_INSN : anewarray
 		if( ins.getOpcode() == Opcodes.ANEWARRAY ){
@@ -142,38 +168,39 @@ public final class Transformer implements ClassFileTransformer{
 		}
 	}
 
+	/**
+		for logging the MULTIANEWARRAY, we want to call a function with the
+		following signature:
 
-//	for( int idx_count=0; idx_count<Integer.valueOf(dimensions); ++idx_count){
-		// ISTORE
-//		patch.add( new VarInsnNode( Opcodes.ISTORE )); // dimension count
-//mn.maxlocalvars
-		// ILOAD
-//TODO pass array of dim counts as array to the function
+		public static void logMultiANewArray( int dimensions, int[] sizes, String message )
+	
+		the following instructions have to be injected before MULTIANEWARRAY:
 
-		/*
-		loop dims
-			istore
-
-		Ldc count(=dims)
-		newarray XXX
-
-		loop dims
-			DUP
-			LDC0123
-			ILOAD
-			IASTORE
-
-		//ldc - nice to have
-
-		Invokestatic
-		iload (back to stack f multianewarray)
-		//*/
-
-		// ILOAD
-//		patch.add( new InsnNode( Opcodes.ILOAD )); // 2. duplicate
-
-//TODO how to adjust the signature of logMultiANewarray to the number of dimensions, do I need to set up an array?
-//	}
+		35:	ISTORE 0
+		36:	ISTORE 1
+		37:	ISTORE 2
+		38:	LDC 3
+		39:	LDC 3
+		40:	NEWARRAY T_INT
+		41:	DUP 
+		42:	LDC 0
+		43:	ILOAD 0
+		44:	IASTORE 
+		45:	DUP 
+		46:	LDC 1
+		47:	ILOAD 1
+		48:	IASTORE 
+		49:	DUP 
+		50:	LDC 2
+		51:	ILOAD 2
+		52:	IASTORE 
+		53:	LDC MULTIANEWARRAY, [[[[I, 
+		54:	INVOKESTATIC ch/usi/inf/sp/profiler/Profiler.logMultiANewArray (I[ILjava/lang/String;)V
+		55:	ILOAD 0
+		56:	ILOAD 1
+		57:	ILOAD 2
+		58:	MULTIANEWARRAY [[[I 3
+	 */
 	private void instr_MULTIANEWARRAY(final AbstractInsnNode ins){
 
 		// MULTIANEWARRAY_INSN : multianewarray
@@ -181,36 +208,30 @@ public final class Transformer implements ClassFileTransformer{
 			InsnList patch = new InsnList();
 
 			int dimensions = ((MultiANewArrayInsnNode) ins).dims;
-//*
+
 			// ISTORE <count idx by dimension>
 			for( int idx_count=0; idx_count<dimensions; ++idx_count){
-				patch.add(new VarInsnNode( Opcodes.ISTORE, idx_count)); // TODO check
-
-// TODO test
-//				patch.add( new VarInsnNode( Opcodes.ILOAD, idx_count )); // 2. duplicate
+				patch.add(new VarInsnNode( Opcodes.ISTORE, idx_count));
 			}
-//*/
 
 			/* 2/3 log function: set up the operand stack by means of byte code instructions */
-//*
+
 			// LDC - 1. arg: dimensions / String
 			patch.add( new LdcInsnNode( dimensions ));
-//*/
 
-//*
-			// NEWARRAY - 2. arg
+
+			// NEWARRAY - 2. arg: the int array of the dimension counts of the observed MULTIANEWARRAY instruction
 			patch.add( new LdcInsnNode( dimensions )); // TODO check
 
 			patch.add( new IntInsnNode( Opcodes.NEWARRAY, Opcodes.T_INT));
-//*
+
 			// loop dims
 			for( int idx_count=0; idx_count<dimensions; ++idx_count){
 				// DUP
 				patch.add( new InsnNode( Opcodes.DUP )); // size
 
 				// LDC <dimension count : int>
-			patch.add( new LdcInsnNode( idx_count )); // string to int // TODO check
-//				patch.add( new InsnNode( Opcodes.ICONST_0)); // TODO
+			patch.add( new LdcInsnNode( idx_count )); // string to int
 
 				// ILOAD
 				patch.add( new VarInsnNode( Opcodes.ILOAD, idx_count )); 
@@ -240,12 +261,10 @@ public final class Transformer implements ClassFileTransformer{
 				, "(I[ILjava/lang/String;)V" // int, int[], String
 					));
 
-//*
 			// ILOAD - 2. duplicate back on operand stack, to have it restored for MULTIANEWARRAY again
 			for( int idx_count=0; idx_count<dimensions; ++idx_count){
 				patch.add( new VarInsnNode( Opcodes.ILOAD, idx_count )); // 2. duplicate
 			}
-//*/
 
 			// insert before ins
 			AbstractInsnNode insBefore = ins.getPrevious();
@@ -255,7 +274,7 @@ public final class Transformer implements ClassFileTransformer{
 				method_instructions.insert(insBefore, patch);
 			}
 
-//*
+/* //DEBUGGING OUTPUT
 			System.out.println("*************************************************");
 			final InsnList instructions = method_instructions;
 			for (int i=0; i<instructions.size(); i++) {
@@ -268,8 +287,9 @@ public final class Transformer implements ClassFileTransformer{
 	}
 
 
+	/* debugging */
+
 	private void DEBUG_bytecode_method(final MethodNode method){
-//	private void DEBUG_bytecode_method(){
 		System.out.println("*************************************************");
 /*
 		MethodNode method = new MethodNode();
@@ -280,7 +300,6 @@ public final class Transformer implements ClassFileTransformer{
 	}
 
 	private void DEBUG_opstack(final AbstractInsnNode ins){
-// TODO test
 		InsnList patch = new InsnList();
 
 		// DUP
