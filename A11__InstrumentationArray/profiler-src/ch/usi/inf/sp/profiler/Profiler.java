@@ -37,6 +37,8 @@ public class Profiler {
 		System.out.println(message + String.valueOf( size ));
 	}
 
+	// 1/3 log function: declare a function header here
+
 //	public static void logMultiANewArray( int[] sizes, String message, String dimensions ){
 //	public static void logMultiANewArray( int[] sizes, String dimensions, String message ){
 	
@@ -44,14 +46,16 @@ public class Profiler {
 
 //	public static void logMultiANewArray( String dimensions){ // , int[] sizes, String message ){ // ok
 //	public static void logMultiANewArray( int dimensions){ // , int[] sizes, String message ){ // ok
-	public static void logMultiANewArray( int[] sizes){ // FIXME
+//	public static void logMultiANewArray( int[] sizes){ // ok
+//	public static void logMultiANewArray(  int dimensions, int[] sizes){ // ok
 //	public static void logMultiANewArray( String dimensions, String message ){ // ok
-/*
-//		System.out.print(message);
+	public static void logMultiANewArray( int dimensions, int[] sizes, String message ){ // FIXME
+//*
+		System.out.print(message);
 		for( int idx=0; idx<dimensions; ++idx){
 // TODO read out array sizes values
-//			System.out.print( "," + String.valueOf(sizes[idx]) );
-			System.out.print(", XXX");
+			if( 0 != idx) System.out.print(", ");
+			System.out.print( String.valueOf(sizes[idx]) );
 		}
 		System.out.println("");
 //*/

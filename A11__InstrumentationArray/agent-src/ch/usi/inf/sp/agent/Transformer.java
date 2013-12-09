@@ -191,7 +191,8 @@ public final class Transformer implements ClassFileTransformer{
 			}
 //*/
 
-/*
+			/* 2/3 log function: set up the operand stack by means of byte code instructions */
+//*
 			// LDC - 1. arg: dimensions / String
 			patch.add( new LdcInsnNode( dimensions ));
 //*/
@@ -200,7 +201,6 @@ public final class Transformer implements ClassFileTransformer{
 			// NEWARRAY - 2. arg
 			patch.add( new LdcInsnNode( dimensions )); // TODO check
 
-//			patch.add( new InsnNode( Opcodes.ICONST_0)); // FIXME
 			patch.add( new IntInsnNode( Opcodes.NEWARRAY, Opcodes.T_INT));
 //*
 			// loop dims
@@ -219,26 +219,29 @@ public final class Transformer implements ClassFileTransformer{
 				// needs: array, index, value on the operand stack
 				patch.add( new InsnNode( Opcodes.IASTORE ));
 			}
-//*/
-/*
+
+
 			// LDC - text - 3. arg
 			String type = String.valueOf( ((MultiANewArrayInsnNode) ins).desc );
+// TODO type to be resolved
 			patch.add( new LdcInsnNode( "MULTIANEWARRAY, [" + type + ", " ));
-//*/
+
+
+			/* 3/3 log function: declare the expected types here */
 
 			// INVOKESTATIC
 			patch.add( new MethodInsnNode( Opcodes.INVOKESTATIC
 				, "ch/usi/inf/sp/profiler/Profiler"
 				, "logMultiANewArray"
-//				, "(Ljava/lang/String;[ILjava/lang/String;)V"
-//				, "(Ljava/lang/String;)V" // 1 arg
-//				, "(I)V" // 1 arg
-//				, "(Ljava/lang/String;Ljava/lang/String;)V" // 2 args
-				, "([I)V" // 1 arg
-				));
+//				, "(I)V" /* 									int */
+//				, "(Ljava/lang/String;)V" /*					String */
+//				, "([I)V" /*									int[] */
+//				, "(I[I)V" /*									int, int[] */
+				, "(I[ILjava/lang/String;)V" // int, int[], String
+					));
 
 //*
-			// ILOAD - 2. duplicate back on operand stack
+			// ILOAD - 2. duplicate back on operand stack, to have it restored for MULTIANEWARRAY again
 			for( int idx_count=0; idx_count<dimensions; ++idx_count){
 				patch.add( new VarInsnNode( Opcodes.ILOAD, idx_count )); // 2. duplicate
 			}
