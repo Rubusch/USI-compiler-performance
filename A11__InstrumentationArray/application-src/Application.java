@@ -50,38 +50,50 @@ public class Application {
 //	public static void func(int [] arg0 ){ //, String arg1, String arg2){
 //		;
 //	}
-
+//*/
 	// assignment test case
 	public static void main( final String[] args){
 		for( int i=1; i<=2; ++i){
 			final long[] is = new long[i * 10];
 			final Object[] os = new Object[i * 10];
-			final int[][][] mis = new int[i * 10][i * 10][i];
-			final Object[][] mos = new Object[i * 10][i * 10];
-		}
+			final int[][][] mis = new int[i * 100][i * 10][i];
+			final Object[][] mos = new Object[i * 100][i * 10];
 
-//		int []arr = {};
-//		func( arr ); // , "10", "foo");
+			// DEBUG tests
+			System.out.println("DEBUG: first dimension size of MULTIANEWARRAY: " + mis.length); // DEBUG: print out the first dimension - should be i * 100
+
+			// DEBUG initialization
+			System.out.print("DEBUG: init is...");
+			for( int cnt=0; cnt<i*10; ++cnt){
+				is[cnt] = Long.valueOf(cnt);
+			}
+			System.out.println("ok");
+
+			System.out.print("DEBUG: init os...");
+			for( int cnt=0; cnt<i*10; ++cnt){
+				os[cnt] = String.valueOf(cnt);
+			}
+			System.out.println("ok");
+
+			System.out.print("DEBUG: init mis...");
+			for (int cnt=0; cnt<i*100; ++cnt) {
+				for (int dnt=0; dnt<i*10; ++dnt) {
+					for (int ent=0; ent<i; ++ent) {
+						mis[cnt][dnt][ent] = 777;
+					}
+				}
+			}
+			System.out.println("ok");
+
+			System.out.print("DEBUG: init mos...");
+			for (int cnt=0; cnt<i*100; ++cnt) {
+				for (int dnt=0; dnt<i*10; ++dnt) {
+					mos[cnt][dnt] = String.valueOf(777);
+				}
+			}
+			System.out.println("ok");
+		}
 
 		System.out.println("READY.");
 	}
-//*/
-	public static void main(final String[] args) {
-		System.out.println("start");
-        for (int i = 1; i <= 4; i++) {
-                final long[] is = new long[i * 10];
-                final Object[] os = new Object[i * 10];
-                
-                System.out.println("before multi");
-                final int[][][] mis = new int[i * 100][i * 10][i];
-               System.out.println(mis.length); // DEBUG: print out the first dimension - should be i * 100
-// TODO try to access elements for debug
-// FIXME wrong order of dimensions, printed, and also shifted (ISTORE) back
-               
-//                final Object[][] mos = new Object[i * 10][i * 10];
-        }
-        
-        System.out.println("the end");
-}
-
 }

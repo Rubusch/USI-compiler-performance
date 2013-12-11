@@ -203,8 +203,6 @@ public final class Transformer implements ClassFileTransformer{
 	 * @param mn 
 	 */
 	private void instr_MULTIANEWARRAY(final AbstractInsnNode ins, MethodNode mn){
-		
-		
 		// MULTIANEWARRAY_INSN : multianewarray
 		if( ins.getOpcode() == Opcodes.MULTIANEWARRAY ){
 			int max = mn.maxLocals;
@@ -214,8 +212,7 @@ public final class Transformer implements ClassFileTransformer{
 			int dimensions = ((MultiANewArrayInsnNode) ins).dims;
 
 			// ISTORE <count idx by dimension>
-			for( int idx_count=0; idx_count<dimensions; ++idx_count){
-//			for( int idx_count=dimensions; idx_count>=0; --idx_count){
+			for( int idx_count=dimensions-1; idx_count>=0; --idx_count){
 				patch.add(new VarInsnNode( Opcodes.ISTORE, max+idx_count));
 			}
 
@@ -236,7 +233,7 @@ public final class Transformer implements ClassFileTransformer{
 				patch.add( new InsnNode( Opcodes.DUP )); // size
 
 				// LDC <dimension count : int>
-			patch.add( new LdcInsnNode( idx_count )); // string to int
+				patch.add( new LdcInsnNode( idx_count )); // string to int
 
 				// ILOAD
 				patch.add( new VarInsnNode( Opcodes.ILOAD, max+idx_count )); 
@@ -249,7 +246,7 @@ public final class Transformer implements ClassFileTransformer{
 			// LDC - text - 3. arg
 			String type = String.valueOf( ((MultiANewArrayInsnNode) ins).desc );
 // TODO type to be resolved
-			patch.add( new LdcInsnNode( "MULTIANEWARRAY, [" + type + ", " ));
+			patch.add( new LdcInsnNode( "MULTIANEWARRAY, " + type + ", " ));
 
 
 			/* 3/3 log function: declare the expected types here */
@@ -267,7 +264,6 @@ public final class Transformer implements ClassFileTransformer{
 
 			// ILOAD - 2. duplicate back on operand stack, to have it restored for MULTIANEWARRAY again
 			for( int idx_count=0; idx_count<dimensions; ++idx_count){
-// FIXME, still something's wrong with restoring the MULTIANEWARRAY instruction
 				patch.add( new VarInsnNode( Opcodes.ILOAD, max+idx_count )); // 2. duplicate
 			}
 
