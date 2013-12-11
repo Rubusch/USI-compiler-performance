@@ -56,9 +56,9 @@ public final class Transformer implements ClassFileTransformer{
 	private byte[] instrument(byte[] bytes) {
 		ClassReader cr = new ClassReader( bytes );
 		ClassNode cn = new ClassNode();
-		cr.accept( cn, ClassReader.SKIP_FRAMES);
+		cr.accept( cn, 0);
 		instrument( cn );
-		final ClassWriter cw = new ClassWriter( ClassWriter.COMPUTE_FRAMES );
+		final ClassWriter cw = new ClassWriter( ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS );
 		cn.accept( cw );
 		return cw.toByteArray();
 	}
@@ -75,7 +75,7 @@ public final class Transformer implements ClassFileTransformer{
 
 				instr_ANEWARRAY(ins);
 
-				instr_MULTIANEWARRAY(ins);
+				instr_MULTIANEWARRAY(ins, mn);
 
 			} // for instructions
 		} // for methods
@@ -200,28 +200,33 @@ public final class Transformer implements ClassFileTransformer{
 		56:	ILOAD 1
 		57:	ILOAD 2
 		58:	MULTIANEWARRAY [[[I 3
+	 * @param mn 
 	 */
-	private void instr_MULTIANEWARRAY(final AbstractInsnNode ins){
-
+	private void instr_MULTIANEWARRAY(final AbstractInsnNode ins, MethodNode mn){
+		
+		
 		// MULTIANEWARRAY_INSN : multianewarray
 		if( ins.getOpcode() == Opcodes.MULTIANEWARRAY ){
+			int max = mn.maxLocals;
+			
 			InsnList patch = new InsnList();
 
 			int dimensions = ((MultiANewArrayInsnNode) ins).dims;
 
 			// ISTORE <count idx by dimension>
 			for( int idx_count=0; idx_count<dimensions; ++idx_count){
-				patch.add(new VarInsnNode( Opcodes.ISTORE, idx_count));
+//			for( int idx_count=dimensions; idx_count>=0; --idx_count){
+				patch.add(new VarInsnNode( Opcodes.ISTORE, max+idx_count));
 			}
 
 			/* 2/3 log function: set up the operand stack by means of byte code instructions */
 
 			// LDC - 1. arg: dimensions / String
-			patch.add( new LdcInsnNode( dimensions ));
+			patch.add( new LdcInsnNode( dimensions )); // dimensions
 
 
 			// NEWARRAY - 2. arg: the int array of the dimension counts of the observed MULTIANEWARRAY instruction
-			patch.add( new LdcInsnNode( dimensions )); // TODO check
+			patch.add( new LdcInsnNode( dimensions )); // size of the array argument
 
 			patch.add( new IntInsnNode( Opcodes.NEWARRAY, Opcodes.T_INT));
 
@@ -234,7 +239,7 @@ public final class Transformer implements ClassFileTransformer{
 			patch.add( new LdcInsnNode( idx_count )); // string to int
 
 				// ILOAD
-				patch.add( new VarInsnNode( Opcodes.ILOAD, idx_count )); 
+				patch.add( new VarInsnNode( Opcodes.ILOAD, max+idx_count )); 
 
 				// IASTORE - create array element
 				// needs: array, index, value on the operand stack
@@ -263,7 +268,7 @@ public final class Transformer implements ClassFileTransformer{
 			// ILOAD - 2. duplicate back on operand stack, to have it restored for MULTIANEWARRAY again
 			for( int idx_count=0; idx_count<dimensions; ++idx_count){
 // FIXME, still something's wrong with restoring the MULTIANEWARRAY instruction
-				patch.add( new VarInsnNode( Opcodes.ILOAD, idx_count )); // 2. duplicate
+				patch.add( new VarInsnNode( Opcodes.ILOAD, max+idx_count )); // 2. duplicate
 			}
 
 			// insert before ins
@@ -283,8 +288,18 @@ public final class Transformer implements ClassFileTransformer{
 			}
 			System.out.println("*************************************************");
 //*/
+
+			mn.maxLocals += dimensions;
 		}
+		
 	}
+
+
+
+
+
+
+
 
 
 	/* debugging */

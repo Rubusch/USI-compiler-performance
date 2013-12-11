@@ -67,12 +67,21 @@ public class Application {
 	}
 //*/
 	public static void main(final String[] args) {
-        for (int i = 1; i <= 2; i++) {
+		System.out.println("start");
+        for (int i = 1; i <= 4; i++) {
                 final long[] is = new long[i * 10];
                 final Object[] os = new Object[i * 10];
-                final int[][][] mis = new int[i * 10][i * 10][i];
+                
+                System.out.println("before multi");
+                final int[][][] mis = new int[i * 100][i * 10][i];
+               System.out.println(mis.length); // DEBUG: print out the first dimension - should be i * 100
+// TODO try to access elements for debug
+// FIXME wrong order of dimensions, printed, and also shifted (ISTORE) back
+               
 //                final Object[][] mos = new Object[i * 10][i * 10];
         }
+        
+        System.out.println("the end");
 }
 
 }
